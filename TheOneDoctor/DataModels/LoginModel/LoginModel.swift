@@ -11,22 +11,21 @@ import ObjectMapper
 
 class LoginModel:Mappable
 {
-    var code:String?
-    var message:String?
-    var userData:LoginUserDataModel?
+    
+    var status: StatusDataModel?
+    var userData: LoginUserDataModel?
+    
     
     required init?(map: Map) {
-        
+        mapping(map: map)
     }
     
     func mapping(map: Map) {
-        code <- map["code"]
-        message <- map["message"]
-        userData <- map["userdata"]
-    }
-    
-    init() {
+        status <- map ["status"]
+        userData <- map ["user_data"]
         
     }
+    
+    
     
 }

@@ -72,7 +72,7 @@ struct AppConstants
     
     static let appGreenColor:UIColor = #colorLiteral(red: 0.537254902, green: 0.7254901961, blue: 0.2470588235, alpha: 1) // 89B93F // R-137 B-185 G-63
     
-    
+    static let appdarkGrayColor:UIColor = #colorLiteral(red: 0.2588235294, green: 0.2549019608, blue: 0.262745098, alpha: 1) //424143 - darkGray
     static let khudColour:UIColor =  UIColor(red: 100/255.0 , green: 166/255.0, blue: 35/255.0, alpha: 1) 
     static var changeViewClick:Bool = false
     

@@ -82,6 +82,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             application.registerUserNotificationSettings( pushNotificationSettings )
         }
         application.registerForRemoteNotifications()
+        
+        user_idChecking()
  
         return true
     }
@@ -120,6 +122,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             } else if let result = result {
                 print("Remote instance ID token: \(result.token)")
                 print("DCS: " + result.token)
+                UserDefaults.standard.set(result.token, forKey: "device_token")
                 
                 //                if let token = InstanceID.instanceID().token() {
                 //                    print("DCS: " + token)
@@ -172,6 +175,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 let nserror = error as NSError
                 fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
             }
+        }
+    }
+    func user_idChecking()
+    {
+        print("user_idChecking")
+        if UserDefaults.standard.value(forKey: "user_id") != nil
+        {
+            GenericMethods.navigateToDashboard()
+        }
+        else
+        {
+            let storyboard: UIStoryboard = UIStoryboard.init(name: "Main", bundle: nil)
+            let loginVC = storyboard.instantiateViewController(withIdentifier: "loginVC") as? LoginViewController
+            let appDelegate = UIApplication.shared.delegate as? AppDelegate
+            appDelegate?.window?.rootViewController = loginVC
+            appDelegate?.window?.makeKeyAndVisible()
         }
     }
     func jsonConversion(_ key: Any?) {

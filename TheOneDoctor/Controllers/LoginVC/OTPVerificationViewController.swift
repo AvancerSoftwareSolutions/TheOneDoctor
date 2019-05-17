@@ -22,13 +22,18 @@ class OTPVerificationViewController: UIViewController {
     //MARK:- Variables
     var otp = ""
     var mobileNumber = ""
+    var pinString = ""
+    let apiManager = APIManager()
+    var loginData:LoginModel?
+    var loginUserData:LoginUserDataModel?
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        pinString = otp
         
-        
+        GenericMethods.setButtonAttributes(button: verifyBtnInstance, with: "VERIFY")
         
         tf1.layer.addBorder(edge: UIRectEdge.bottom, color: UIColor.black, thickness: 1.0)
         tf2.layer.addBorder(edge: UIRectEdge.bottom, color: UIColor.black, thickness: 1.0)
@@ -55,6 +60,7 @@ class OTPVerificationViewController: UIViewController {
     }
     func pinValidationMethod()
     {
+        pinString = ""
         if GenericMethods.isStringEmpty(tf1.text) || GenericMethods.isStringEmpty(tf2.text) || GenericMethods.isStringEmpty(tf3.text) || GenericMethods.isStringEmpty(tf4.text)
         {
             GenericMethods.showAlert(alertMessage: "Please enter valid pin")
@@ -64,6 +70,7 @@ class OTPVerificationViewController: UIViewController {
         print("\(tf1.text!)\(tf2.text!)\(tf3.text!)\(tf4.text!)")
         let pin = "\(tf1.text!)\(tf2.text!)\(tf3.text!)\(tf4.text!)"
         print("pin \(pin)")
+        pinString = pin
     }
 
 
@@ -73,7 +80,81 @@ class OTPVerificationViewController: UIViewController {
         
     }
     @IBAction func verifyBtnClick(_ sender: Any) {
-        
+        if GenericMethods.isStringEmpty(self.pinString)
+        {
+            GenericMethods.showAlert(alertMessage: "Please enter valid OTP")
+        }
+        else if otp != pinString
+        {
+            GenericMethods.showAlert(alertMessage: "Incorrect OTP")
+        }
+        else
+        {
+            
+            var parameters = Dictionary<String, Any>()
+            parameters["mobile"] = mobileNumber
+            parameters["token"] = UserDefaults.standard.value(forKey: "device_token") as? String ?? ""
+            parameters["device_id"] = UIDevice.current.identifierForVendor?.uuidString
+            
+            GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
+            
+            apiManager.loginAPI(parameters: parameters) { (status, showError, response, error) in
+                
+                GenericMethods.hideLoaderMethod(view: self.view)
+                
+                if status == true {
+                    self.loginData = response
+                    if self.loginData?.status?.code == "0" {
+                        //MARK: Login Success Details
+                        UserDefaults.standard.set(self.loginData?.userData?.userId, forKey: "user_id")
+                        UserDefaults.standard.set(self.loginData?.userData?.userImg, forKey: "user_image")
+                        UserDefaults.standard.set(self.loginData?.userData?.gender, forKey: "gender")
+                        
+                        let alert = UIAlertController(title: nil, message: self.loginData?.status?.message ?? "", preferredStyle: .alert)
+                        UIApplication.shared.topMostViewController()?.present(alert, animated: true)
+                        let duration: Int = 1 // duration in seconds
+                        
+                        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Double(duration) * Double(NSEC_PER_SEC)) / Double(NSEC_PER_SEC), execute: {
+                            alert.dismiss(animated: true)
+                            // dashboardVC
+                            GenericMethods.navigateToDashboard()
+                            
+                        })
+                        
+                    }
+                    else
+                    {
+                        GenericMethods.showAlert(alertMessage: self.loginData?.status?.message ?? "Unable to fetch data. Please try again after sometime.")
+                    }
+                    
+                }
+                else {
+                    GenericMethods.showAlert(alertMessage:error?.localizedDescription ?? "")
+                    
+                }
+            }
+        }
+    }
+    func navigateToDashboardVC()
+    {
+        let storyboard: UIStoryboard = UIStoryboard.init(name: "Main", bundle: nil)
+        let dashNavigateVC = storyboard.instantiateViewController(withIdentifier: "dashNavigateVC") as! DashboardNavigateVC
+//        let navigator = UINavigationController(rootViewController: dashboardVC!)
+//        navigator.navigationBar.tintColor = AppConstants.appGreenColor
+//        navigator.navigationBar.backgroundColor = AppConstants.appGreenColor
+        /*
+        navigator.navigationBar.tintColor = UIColor.clear
+        navigator.navigationBar.backgroundColor = UIColor.clear
+        navigator.navigationBar.isOpaque = true
+        navigator.navigationBar.isTranslucent = true
+        navigator.view.backgroundColor = UIColor.clear
+        navigator.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        navigator.navigationBar.shadowImage = UIImage()
+ */
+//        navigator.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        appDelegate?.window?.rootViewController = dashNavigateVC
+        appDelegate?.window?.makeKeyAndVisible()
     }
     
     /*

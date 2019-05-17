@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="docSpecialityCell" id="gTV-IL-0wX" customClass="DoctorSpecialityCollectionViewCell" customModule="TheOneDoctor" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="175" height="45"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="175" height="45"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="De2-Dy-ubK">
+                        <rect key="frame" x="0.0" y="0.0" width="175" height="45"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bc2-0j-FsP">
+                                <rect key="frame" x="145" y="0.0" width="30" height="45"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="30" id="9ZQ-mg-5P8"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                <state key="normal" title="X">
+                                    <color key="titleColor" name="AppDarkGray"/>
+                                </state>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Anesthiology Anesthiology" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3bE-T3-Cdk">
+                                <rect key="frame" x="8" y="0.0" width="137" height="45"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="3bE-T3-Cdk" firstAttribute="centerY" secondItem="De2-Dy-ubK" secondAttribute="centerY" id="13X-mJ-ZOJ"/>
+                            <constraint firstItem="bc2-0j-FsP" firstAttribute="leading" secondItem="3bE-T3-Cdk" secondAttribute="trailing" id="3xJ-Hv-med"/>
+                            <constraint firstItem="bc2-0j-FsP" firstAttribute="top" secondItem="De2-Dy-ubK" secondAttribute="top" id="AVZ-Nx-xJN"/>
+                            <constraint firstItem="3bE-T3-Cdk" firstAttribute="leading" secondItem="De2-Dy-ubK" secondAttribute="leading" constant="8" id="Jow-3W-E4o"/>
+                            <constraint firstAttribute="bottom" secondItem="bc2-0j-FsP" secondAttribute="bottom" id="OKl-u1-6RG"/>
+                            <constraint firstAttribute="bottom" secondItem="3bE-T3-Cdk" secondAttribute="bottom" id="VIW-kC-ctu"/>
+                            <constraint firstAttribute="trailing" secondItem="bc2-0j-FsP" secondAttribute="trailing" id="WyL-9Z-TDb"/>
+                            <constraint firstItem="bc2-0j-FsP" firstAttribute="centerY" secondItem="De2-Dy-ubK" secondAttribute="centerY" id="iIp-yT-ftd"/>
+                            <constraint firstItem="3bE-T3-Cdk" firstAttribute="top" secondItem="De2-Dy-ubK" secondAttribute="top" id="mlQ-wS-oyo"/>
+                        </constraints>
+                    </view>
+                </subviews>
+            </view>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="De2-Dy-ubK" secondAttribute="trailing" id="MBA-Td-s2f"/>
+                <constraint firstItem="De2-Dy-ubK" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="gXR-PM-W8K"/>
+                <constraint firstAttribute="bottom" secondItem="De2-Dy-ubK" secondAttribute="bottom" id="hxY-f6-iDy"/>
+                <constraint firstItem="De2-Dy-ubK" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="m3g-J4-IHN"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
+            <size key="customSize" width="175" height="48"/>
+            <connections>
+                <outlet property="bgView" destination="De2-Dy-ubK" id="PEA-P4-5dy"/>
+                <outlet property="deleteBtnInst" destination="bc2-0j-FsP" id="UkZ-re-51l"/>
+                <outlet property="specialityLbl" destination="3bE-T3-Cdk" id="qfY-sm-YCk"/>
+            </connections>
+            <point key="canvasLocation" x="222.46376811594206" y="125.89285714285714"/>
+        </collectionViewCell>
+    </objects>
+    <resources>
+        <namedColor name="AppDarkGray">
+            <color red="0.25882352941176473" green="0.25490196078431371" blue="0.2627450980392157" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>

@@ -1,5 +1,5 @@
 //
-//  LoginUserDataModel.swift
+//  SendOTPModel.swift
 //  TheOneDoctor
 //
 //  Created by MyMac on 06/05/19.
@@ -9,21 +9,17 @@
 import Foundation
 import ObjectMapper
 
-class LoginUserDataModel:Mappable
+class SendOTPModel:Mappable
 {
-    var userId:Int?
-    var userImg:String?
-    var gender:String?
-
+    var status:StatusDataModel?
+    
+    
     required init?(map: Map) {
         
     }
     
-
     func mapping(map: Map) {
-        userId <- map ["user_id"]
-        userImg <- map ["picture"]
-        gender <- map ["sex"]
+        status <- map["status"]
     }
 
 }

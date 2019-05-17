@@ -1,14 +1,14 @@
 //
-//  DashboardViewController.swift
+//  DashboardNavigateVC.swift
 //  TheOneDoctor
 //
-//  Created by MyMac on 06/05/19.
+//  Created by MyMac on 08/05/19.
 //  Copyright © 2019 MyMac. All rights reserved.
 //
 
 import UIKit
 
-class DashboardViewController: UIViewController {
+class DashboardNavigateVC: UINavigationController {
 
     override func viewDidLoad() {
         super.viewDidLoad()

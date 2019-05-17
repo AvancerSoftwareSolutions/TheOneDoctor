@@ -12,6 +12,7 @@ import CommonCrypto
 import Alamofire
 import Photos
 import SwiftSVG
+import SDWebImage
 
 extension CALayer {
     
@@ -310,7 +311,17 @@ class GenericMethods: NSObject {
         imageView.layer.borderColor = UIColor.white.cgColor
         imageView.contentMode = .scaleToFill
         imageView.image = nil
-        imageView.sd_setImage(with: URL(string: "\((UserDefaults.standard.value(forKey: "user_image")) ?? "")"), placeholderImage: UIImage(named: "emptyProfile.png"),options: SDWebImageOptions(rawValue: 0), completed: { (image, error, cacheType, imageURL) in
+        let gender = UserDefaults.standard.value(forKey: "gender") as? String ?? ""
+        var placeHolderImg = UIImage(named: "Menprofile.png")
+        if gender == "Male"
+        {
+            placeHolderImg = UIImage(named: "Menprofile.png")
+        }
+        else
+        {
+            placeHolderImg = UIImage(named: "Womenprofile.png")
+        }
+        imageView.sd_setImage(with: URL(string: "\((UserDefaults.standard.value(forKey: "user_image")) ?? "")"), placeholderImage: placeHolderImg,options: SDWebImageOptions(rawValue: 0), completed: { (image, error, cacheType, imageURL) in
             
             if error == nil
             {
@@ -319,7 +330,7 @@ class GenericMethods: NSObject {
             }
             else{
                 print(error?.localizedDescription as Any)
-                imageView.image = UIImage(named: "emptyProfile.png")
+                imageView.image = placeHolderImg
                 
             }
             
@@ -361,10 +372,75 @@ class GenericMethods: NSObject {
         
     }
     */
+    class func showLoaderMethod(shownView:UIView,message:String)
+    {
+        UIApplication.shared.beginIgnoringInteractionEvents()
+        let loadingNotification = MBProgressHUD.showAdded(to: shownView, animated: true)
+        loadingNotification.mode = MBProgressHUDMode.indeterminate
+        loadingNotification.label.text = message
+    }
     class func hideLoaderMethod(view:UIView)
     {
         MBProgressHUD.hide(for: view, animated: true)
         UIApplication.shared.endIgnoringInteractionEvents()
+    }
+    class func navigateToDashboard()
+    {
+        let storyboard: UIStoryboard = UIStoryboard.init(name: "Main", bundle: nil)
+        let dashNavigateVC = storyboard.instantiateViewController(withIdentifier: "dashNavigateVC") as! DashboardNavigateVC
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        appDelegate?.window?.rootViewController = dashNavigateVC
+        appDelegate?.window?.makeKeyAndVisible()
+        
+    }
+    //MARK:- Getting thumbnail from Video
+    class func createThumbnailOfVideoFromRemoteUrl(url: String,imgView:UIImageView,playImgView:UIImageView) {
+//        DispatchQueue.global(qos: .userInitiated).async {
+            //Wrap thumbnail generation code here
+            let asset = AVAsset(url: URL(string: url)!)
+            let assetImgGenerate = AVAssetImageGenerator(asset: asset)
+            assetImgGenerate.appliesPreferredTrackTransform = true
+            //Can set this to improve performance if target size is known before hand
+            //assetImgGenerate.maximumSize = CGSize(width,height)
+            let time = CMTimeMakeWithSeconds(1.0, preferredTimescale: 600)
+            do {
+                let img = try assetImgGenerate.copyCGImage(at: time, actualTime: nil)
+                let thumbnail = UIImage(cgImage: img)
+                DispatchQueue.main.async {
+                    playImgView.isHidden = false
+                    imgView.contentMode = .scaleToFill
+                    imgView.image = thumbnail
+                }
+                
+            } catch {
+//                print(error.localizedDescription)
+                
+                DispatchQueue.main.async {
+                    playImgView.isHidden = true
+                    imgView.contentMode = .scaleAspectFit
+                    imgView.image = nil
+                    imgView.sd_setImage(with: URL(string: url), placeholderImage: UIImage(named: "emptyProfile.png"),options: SDWebImageOptions(rawValue: 0), completed: { (image, error, cacheType, imageURL) in
+                        
+                        if error == nil
+                        {
+                            imgView.image = image
+                            
+                        }
+                        else{
+                            print("error is \(error?.localizedDescription as Any)")
+                            imgView.image = UIImage(named: "emptyProfile.png")
+                            
+                        }
+                        
+                        // Perform operation.
+                    })
+                }
+                
+                
+                
+            }
+//        }
+        
     }
     // MARK:  Encrypt Method
     class func sha512(string:String) -> String
