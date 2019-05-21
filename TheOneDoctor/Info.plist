@@ -42,8 +42,6 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Allow Camera to capture photo</string>
-	<key>NSFaceIDUsageDescription</key>
-	<string>This application requires face ID to unlock</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Allow Microphone to take video</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>

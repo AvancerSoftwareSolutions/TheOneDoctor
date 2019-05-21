@@ -157,7 +157,7 @@ extension SpecialityListViewController:UITableViewDelegate,UITableViewDataSource
         }
         else
         {
-            specialityCell?.specialityNameLbl.text = self.addSpecialityData?.subSpecialityData?[indexPath.row].name
+            specialityCell?.specialityNameLbl.text = self.addSpecialityData?.subSpecialityData?[indexPath.row].subSpecialityname
         }
         
         return specialityCell!
@@ -189,7 +189,7 @@ extension SpecialityListViewController:UITableViewDelegate,UITableViewDataSource
                 }
                 else
                 {
-                    self.removeDictFromArray(searchString: addSpecialityData?.subSpecialityData?[indexPath.row].id ?? "")
+                    self.removeDictFromArray(searchString: addSpecialityData?.subSpecialityData?[indexPath.row].subSpecialityId ?? "")
 //                    let searchString = addSpecialityData?.subSpecialityData?[indexPath.row].id!
 //                    let predicate = NSPredicate(format: "id contains[cd] %@", searchString!)
 //                    // change it to "coupon_code == @" for checking equality.
@@ -224,8 +224,9 @@ extension SpecialityListViewController:UITableViewDelegate,UITableViewDataSource
                 else
                 {
                     var mutableDictionary:[String:Any] = [:]
-                    mutableDictionary.add(["id" : addSpecialityData?.subSpecialityData?[indexPath.row].id ?? ""])
-                    mutableDictionary.add(["name" : addSpecialityData?.subSpecialityData?[indexPath.row].name ?? ""])
+                    mutableDictionary.add(["subspeciality_id" : addSpecialityData?.subSpecialityData?[indexPath.row].subSpecialityId ?? ""])
+                    mutableDictionary.add(["subspecialityname" : addSpecialityData?.subSpecialityData?[indexPath.row].subSpecialityname ?? ""])
+                    mutableDictionary.add(["speciality_id" : addSpecialityData?.subSpecialityData?[indexPath.row].speciality_id ?? ""])
                     self.selectedSpecialityListArray.add(mutableDictionary)
                     
                 }

@@ -1066,6 +1066,23 @@ class GenericMethods: NSObject {
             }
         })
     }
+    class func currentDateTime() -> Date
+    {
+        let date = NSDate()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd hh:mm:ss"
+        dateFormatter.timeZone = TimeZone.current
+        let datestr = dateFormatter.string(from: date as Date)
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        //        print("datestr\(datestr)")
+        //        print("dateDate\(dateFormatter.date(from: datestr)!)")
+        guard let currentDate = dateFormatter.date(from: datestr)
+            else
+        {
+            return Date()
+        }
+        return currentDate
+    }
     //MARK: AlertController
     class func showAlertMethod(alertMessage: String)
     {

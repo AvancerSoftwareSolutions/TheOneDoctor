@@ -9,18 +9,21 @@
 import UIKit
 import AVKit
 import AVFoundation
+import ACFloatingTextfield_Swift
+import Photos
+import MobileCoreServices
+import BSImagePicker
 
-class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,sendSpecialityListValuesDelegate {
+class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UIImagePickerControllerDelegate, UINavigationControllerDelegate,UIDocumentInteractionControllerDelegate,sendSpecialityListValuesDelegate,sendDeletePicDelegate {
     
     
     
-    
-
     //MARK:- IBOutlets
     @IBOutlet weak var scrollViewInstance: UIScrollView!
     @IBOutlet weak var headerViewHgtConst: NSLayoutConstraint! // 260
     @IBOutlet weak var profileImgView: UIImageView!
     @IBOutlet weak var userNameLbl: UILabel!
+    @IBOutlet weak var designationLbl: UILabel!
     @IBOutlet weak var specialityCollectionView: UICollectionView!
 
     @IBOutlet weak var subSpecialityCollectionView: UICollectionView!
@@ -40,7 +43,12 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,sen
     @IBOutlet weak var biographyTextView: UITextView!
     @IBOutlet weak var biographyTVHgtConst: NSLayoutConstraint!
     
+    @IBOutlet weak var editPicturesBtnInstance: UIButton!
     
+    @IBOutlet weak var otpTF: ACFloatingTextfield!
+    
+    @IBOutlet weak var otpHgtConst: NSLayoutConstraint! //45
+    @IBOutlet weak var otpTopConst: NSLayoutConstraint! // 15
     
     //MARK:- Variables
     var docSpecialityCell:DoctorSpecialityCollectionViewCell?
@@ -49,19 +57,38 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,sen
     var profileData:ProfileModel?
     var addSpecialityData:AddSpecialityModel?
     var cancelSpecialityData:CancelSpecialityModel?
+    var sendOTPData:SendOTPModel?
+    var profileUpdateData:ProfileUpdateModel?
     
-    
+    var imagePicker = UIImagePickerController()
     var doctorMediaArray:NSMutableArray = []
     var doctorUploadFileArray:NSMutableArray = []
     
     var specialityArray:NSMutableArray = []
     var subSpecialityArray:NSMutableArray = []
     
+    var selectedAssets = [PHAsset]()
+    
+    var fileDataArr = [Data]()
+    var fileNameArr = [String]()
+    var mimeTypeArr = [String]()
+    var uploadType:Int = 0 // 0 - profile pic 1- add Pic
+    
+    var uploadingMediaArray:NSMutableArray = []
+    var randomNumber = ""
+    
+    var otp = ""
+    var mobileNumber = ""
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.title = "Profile"
+        
+        otpHgtConst.constant = 0
+        otpTopConst.constant = 0
+        
         let label = UILabel(frame: CGRect(x: 0, y: 0, width: 70, height: 30))
         label.text = "Update"
         label.font = UIFont.systemFont(ofSize: 13.0)
@@ -73,6 +100,10 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,sen
         
         self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(customView: label)
         userNameLbl.adjustsFontSizeToFitWidth = true
+        label.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileUpdateMethod))
+        tapGesture.numberOfTapsRequired = 1
+        label.addGestureRecognizer(tapGesture)
         
         specialityCollectionView.register(UINib(nibName: "DoctorSpecialityCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "docSpecialityCell")
         subSpecialityCollectionView.register(UINib(nibName: "DoctorSpecialityCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "docSpecialityCell")
@@ -90,12 +121,15 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,sen
         biographyTextView.layer.borderWidth = 1.0
         biographyTextView.layer.cornerRadius = 5.0
         
+        
+        
         let numberToolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: 320, height: 50))
         numberToolbar.barStyle = .default
         numberToolbar.items = [UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil), UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(self.doneWithNumberPad))]
         numberToolbar.sizeToFit()
         mobileTF.inputAccessoryView = numberToolbar
-        
+        otpTF.inputAccessoryView = numberToolbar
+        biographyTextView.inputAccessoryView = numberToolbar
 
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWasShown), name: UIResponder.keyboardDidShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
@@ -104,6 +138,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,sen
         
         // Do any additional setup after loading the view.
     }
+    
     func roundButton(button:UIButton)
     {
         button.layer.cornerRadius = button.frame.size.height / 2
@@ -113,8 +148,12 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,sen
     }
     @objc func doneWithNumberPad()
     {
+        let _ = biographyTextView.resignFirstResponder()
         let _ = mobileTF.resignFirstResponder()
+        let _ = otpTF.resignFirstResponder()
     }
+    
+    
     override func viewDidLayoutSubviews() {
         scrollViewInstance.contentSize = CGSize(width: scrollViewInstance.frame.width, height: addPicUploadBtnInstance.frame.origin.y+addPicUploadBtnInstance.frame.height+10)
         
@@ -140,17 +179,30 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,sen
 
     @objc func specialityDeleteMethod(button:UIButton)
     {
-        
+        if specialityArray.count == 1
+        {
+           GenericMethods.showAlert(alertMessage: "Atleast one speciality should be added.")
+            return
+        }
+        let selectedId = (self.specialityArray[button.tag] as? [AnyHashable:Any])? ["id"] as? String ?? ""
+        self.removeDictFromArray(searchKey: "id", searchString: selectedId, array: self.specialityArray)
+        self.removeDictFromArray(searchKey: "speciality_id", searchString: selectedId, array: self.subSpecialityArray)
+        specialityCollectionView.reloadData()
+        subSpecialityCollectionView.reloadData()
+        print("specialityArray \(specialityArray) subSpecialityArray \(subSpecialityArray)")
     }
     @objc func subSpecialityDeleteMethod(button:UIButton)
     {
-        
+        let selectedId = (self.subSpecialityArray[button.tag] as? [AnyHashable:Any])? ["subspeciality_id"] as? String ?? ""
+        self.removeDictFromArray(searchKey: "subspeciality_id", searchString: selectedId, array: self.subSpecialityArray)
+        subSpecialityCollectionView.reloadData()
+        print("subSpecialityArray \(subSpecialityArray)")
     }
     // MARK: - Profile API
     func loadingProfileDetailsAPI()
     {
         var parameters = Dictionary<String, Any>()
-        parameters["user_id"] = UserDefaults.standard.value(forKey: "user_id") as Any
+        parameters["user_id"] = UserDefaults.standard.value(forKey: "user_id") ?? 0 as Int
         
         GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
         
@@ -161,21 +213,19 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,sen
             if status == true {
                 self.profileData = response
                 if self.profileData?.status?.code == "0" {
-                    //MARK: Login Success Details
+                    //MARK: Profile Success Details
+                    self.mobileNumber = self.profileData?.profileData?.mobile ?? ""
                     self.mobileTF.text = self.profileData?.profileData?.mobile
                     self.emailTF.text = self.profileData?.profileData?.email
                     self.experienceTF.text = self.profileData?.profileData?.experience
                     self.userNameLbl.text = "\(self.profileData?.profileData?.firstname ?? "") \(self.profileData?.profileData?.lastname ?? "")"
+                    self.designationLbl.text = self.profileData?.profileData?.designation
                     UserDefaults.standard.set(self.profileData?.profileData?.profPicture, forKey: "user_image")
                     UserDefaults.standard.set(self.profileData?.profileData?.gender, forKey: "gender")
                     
-//                    self.specialityArray = NSMutableArray(array: (self.profileData?.profileData?.specialityList)!)
-//                    self.subSpecialityArray = NSMutableArray(array: (self.profileData?.profileData?.subspecialityList)!)
-//                    print("\(self.specialityArray)\n \(self.subSpecialityArray)")
                     var mutableDictionary:[String:Any] = [:]
                     for i in 0..<(self.profileData?.profileData?.specialityList?.count ?? 0)
                     {
-//                        mutableDictionary.add(["":])
                         mutableDictionary.add(["id" : self.profileData?.profileData?.specialityList?[i].id ?? ""])
                         mutableDictionary.add(["name" : self.profileData?.profileData?.specialityList?[i].name ?? ""])
                         self.specialityArray.add(mutableDictionary)
@@ -184,8 +234,9 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,sen
                     var mutablesubDictionary:[String:Any] = [:]
                     for i in 0..<(self.profileData?.profileData?.subspecialityList?.count ?? 0)
                     {
-                        mutablesubDictionary.add(["id" : self.profileData?.profileData?.subspecialityList?[i].id ?? ""])
-                        mutablesubDictionary.add(["name" : self.profileData?.profileData?.subspecialityList?[i].name ?? ""])
+                        mutablesubDictionary.add(["subspeciality_id" : self.profileData?.profileData?.subspecialityList?[i].subSpecialityId ?? ""])
+                        mutablesubDictionary.add(["subspecialityname" : self.profileData?.profileData?.subspecialityList?[i].subSpecialityname ?? ""])
+                        mutablesubDictionary.add(["speciality_id" : self.profileData?.profileData?.subspecialityList?[i].speciality_id ?? ""])
                         self.subSpecialityArray.add(mutablesubDictionary)
                        
                     }
@@ -204,11 +255,22 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,sen
                     }
                     
                     self.doctorMediaArray = NSMutableArray(array: arr1 + arr2)
+                    if self.doctorMediaArray.count > 0
+                    {
+                        self.editPicturesBtnInstance.isHidden = false
+                    }
+                    guard let arr3 = self.profileData?.profileData?.uploadingPictureList,let arr4 = self.profileData?.profileData?.uploadingVideoList
+                        else {
+                            self.uploadingMediaArray = []
+                            return
+                            
+                    }
                     
-                    print("doctorMediaArray \(self.doctorMediaArray)")
+                    self.uploadingMediaArray = NSMutableArray(array: arr3 + arr4)
+                    
+                    print("uploadingMediaArray \(self.uploadingMediaArray)")
                     
                     self.reloadViews()
-
                 }
                 else
                 {
@@ -245,12 +307,24 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,sen
         self.doctorPicturesCollectionView.reloadData()
     }
     
-    func getIdMethod(listArray:NSMutableArray)-> [String]
+    func getIdMethod(listArray:NSMutableArray,type:Int)-> [String]
     {
         var idArray:[String] = []
+        if listArray.count == 0
+        {
+            return [""]
+        }
         for i in 0..<(listArray.count)
         {
-            idArray.append((listArray[i] as? [AnyHashable:Any])? ["id"] as? String ?? "")
+            if type == 0
+            {
+               idArray.append((listArray[i] as? [AnyHashable:Any])? ["id"] as? String ?? "")
+            }
+            else
+            {
+                idArray.append((listArray[i] as? [AnyHashable:Any])? ["subspeciality_id"] as? String ?? "")
+            }
+            
         }
         return idArray
     }
@@ -259,8 +333,10 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,sen
     {
         var parameters = Dictionary<String, Any>()
         
-        parameters["id"] = getIdMethod(listArray: specialityArray) as Any
-        parameters["subid"] = getIdMethod(listArray: subSpecialityArray) as Any
+        parameters["id"] = getIdMethod(listArray: specialityArray, type: 0) as [String]
+        parameters["subid"] = getIdMethod(listArray: subSpecialityArray, type: 1) as [String]
+//        parameters["id"] = [""]
+//        parameters["subid"] = [""]
         
         GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
         
@@ -311,62 +387,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,sen
             }
         }
     }
-    func cancelSpecialityDetailsAPI(id:String,type:Int)
-    {
-        var parameters = Dictionary<String, Any>()
-        
-        parameters["id"] = getIdMethod(listArray: specialityArray) as Any
-        parameters["subid"] = getIdMethod(listArray: subSpecialityArray) as Any
-        
-        GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
-        
-        apiManager.cancelSpecialityDetailsAPI(parameters: parameters) { (status, showError, response, error) in
-            
-            GenericMethods.hideLoaderMethod(view: self.view)
-            
-            if status == true {
-                self.cancelSpecialityData = response
-                if self.cancelSpecialityData?.status?.code == "0" {
-                    //MARK: Speciality Success Details
-//                    if type == 0
-//                    {
-//                        if self.cancelSpecialityData?.specialityData?.count ?? 0 == 0
-//                        {
-//                            GenericMethods.showAlertMethod(alertMessage: "Empty List")
-//                            return
-//                        }
-//                    }
-//                    else
-//                    {
-//                        if self.cancelSpecialityData?.subSpecialityData?.count ?? 0 == 0
-//                        {
-//                            GenericMethods.showAlertMethod(alertMessage: "Empty List")
-//                            return
-//                        }
-//                    }
-//                    let specialityListVC = self.storyboard?.instantiateViewController(withIdentifier: "specialityListVC") as! SpecialityListViewController
-//                    specialityListVC.addSpecialityData = self.addSpecialityData
-//                    specialityListVC.type = type
-//                    specialityListVC.delegate = self
-//
-//                    self.definesPresentationContext = true
-//                    specialityListVC.modalTransitionStyle = .crossDissolve
-//                    specialityListVC.modalPresentationStyle = .overCurrentContext
-//                    self.present(specialityListVC, animated: true, completion: nil)
-                }
-                else
-                {
-                    GenericMethods.showAlert(alertMessage: self.addSpecialityData?.status?.message ?? "Unable to fetch data. Please try again after sometime.")
-                }
-                
-                
-            }
-            else {
-                GenericMethods.showAlert(alertMessage:error?.localizedDescription ?? "")
-                
-            }
-        }
-    }
+    
     func sendSpecialityListValues(selectedListArray: NSMutableArray,type:Int)
     {
         if type == 0
@@ -383,10 +404,266 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,sen
         print("specialityArray \(specialityArray) subSpecialityArray \(subSpecialityArray)")
         
     }
+    func removeDictFromArray(searchKey:String,searchString:String,array:NSMutableArray)
+    {
+        
+        let predicate = NSPredicate(format: "\(searchKey) contains[cd] %@", searchString)
+        // change it to "coupon_code == @" for checking equality.
+        
+        let indexes = array.indexesOfObjects(options: []) { (dictionary, index, stop) -> Bool in
+            return predicate.evaluate(with: dictionary)
+        }
+        array.removeObjects(at: indexes)
+    }
+    func imagePickerController(_ picker: UIImagePickerController,
+                               didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any])
+    {
+        fileDataArr = []
+        fileNameArr = []
+        mimeTypeArr = []
+        /*
+         Get the image from the info dictionary.
+         If no need to edit the photo, use `UIImagePickerControllerOriginalImage`
+         instead of `UIImagePickerControllerEditedImage`
+         */
+        
+        if UIImagePickerController.isSourceTypeAvailable(.camera)
+        {
+            print("info \(info)")
+            let mediaType = info[.mediaType] as! NSString
+            
+            if mediaType.isEqual(to: kUTTypeImage as String) {
+                
+                guard let chosenImage = info[.originalImage] as? UIImage else
+                {
+                    fatalError("Expected a dictionary containing an image, but was provided the following: \(info)")
+                }
+                //                UIImageWriteToSavedPhotosAlbum(chosenImage, nil, nil, nil)
+                
+                let imageData = chosenImage.jpegData(compressionQuality: 0.0)
+                
+                //                let dataString = imageData!.base64EncodedString(options: .lineLength64Characters)
+                //Media is an image info[.imageURL]
+                if let imageURL = info[.imageURL] as? URL
+                {
+                    let imagePath = imageURL.path
+                    print("\(imageURL) \n \(imagePath)")
+                    //                let fileExtension = imageURL.pathExtension
+                    
+                    print("mimieType \(FileUpload.mimeTypeForPath(path: imagePath))")
+                    let duration: Int = 1 // duration in seconds
+                    
+                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Double(duration) * Double(NSEC_PER_SEC)) / Double(NSEC_PER_SEC), execute: {
+                        if self.uploadType == 0
+                        {
+                            self.updateProfPicUpload(fileData: imageData!, filename: imageURL.lastPathComponent, mimeType: FileUpload.mimeTypeForPath(path: imagePath), keyname: "picture")
+                        }
+                        else
+                        {
+                            self.fileDataArr.append(imageData!)
+                            self.fileNameArr.append(imageURL.lastPathComponent)
+                            self.mimeTypeArr.append(FileUpload.mimeTypeForPath(path: imagePath))
+                            
+                            self.addDocFilesUpload()
+                        }
+                        
+                        
+//                        self.postMethodFileUpload(fileData: imageData!, filename: imageURL.lastPathComponent, mimeType: "\(FileUpload.mimeTypeForPath(path: imagePath))")
+                    })
+                }
+                else
+                {
+                    let fileManager = FileManager.default
+                    if let tDocumentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
+                        let filePath =  tDocumentDirectory.appendingPathComponent("RapidWallet")
+                        if !fileManager.fileExists(atPath: filePath.path) {
+                            do {
+                                try fileManager.createDirectory(atPath: filePath.path, withIntermediateDirectories: true, attributes: nil)
+                            } catch {
+                                NSLog("Couldn't create document directory")
+                            }
+                        }
+                        else
+                        {
+                            print("Already exists")
+                        }
+                        NSLog("Document directory is \(filePath)")
+                        
+                        let fileURL = filePath.appendingPathComponent("Imageon\(GenericMethods.currentDateTime())")
+                        print(fileURL)
+                        //writing
+                        do {
+                            try imageData!.write(to: fileURL, options:[])
+                            
+                            print(fileURL.path)
+                            print("mimieType \(FileUpload.mimeTypeForPath(path: fileURL.path))")
+                            if self.uploadType == 0
+                            {
+                                self.updateProfPicUpload(fileData: imageData!, filename: fileURL.lastPathComponent, mimeType: FileUpload.mimeTypeForPath(path: fileURL.path), keyname: "picture")
+                            }
+                            else
+                            {
+                                self.fileDataArr.append(imageData!)
+                                self.fileNameArr.append(fileURL.lastPathComponent)
+                                self.mimeTypeArr.append(FileUpload.mimeTypeForPath(path: fileURL.path))
+                                
+                                self.addDocFilesUpload()
+                            }
+//                            postMethodFileUpload(fileData: imageData!, filename: fileURL.lastPathComponent, mimeType: "\(FileUpload.mimeTypeForPath(path: fileURL.path))")
+//                            FileUpload.removeFileDataToLocal()
+                        }
+                        catch {
+                            print("failed to write data")
+                        }
+                    }
+                    
+                }
+                
+                
+                //                let UTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (fileExtension as CFString?)!, nil) as? String
+                //                let contentType = UTTypeCopyPreferredTagWithClass((UTI as CFString?)!, kUTTagClassMIMEType) as? String
+                //                print(contentType)
+                
+                
+                //                print(dataString)
+                
+                //                    [self postMethodwithPath:videoUrl withImageData:videoData withPictureName:[videoUrl lastPathComponent]];
+                
+            } else if mediaType.isEqual(to: kUTTypeMovie as String) {
+                let videoURL = info[.mediaURL] as! URL
+                //                if UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(videoPath)
+                //                {
+                //                    UISaveVideoAtPathToSavedPhotosAlbum(videoPath, nil, nil, nil)
+                //                }
+                do{
+                    let videoData = try Data.init(contentsOf: videoURL)
+                    if self.uploadType == 0
+                    {
+                        self.updateProfPicUpload(fileData: videoData, filename: videoURL.lastPathComponent, mimeType: FileUpload.mimeTypeForPath(path: videoURL.path), keyname: "picture")
+                    }
+                    else
+                    {
+                        self.fileDataArr.append(videoData)
+                        self.fileNameArr.append(videoURL.lastPathComponent)
+                        self.mimeTypeArr.append(FileUpload.mimeTypeForPath(path: videoURL.path))
+                        
+                        self.addDocFilesUpload()
+                    }
+                }
+                catch
+                {
+                    print("Cannot convert video data")
+                }
+                // Media is a video
+                
+            }
+        }
+        else if UIImagePickerController.isSourceTypeAvailable(.photoLibrary)
+        {
+            var asset = PHAsset()
+            asset = info[.phAsset] as! PHAsset
+            FileUpload.getURL(of: asset) { (photoUrl) in
+                print("url is \(photoUrl as Any)")
+                
+                do{
+                    let photoData = try Data.init(contentsOf: photoUrl!)
+                    
+                    if self.uploadType == 0
+                    {
+                        self.updateProfPicUpload(fileData: photoData, filename: photoUrl!.lastPathComponent, mimeType: FileUpload.mimeTypeForPath(path: photoUrl!.path), keyname: "picture")
+                    }
+                    else
+                    {
+                        self.fileDataArr.append(photoData)
+                        self.fileNameArr.append(photoUrl!.lastPathComponent)
+                        self.mimeTypeArr.append(FileUpload.mimeTypeForPath(path: photoUrl!.path))
+                        
+                        self.addDocFilesUpload()
+                    }
+                    
+                    
+                    
+//                    self.postMethodFileUpload(fileData: photoData, filename: photoUrl!.lastPathComponent, mimeType: "\(FileUpload.mimeTypeForPath(path: photoUrl!.path))")
+                    
+                    //                    let dataString = videoData.base64EncodedString(options: .lineLength64Characters)
+                    //                    print(dataString)
+                    
+                    //                    [self postMethodwithPath:videoUrl withImageData:videoData withPictureName:[videoUrl lastPathComponent]];
+                }
+                catch
+                {
+                    print("Cannot convert photo data")
+                }
+                
+            }
+            /* UIImage *chosenImage = [info valueForKey:UIImagePickerControllerOriginalImage];
+             UIImageWriteToSavedPhotosAlbum(chosenImage, nil, nil, nil);
+             NSData *imageData = UIImageJPEGRepresentation(chosenImage, 0.0);
+             NSLog(@"imageData %@",imageData);
+             */
+            
+            
+        }
+        
+        
+        
+        //        guard let selectedImage = info[.originalImage] as? UIImage else {
+        //            fatalError("Expected a dictionary containing an image, but was provided the following: \(info)")
+        //        }
+        //                let imageData = selectedImage.jpegData(compressionQuality: 0.2)
+        //                let imgString = imageData?.base64EncodedString(options: .lineLength64Characters)
+        //                print(imgString as Any)
+        
+        
+        //        profileImgView.image = selectedImage
+        
+        
+        
+        picker.dismiss(animated: true, completion: nil)
+        
+    }
+    
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.isNavigationBarHidden = false
+        self.dismiss(animated: true, completion: nil)
+    }
     // MARK: - IBActions
     
     @IBAction func profilePicbtnClick(_ sender: Any) {
+        self.uploadType = 0
+        let alert = UIAlertController(title: "Choose Image", message: nil, preferredStyle: .actionSheet)
+        alert.addAction(UIAlertAction(title: "Camera", style: .default, handler: { _ in
+            self.imagePicker.delegate = self
+            FileUpload.showcamera(imagePicker: self.imagePicker, vc: self)
+        }))
         
+        alert.addAction(UIAlertAction(title: "Gallery", style: .default, handler: { _ in
+            self.imagePicker.delegate = self
+            FileUpload.openGallary(imagePicker: self.imagePicker, vc: self)
+            
+            
+            
+        }))
+        
+        
+        alert.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil))
+        
+        /*If you want work actionsheet on ipad
+         then you have to use popoverPresentationController to present the actionsheet,
+         otherwise app will crash on iPad */
+        switch UIDevice.current.userInterfaceIdiom {
+        case .pad:
+            alert.popoverPresentationController?.sourceView = self.view
+            alert.popoverPresentationController?.sourceRect = self.view.bounds
+            alert.popoverPresentationController?.permittedArrowDirections = .up
+            
+        default:
+            break
+        }
+        
+        
+        self.present(alert, animated: true, completion: nil)
     }
     
     @IBAction func addSpecBtnClick(_ sender: Any) {
@@ -399,6 +676,328 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,sen
         
     }
     @IBAction func docAddiPicUploadBtnClick(_ sender: Any) {
+        self.uploadType = 1
+        let alert = UIAlertController(title: "Choose Image", message: nil, preferredStyle: .actionSheet)
+        alert.addAction(UIAlertAction(title: "Camera", style: .default, handler: { _ in
+            self.imagePicker.delegate = self
+            FileUpload.showcamera(imagePicker: self.imagePicker, vc: self)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Gallery", style: .default, handler: { _ in
+//            self.imagePicker.delegate = self
+//            FileUpload.openGallary(imagePicker: self.imagePicker, vc: self, assets: self.selectedAssets)
+            
+            let vc = BSImagePickerViewController()
+            self.bs_presentImagePickerController(vc, animated: true, select: { (asset:PHAsset) in
+                
+            }, deselect: { (asset:PHAsset) in
+                
+            }, cancel: { (assets:[PHAsset]) in
+                
+            }, finish: { (outputassets:[PHAsset]) in
+                self.selectedAssets = []
+                for i in 0..<outputassets.count
+                {
+                    self.selectedAssets.append(outputassets[i])
+                }
+                print("selectedAssets \(self.selectedAssets)")
+                self.gettingValuesFromPHAsset(assetsArr: self.selectedAssets)
+                
+            }, completion: nil)
+            
+        }))
+        
+        
+        alert.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil))
+        
+        /*If you want work actionsheet on ipad
+         then you have to use popoverPresentationController to present the actionsheet,
+         otherwise app will crash on iPad */
+        switch UIDevice.current.userInterfaceIdiom {
+        case .pad:
+            alert.popoverPresentationController?.sourceView = self.view
+            alert.popoverPresentationController?.sourceRect = self.view.bounds
+            alert.popoverPresentationController?.permittedArrowDirections = .up
+            
+        default:
+            break
+        }
+        
+        
+        self.present(alert, animated: true, completion: nil)
+    }
+    @IBAction func editPicturesBtnClick(_ sender: Any) {
+        let deletePicVC = self.storyboard?.instantiateViewController(withIdentifier: "deletePicVC") as! DeletePicturesViewController
+        deletePicVC.picturesArray = self.doctorMediaArray
+        deletePicVC.uploadPicturesArray = self.uploadingMediaArray
+        deletePicVC.delegate = self
+        let navigateVC = UINavigationController(rootViewController: deletePicVC)
+        navigateVC.navigationBar.barTintColor = AppConstants.appGreenColor
+        navigateVC.navigationBar.tintColor = UIColor.white
+        navigateVC.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.white]
+
+        self.present(navigateVC, animated: true, completion: nil)
+    }
+    
+    @IBAction func otpTFEditingChange(_ sender: UITextField) {
+//        if sender.text!.count == 4
+//        {
+//            if sender.text == randomNumber
+//            {
+//                otpHgtConst.constant = 0
+//                otpTopConst.constant = 0
+//            }
+//            else
+//            {
+//                GenericMethods.showAlert(alertMessage: "Invalid OTP")
+//            }
+//        }
+    }
+    @IBAction func mobileEditingChange(_ sender: UITextField) {
+//        if sender.text!.count == 8
+//        {
+//            if sender.text != self.mobileNumber
+//            {
+//                sendOTPMethod()
+//            }
+//
+//        }
+    }
+    
+    //MARK:- Delegate Method
+    func sendDeletePicValues(picArray: NSMutableArray,uploadArray:NSMutableArray) {
+        self.doctorMediaArray = NSMutableArray(array: picArray)
+        self.uploadingMediaArray = NSMutableArray(array: uploadArray)
+        self.doctorPicturesCollectionView.reloadData()
+    }
+    
+    func gettingValuesFromPHAsset(assetsArr:[PHAsset])
+    {
+        fileDataArr = []
+        fileNameArr = []
+        mimeTypeArr = []
+        
+        for i in 0..<assetsArr.count {
+            
+            FileUpload.getURL(of: assetsArr[i]) { (mediaURL) in
+                print("mediaURL \(String(describing: mediaURL))")
+                do
+                {
+                    let mediaData = try Data.init(contentsOf: mediaURL!)
+                    self.fileDataArr.append(mediaData)
+                    self.fileNameArr.append(mediaURL!.lastPathComponent)
+                    self.mimeTypeArr.append(FileUpload.mimeTypeForPath(path: mediaURL!.path))
+                    if self.fileDataArr.count == (assetsArr.count)
+                    {
+                        self.addDocFilesUpload()
+                    }
+                }
+                catch
+                {
+                    print("Cannot convert photo data")
+                }
+            }
+        }
+    }
+    //TODO: File upload
+    
+    func updateProfPicUpload(fileData:Data,filename:String,mimeType:String,keyname:String)
+    {
+        WebAPIHelper.postMethodFileUpload(fileData: fileData, filename: filename, mimeType: mimeType, methodName: "upload", keyname: "file", vc: self, success: { (response) in
+             print("response \(response as Any)")
+        }, Failure: { (error) in
+            print(error.localizedDescription)
+            })
+        
+//        WebAPIHelper.postMethodMultipleFileUpload(fileData: fileDataArr, filename: fileNameArr, mimeType: mimeTypeArr, methodName: "multipleupload", vc: self, success: { (response) in
+//            print("response \(response as Any)")
+//        }, Failure: { (error) in
+//            print(error.localizedDescription)
+//        })
+        
+        /*
+         
+         WebAPIHelper.postMethodFileUpload(fileData: fileData, filename: filename, mimeType: mimeType, methodName: "vendorapi/fileupload", vc: self, success: { (response) in
+         
+         if response?.object(forKey: "status") as! Int == 0
+         {
+         GenericMethods.showAlert(alertMessage: "\(response?.object(forKey: "message") as! String)")
+         
+         }
+         else
+         {
+         if response?.object(forKey: "status") as! Bool == true
+         {
+         //                    let detailsDict:NSMutableDictionary = NSMutableDictionary(dictionary: response?.object(forKey: "response") as! Dictionary)
+         //
+         //                    let uploadFileDict:NSMutableDictionary = NSMutableDictionary(dictionary: detailsDict.object(forKey: "upload_file_details") as! Dictionary)
+         //                    self.uploadfileStr = detailsDict.object(forKey: "upload_file_path") as? String ?? ""
+         //                    self.documentFileLbl.isHidden = false
+         //                    self.documentFileLbl.text = "\(uploadFileDict.object(forKey: "name") as! String)"
+         //                    self.documentUploadBtnInst.setTitle("Uploaded", for: .normal)
+         //                    self.documentUploadBtnInst.isEnabled = false
+         //                    self.documentDeleteBtnInst.isHidden = false
+         //
+         //                    FileUpload.saveFileDataToLocal(fileData: fileData, fileStr: self.uploadfileStr)
+         }
+         }
+         
+         }, Failure: { (error) in
+         print(error.localizedDescription)
+         })
+         */
+    }
+    func addDocFilesUpload()
+    {
+//        print("fileData \(fileData) \n filename \(filename) \n mimeType \(mimeType) \n")
+        
+        GenericMethods.showLoaderMethod(shownView: self.view, message: "Uploading")
+        
+        
+        print("fileDataArr \(fileDataArr)\n fileNameArr \(fileNameArr)\n mimeTypeArr \(mimeTypeArr)\n")
+        
+        WebAPIHelper.addDoctorPicFileUpload(fileData: fileDataArr, filename: fileNameArr, mimeType: mimeTypeArr, methodName: "multipleupload", vc: self, success: { (response) in
+            print("response \(response as Any)")
+            
+            let picPathArray:[String] = response?.object(forKey: "picturepath") as! [String]
+            
+            for i in 0..<picPathArray.count
+            {
+               self.doctorMediaArray.add(picPathArray[i])
+            }
+            
+            let uploadingDataArray:[String] = response?.object(forKey: "data") as! [String]
+            
+            for i in 0..<uploadingDataArray.count
+            {
+                self.uploadingMediaArray.add(uploadingDataArray[i])
+            }
+            
+            self.doctorPicturesCollectionView.reloadData()
+            
+        }, Failure: { (error) in
+            print(error.localizedDescription)
+        })
+    }
+    func otpSuccessMethod()
+    {
+        self.otp = self.randomNumber
+        self.otpHgtConst.constant = 45
+        self.otpTopConst.constant = 15
+        let _ = self.otpTF.becomeFirstResponder()
+    }
+    
+    func sendOTPMethod()
+    {
+        randomNumber = AppConstants.fourDigitNumber
+        
+        var parameters = Dictionary<String, Any>()
+        parameters["mobile"] = mobileTF.text
+        parameters["Type"] = "Register"
+        parameters["OTP"] = randomNumber
+        
+        GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
+        apiManager.sendOTPAPI(parameters: parameters) { (status, showError, response, error) in
+            
+            GenericMethods.hideLoaderMethod(view: self.view)
+            
+            if status == true {
+                self.sendOTPData = response
+                
+                if self.sendOTPData?.status?.code == "0" {
+                    //MARK: sendOTP Success Details
+                    
+                    let alert = UIAlertController(title: nil, message: self.sendOTPData?.status?.message ?? "", preferredStyle: .alert)
+                    
+                    UIApplication.shared.topMostViewController()?.present(alert, animated: true)
+                    let duration: Int = 1 // duration in seconds
+                    
+                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Double(duration) * Double(NSEC_PER_SEC)) / Double(NSEC_PER_SEC), execute: {
+                        alert.dismiss(animated: true)
+                        self.otpSuccessMethod()
+                    })
+                    
+                }
+                else
+                {
+                    GenericMethods.showAlert(alertMessage: self.sendOTPData?.status?.message ?? "Unable to fetch data. Please try again after sometime.")
+                }
+                
+            }
+            else {
+                GenericMethods.showAlert(alertMessage:error?.localizedDescription ?? "")
+                
+            }
+        }
+    }
+    @objc func profileUpdateMethod()
+    {
+        if GenericMethods.isStringEmpty(emailTF.text)
+        {
+            GenericMethods.showAlert(alertMessage: "Please enter mail id")
+        }
+        else if GenericMethods.isStringEmpty(mobileTF.text)
+        {
+            GenericMethods.showAlert(alertMessage: "Please enter mail id")
+        }
+        else if !GenericMethods.validate(YourEMailAddress: emailTF.text!)
+        {
+            GenericMethods.showAlertMethod(alertMessage: "Enter valid EmailId")
+        }
+        else if mobileTF.text!.count < 8
+        {
+            GenericMethods.showAlertMethod(alertMessage: "Invalid mobile number")
+        }
+        else if otpHgtConst.constant == 45 && otpTF.text!.count == 4 && self.otp != self.randomNumber
+        {
+            GenericMethods.showAlertMethod(alertMessage: "Invalid OTP")
+        }
+        else
+        {
+            print("update success")
+            /*
+            var parameters = Dictionary<String, Any>()
+            parameters["mobile"] = mobileTF.text
+            parameters["Type"] = "Login"
+            parameters["OTP"] = randomNumber
+            
+            GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
+            apiManager.updateProfileDetailsAPI(parameters: parameters) { (status, showError, response, error) in
+                
+                GenericMethods.hideLoaderMethod(view: self.view)
+                
+                if status == true {
+                    self.profileUpdateData = response
+                    
+                    if self.profileUpdateData?.status?.code == "0" {
+                        //MARK: Login Success Details
+                        
+                        let alert = UIAlertController(title: nil, message: self.profileUpdateData?.status?.message ?? "", preferredStyle: .alert)
+                        
+                        UIApplication.shared.topMostViewController()?.present(alert, animated: true)
+                        let duration: Int = 1 // duration in seconds
+                        
+                        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Double(duration) * Double(NSEC_PER_SEC)) / Double(NSEC_PER_SEC), execute: {
+                            alert.dismiss(animated: true)
+                            
+                        })
+                        
+                    }
+                    else
+                    {
+                        GenericMethods.showAlert(alertMessage: self.profileUpdateData?.status?.message ?? "Unable to fetch data. Please try again after sometime.")
+                    }
+                    
+                }
+                else {
+                    GenericMethods.showAlert(alertMessage:error?.localizedDescription ?? "")
+                    
+                }
+            }
+            */
+        }
+        
+        
         
     }
     /*
@@ -410,7 +1009,6 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,sen
         // Pass the selected object to the new view controller.
     }
     */
-
 }
 extension ProfileViewController:UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout
     
@@ -450,6 +1048,7 @@ extension ProfileViewController:UICollectionViewDelegate,UICollectionViewDataSou
         switch collectionView {
         case specialityCollectionView:
             docSpecialityCell = collectionView.dequeueReusableCell(withReuseIdentifier: "docSpecialityCell", for: indexPath) as? DoctorSpecialityCollectionViewCell
+            docSpecialityCell?.deleteBtnInst.tag = indexPath.row
             docSpecialityCell?.deleteBtnInst.addTarget(self, action: #selector(specialityDeleteMethod(button:)), for: .touchUpInside)
             designMethod()
             
@@ -460,9 +1059,10 @@ extension ProfileViewController:UICollectionViewDelegate,UICollectionViewDataSou
             return docSpecialityCell!
         case subSpecialityCollectionView:
             docSpecialityCell = collectionView.dequeueReusableCell(withReuseIdentifier: "docSpecialityCell", for: indexPath) as? DoctorSpecialityCollectionViewCell
+            docSpecialityCell?.deleteBtnInst.tag = indexPath.row
             docSpecialityCell?.deleteBtnInst.addTarget(self, action: #selector(subSpecialityDeleteMethod(button:)), for: .touchUpInside)
             designMethod()
-            docSpecialityCell?.specialityLbl.text = (self.subSpecialityArray[indexPath.item] as? [AnyHashable:Any])? ["name"] as? String ?? ""
+            docSpecialityCell?.specialityLbl.text = (self.subSpecialityArray[indexPath.item] as? [AnyHashable:Any])? ["subspecialityname"] as? String ?? ""
             return docSpecialityCell!
         case doctorPicturesCollectionView:
             
@@ -491,10 +1091,10 @@ extension ProfileViewController:UICollectionViewDelegate,UICollectionViewDataSou
             
             let size = ((self.specialityArray[indexPath.item] as? [AnyHashable:Any])? ["name"] as? NSString)!.size(withAttributes: nil)
             print("size \(size.width)")
-            return CGSize(width: (size.width + 38) , height: cellHeight)
+            return CGSize(width: (size.width + 44) , height: cellHeight)
             
         case subSpecialityCollectionView:
-            let size = ((self.subSpecialityArray[indexPath.item] as? [AnyHashable:Any])? ["name"] as? NSString)!.size(withAttributes: nil)
+            let size = ((self.subSpecialityArray[indexPath.item] as? [AnyHashable:Any])? ["subspecialityname"] as? NSString)!.size(withAttributes: nil)
             print("size \(size.width)")
             return CGSize(width: (size.width + 44) , height: cellHeight)
 //            return CGSize(width: cellWidth, height: cellHeight)
@@ -549,4 +1149,87 @@ extension ProfileViewController:UICollectionViewDelegate,UICollectionViewDataSou
     }
     
     
+}
+extension ProfileViewController:UITextFieldDelegate
+{
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        switch textField {
+        case otpTF:
+            if textField.text!.count > 3 && range.length == 0
+            {
+                return false
+            }
+            else
+            {
+                otpTopConst.constant = 15
+                otpHgtConst.constant = 45
+                
+                return true
+            }
+            
+        case mobileTF:
+            
+            if textField.text!.count > 7 && range.length == 0
+            {
+                return false
+            }
+            else
+            {
+                otpTopConst.constant = 0
+                otpHgtConst.constant = 0
+                return true
+            }
+        default:
+            break
+        }
+        return true
+    }
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if textField == emailTF
+        {
+            let _ = emailTF.resignFirstResponder()
+        }
+        return true
+    }
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        switch textField {
+        case mobileTF:
+            if textField.text!.count == 8 && textField.text! != self.mobileNumber
+            {
+                sendOTPMethod()
+            }
+        case otpTF:
+            if textField.text!.count == 4
+            {
+                if textField.text == randomNumber
+                {
+                    otpHgtConst.constant = 0
+                    otpTopConst.constant = 0
+                }
+                else
+                {
+                    GenericMethods.showAlert(alertMessage: "Invalid OTP")
+                }
+            }
+        default:
+            break
+        }
+    }
+    
+}
+extension ProfileViewController:UITextViewDelegate
+{
+   
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        return textView.text.count + (text.count - range.length) <= 250
+    }
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        let scrollPoint : CGPoint = CGPoint(x:0 , y: biographyTextView.frame.origin.y)
+        self.scrollViewInstance.setContentOffset(scrollPoint, animated: true)
+    }
+    
+    func textViewDidEndEditing(_ textView: UITextView) {
+        let zero:UIEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        self.scrollViewInstance.contentInset = zero;
+    }
 }

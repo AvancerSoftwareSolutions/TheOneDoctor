@@ -11,6 +11,7 @@ import Foundation
 import Photos
 import Alamofire
 import MobileCoreServices
+import BSImagePicker
 
 class FileUpload: NSObject {
     
@@ -245,7 +246,7 @@ class FileUpload: NSObject {
         if(UIImagePickerController .isSourceTypeAvailable(UIImagePickerController.SourceType.camera))
         {
             imagePicker.sourceType = UIImagePickerController.SourceType.camera
-            imagePicker.mediaTypes = [kUTTypeImage as String]
+            imagePicker.mediaTypes = [kUTTypeImage as String,kUTTypeMovie as String,kUTTypeVideo as String]
             imagePicker.allowsEditing = false
             imagePicker.videoQuality = UIImagePickerController.QualityType.typeHigh
             vc.present(imagePicker, animated: true, completion: nil)
@@ -313,12 +314,28 @@ class FileUpload: NSObject {
     }
     class func openGallary(imagePicker:UIImagePickerController,vc:UIViewController)
     {
+//        let vc = BSImagePickerViewController()
+//        vc.bs_presentImagePickerController(vc, animated: true, select: { (asset:PHAsset) in
+//
+//        }, deselect: { (asset:PHAsset) in
+//
+//        }, cancel: { (assets:[PHAsset]) in
+//
+//        }, finish: { (outputassets:[PHAsset]) in
+//            for i in 0..<outputassets.count
+//            {
+//                assets.append(outputassets[i])
+//            }
+//
+//        }, completion: nil)
+        
         imagePicker.sourceType = UIImagePickerController.SourceType.photoLibrary
-        imagePicker.mediaTypes = [kUTTypeImage as String]
-        //        imagePicker.mediaTypes = UIImagePickerController.availableMediaTypes(for: .photoLibrary)!
+        imagePicker.mediaTypes = [kUTTypeImage as String,kUTTypeVideo as String]
+        imagePicker.mediaTypes = UIImagePickerController.availableMediaTypes(for: .photoLibrary)!
         imagePicker.allowsEditing = false
         imagePicker.videoQuality = UIImagePickerController.QualityType.typeHigh
         vc.present(imagePicker, animated: true, completion: nil)
+        
     }
 
 }

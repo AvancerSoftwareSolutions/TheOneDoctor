@@ -20,10 +20,13 @@ class ProfileDataModel:Mappable
     var experience:String?
     var gender:String?
     var maxcount:String?
+    var designation:String?
     var specialityList:Array<ProfileSpecialityDataModel>?
-    var subspecialityList:Array<ProfileSpecialityDataModel>?
+    var subspecialityList:Array<SubSpecialityDataModel>?
     var additionalPictureList:Array<String>?
     var additionalVideoList:Array<String>?
+    var uploadingPictureList:Array<String>?
+    var uploadingVideoList:Array<String>?
     
     required init?(map: Map) {
         
@@ -40,10 +43,13 @@ class ProfileDataModel:Mappable
         profPicture <- map["profile"]
         gender <- map["sex"]
         maxcount <- map["maxcount"]
+        designation <- map["designation"]
         specialityList <- map["speciality"]
         subspecialityList <- map["subspeciality"]
         additionalPictureList <- map["additionalpictures"]
         additionalVideoList <- map["additionalvideos"]
+        uploadingPictureList <- map["additionalpicture"]
+        uploadingVideoList <- map["additionalvideo"]
     }
     
     

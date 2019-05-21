@@ -12,9 +12,9 @@ import AlamofireObjectMapper
 
 class APIManager
 {
-    //MARK:- Base Url & Suffixes
+    //MARK:- Base Url & Suffixes 
     let baseURL = "http://159.89.162.140:3112/api/doctor/"
-    
+    let fileUploadBaseURL = "http://159.89.162.140/Mongo/HMSNew/API/Doctor/"
     let Authorization = "Basic YWRtaW46MTIzNA=="
     
     let createApiKeyURLSuffix = ""
@@ -23,8 +23,8 @@ class APIManager
     let profileSuffix = "Details"
     let updateKeyURLSuffix = ""
     let addSpecialitySuffix = "Speciality"
-    let cancelSpecialitySuffix = "SpecialityCancel"
-    
+    let deletePicSuffix = "fileremove"
+    let updateProfileSuffix = "update"
     
     func consolePrintValues(url:String,parameters:Dictionary<String, Any>)
     {
@@ -300,16 +300,17 @@ class APIManager
         }
     }
     
-    func cancelSpecialityDetailsAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:CancelSpecialityModel?, _ error:Error?)-> Void)
+    func deletePicDetailsAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:DeletePicModel?, _ error:Error?)-> Void)
     {
-        let cancelSpecialityAPIURL = baseURL + cancelSpecialitySuffix
+        let deletePicAPIURL = baseURL + deletePicSuffix
         //        let headers: HTTPHeaders = [ "Authorization": Authorization]
-        consolePrintValues(url: cancelSpecialityAPIURL, parameters: parameters)
-        Alamofire.request(cancelSpecialityAPIURL, method: .post, parameters: parameters, headers: nil)
+        consolePrintValues(url: deletePicAPIURL, parameters: parameters)
+        
+        Alamofire.request(deletePicAPIURL, method: .post, parameters: parameters, headers: nil)
             .validate(contentType: ["application/json"]).responseJSON(completionHandler: { (response) in
                 print(response as Any)
             })
-            .responseObject { (response: DataResponse<CancelSpecialityModel>) in
+            .responseObject { (response: DataResponse<DeletePicModel>) in
                 let i =  response.response?.statusCode
                 
                 if i==402{
@@ -322,7 +323,55 @@ class APIManager
                             createApiKey = response
                             
                             UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
-                            self.cancelSpecialityDetailsAPI(parameters: parameters, completion: completion)
+                            self.deletePicDetailsAPI(parameters: parameters, completion: completion)
+                            
+                            
+                        }
+                        else {
+                            print("Failed")
+                            
+                        }
+                    }
+                }
+                else
+                {
+                    switch response.result {
+                        
+                    case .success:
+                        let responseData = response.result.value
+                        completion(true, false, responseData, nil)
+                        
+                    case .failure(let error):
+                        completion(false, true, nil, error)
+                    }
+                }
+                
+        }
+    }
+    func updateProfileDetailsAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:ProfileUpdateModel?, _ error:Error?)-> Void)
+    {
+        let updateProfileAPIURL = baseURL + updateProfileSuffix
+        //        let headers: HTTPHeaders = [ "Authorization": Authorization]
+        consolePrintValues(url: updateProfileAPIURL, parameters: parameters)
+        
+        Alamofire.request(updateProfileAPIURL, method: .post, parameters: parameters, headers: nil)
+            .validate(contentType: ["application/json"]).responseJSON(completionHandler: { (response) in
+                print(response as Any)
+            })
+            .responseObject { (response: DataResponse<ProfileUpdateModel>) in
+                let i =  response.response?.statusCode
+                
+                if i==402{
+                    let apiManager = APIManager()
+                    apiManager.createAPIKey{ (status, showError, response, error) in
+                        var createApiKey: CreateAPIKeyModel?
+                        if status == true {
+                            print("Sucess")
+                            
+                            createApiKey = response
+                            
+                            UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
+                            self.updateProfileDetailsAPI(parameters: parameters, completion: completion)
                             
                             
                         }

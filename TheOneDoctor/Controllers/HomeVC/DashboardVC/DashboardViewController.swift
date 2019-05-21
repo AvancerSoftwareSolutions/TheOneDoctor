@@ -66,7 +66,7 @@ class DashboardViewController: UIViewController,UIGestureRecognizerDelegate {
         imgView.layer.masksToBounds = true
     }
     override func viewWillAppear(_ animated: Bool) {
-//        navigationController?.navigationBar.isHidden = true
+        navigationController?.navigationBar.isHidden = true
     }
     override func viewWillDisappear(_ animated: Bool) {
         navigationController?.navigationBar.isHidden = false

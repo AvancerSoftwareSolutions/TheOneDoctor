@@ -15,6 +15,7 @@ class DoctorSpecialityCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var specialityLbl: UILabel!
     override func awakeFromNib() {
         super.awakeFromNib()
+        specialityLbl.adjustsFontSizeToFitWidth = true
         // Initialization code
     }
 

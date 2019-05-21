@@ -34,6 +34,7 @@ class WebAPIHelper: NSObject {
             GenericMethods.hideLoaderMethod(view: vc.view)
             
             GenericMethods.hideLoading()
+            GenericMethods.hideLoaderMethod(view: vc.view)
             GenericMethods.showAlertWithTitle(alertTitle: AppConstants.AppName, alertMessage: "The Internet connection appears to be offline.")
 
             
@@ -145,6 +146,7 @@ class WebAPIHelper: NSObject {
                 GenericMethods.hideLoaderMethod(view: vc.view)
 //                UIApplication.shared.endIgnoringInteractionEvents()
                 GenericMethods.hideLoading()
+                GenericMethods.hideLoaderMethod(view: vc.view)
                 GenericMethods.showAlertWithTitle(alertTitle: AppConstants.AppName, alertMessage: "The Internet connection appears to be offline.")
             } else {
                 print(params)
@@ -271,7 +273,7 @@ class WebAPIHelper: NSObject {
         
     }
 
-    class func postMethodFileUpload(fileData:Data,filename:String,mimeType:String,methodName:String,vc:UIViewController,success: @escaping (AnyObject?)->Void, Failure: @escaping (NSError) ->Void)
+    class func postMethodFileUpload(fileData:Data,filename:String,mimeType:String,methodName:String,keyname:String,vc:UIViewController,success: @escaping (AnyObject?)->Void, Failure: @escaping (NSError) ->Void)
     {
         if ReachabilityManager.shared.isConnectedToNetwork() == false
             
@@ -282,19 +284,22 @@ class WebAPIHelper: NSObject {
         }
         else
         {
-            let headers: HTTPHeaders = [
-                "X-API-KEY": "AvancerRapidWallet",
-                "Accept": "application/json"
-            ]
-            
+            let apiManager = APIManager()
+//            let headers: HTTPHeaders = [
+//                "Accept": "application/json"
+//            ]
+            let userId = UserDefaults.standard.value(forKey: "user_id") as? String ?? ""
             Alamofire.upload(multipartFormData: { multipartFormData in
                 
-                multipartFormData.append(fileData, withName: "uploadfile", fileName: filename, mimeType: mimeType)
+                multipartFormData.append(fileData, withName: keyname, fileName: filename, mimeType: mimeType)
+                
+                multipartFormData.append(userId.data(using: .utf8)!, withName: "doctor_id")
                 
                 
-            }, to: "\(AppConstants.BaseUrl)\(methodName)", method: .post, headers: headers,
+            }, to: "\(apiManager.fileUploadBaseURL)\(methodName)", method: .post, headers: nil,
                encodingCompletion: { encodingResult in
                 GenericMethods.hideLoading()
+                GenericMethods.hideLoaderMethod(view: vc.view)
                 print(encodingResult)
                 switch encodingResult {
                     
@@ -341,6 +346,155 @@ class WebAPIHelper: NSObject {
             
         }
             
+    }
+    class func addDoctorPicFileUpload(fileData:[Data],filename:[String],mimeType:[String],methodName:String,vc:UIViewController,success: @escaping (AnyObject?)->Void, Failure: @escaping (NSError) ->Void)
+    {
+        let apiManager = APIManager()
+        if ReachabilityManager.shared.isConnectedToNetwork() == false
+            
+        {
+            GenericMethods.hideLoaderMethod(view: vc.view)
+            GenericMethods.showAlertWithTitle(alertTitle: AppConstants.AppName, alertMessage: "The Internet connection appears to be offline.")
+            
+        }
+        else
+        {
+//            let headers: HTTPHeaders = [
+//                "Accept": "application/json"
+//            ]
+//            UserDefaults.standard.value(forKey: "user_id") ?? 0 as Int
+            let userId = UserDefaults.standard.value(forKey: "user_id") as? Int ?? 0
+            print("userId \(userId)")
+            print("secondUSerid \(UserDefaults.standard.value(forKey: "user_id") as Any)")
+//
+            let body:Parameters = ["doctor_id" : "2"]
+            
+            Alamofire.upload(multipartFormData: { (multipartFormData: MultipartFormData) in
+                for i in 0..<fileData.count
+                {
+                    multipartFormData.append(fileData[i], withName: "file[\(i)]", fileName: filename[i], mimeType: mimeType[i])
+                }
+                for (key, value) in body {
+                    print("value is \(value)")
+                    multipartFormData.append("2".data(using: String.Encoding.utf8)!, withName: key)
+                }
+            }, to: "\(apiManager.fileUploadBaseURL)\(methodName)", encodingCompletion: { (encodingResult) in
+                
+                
+                    GenericMethods.hideLoading()
+                GenericMethods.hideLoaderMethod(view: vc.view)
+                    print(encodingResult)
+                    switch encodingResult {
+                        
+                    case .success(let upload, _, _):
+                        print(upload.response as Any)
+                        print("response Data is \(upload.responseData as Any)")
+                        upload.responseJSON { response in
+                            
+                            //                        print("response is \(response.response as Any)")
+                            //                        print(response.request as Any)
+                            //                        print(response.result)
+                            
+                            switch response.result {
+                                
+                            case .success(let json):
+                                GenericMethods.hideLoaderMethod(view: vc.view)
+                                let y: AnyObject = (json as AnyObject?)!
+                                if let str:Int = y.object(forKey: "error_code") as? Int
+                                {
+                                    print(str)
+                                    GenericMethods.showAlert(alertMessage: "Something Went Wrong! Please try again")
+                                }
+                                else
+                                {
+                                    success(json as AnyObject?)
+                                }
+                                
+                                
+                            case .failure(let error):
+                                GenericMethods.hideLoaderMethod(view: vc.view)
+                                Failure(error as NSError)
+                                
+                                print("failure error is \(error)")
+                                
+                                GenericMethods.showAlertWithTitle(alertTitle: AppConstants.AppName, alertMessage: "\(error.localizedDescription)")
+                            }
+                        }
+                    case .failure(let encodingError):
+                        GenericMethods.hideLoaderMethod(view: vc.view)
+                        Failure(encodingError as NSError)
+                        print("encodingError:\(encodingError)")
+                    }
+                })
+            /*
+            Alamofire.upload(multipartFormData: { multipartFormData in
+             
+             
+             
+             
+                for i in 0..<fileData.count
+                {
+                  multipartFormData.append(fileData[i], withName: "file[]", fileName: filename[i], mimeType: mimeType[i])
+                }
+                for (key, value) in body {
+                    multipartFormData.append((value as! String).data(using: String.Encoding.utf8)!, withName: key)
+                }
+             
+                
+//                multipartFormData.append(fileData, withName: "uploadfile", fileName: filename, mimeType: mimeType)
+                
+                
+            }, to: "\(apiManager.fileUploadBaseURL)\(methodName)", method: .post, headers: nil,
+               encodingCompletion: { encodingResult in
+             
+                GenericMethods.hideLoading()
+                print(encodingResult)
+                switch encodingResult {
+                    
+                case .success(let upload, _, _):
+                    print(upload.response as Any)
+                    print("response Data is \(upload.responseData as Any)")
+                    upload.responseJSON { response in
+                        
+                        //                        print("response is \(response.response as Any)")
+                        //                        print(response.request as Any)
+                        //                        print(response.result)
+                        
+                        switch response.result {
+                            
+                        case .success(let json):
+                            GenericMethods.hideLoaderMethod(view: vc.view)
+                            let y: AnyObject = (json as AnyObject?)!
+                            if let str:Int = y.object(forKey: "error_code") as? Int
+                            {
+                                print(str)
+                                GenericMethods.showAlert(alertMessage: "Something Went Wrong! Please try again")
+                            }
+                            else
+                            {
+                                success(json as AnyObject?)
+                            }
+                            
+                            
+                        case .failure(let error):
+                            GenericMethods.hideLoaderMethod(view: vc.view)
+                            Failure(error as NSError)
+                            
+                            print("failure error is \(error)")
+                            
+                            GenericMethods.showAlertWithTitle(alertTitle: AppConstants.AppName, alertMessage: "\(error.localizedDescription)")
+                        }
+                    }
+                case .failure(let encodingError):
+                    GenericMethods.hideLoaderMethod(view: vc.view)
+                    Failure(encodingError as NSError)
+                    print("encodingError:\(encodingError)")
+                }
+            })
+            */
+            
+        }
+        
     }
     class func startDownload(audioUrl:String,vc:UIViewController,success: @escaping (URL?)->Void, Failure: @escaping (NSError) ->Void) {
         
