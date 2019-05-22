@@ -107,7 +107,26 @@ class FileUpload: NSObject {
         }
         return "application/octet-stream"
     }
-    
+    class func checkImgOrVideofromURL(filePath:String) ->
+        String
+    {
+        
+        let extend = NSURL(fileURLWithPath: filePath).pathExtension
+        
+        let uti = UTTypeCreatePreferredIdentifierForTag(
+            kUTTagClassFilenameExtension,extend! as CFString,
+        nil)
+        if UTTypeConformsTo((uti?.takeRetainedValue())!, kUTTypeImage) {
+            print("This is an image!")
+            return "image"
+        }
+        else
+        {
+            print("This is an video!")
+            return "video"
+        }
+        
+    }
     
     
     class func saveFileDataToLocal(fileData:Data , fileStr:String)
@@ -196,7 +215,11 @@ class FileUpload: NSObject {
                 return true
             }
             asset.requestContentEditingInput(with: options, completionHandler: { (contentEditingInput, info) in
-                completionHandler(contentEditingInput!.fullSizeImageURL)
+                guard let input = contentEditingInput else
+                {
+                    return completionHandler(nil)
+                }
+                completionHandler(input.fullSizeImageURL)
             })
         } else if asset.mediaType == .video {
             let options: PHVideoRequestOptions = PHVideoRequestOptions()

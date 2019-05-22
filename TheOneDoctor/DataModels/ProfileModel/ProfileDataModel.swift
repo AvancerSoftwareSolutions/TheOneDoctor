@@ -21,6 +21,8 @@ class ProfileDataModel:Mappable
     var gender:String?
     var maxcount:String?
     var designation:String?
+    var short_biography:String?
+    var picture:String?
     var specialityList:Array<ProfileSpecialityDataModel>?
     var subspecialityList:Array<SubSpecialityDataModel>?
     var additionalPictureList:Array<String>?
@@ -41,6 +43,7 @@ class ProfileDataModel:Mappable
         mobile <- map["mobile"]
         experience <- map["experience"]
         profPicture <- map["profile"]
+        picture <- map["picture"]
         gender <- map["sex"]
         maxcount <- map["maxcount"]
         designation <- map["designation"]
@@ -50,6 +53,7 @@ class ProfileDataModel:Mappable
         additionalVideoList <- map["additionalvideos"]
         uploadingPictureList <- map["additionalpicture"]
         uploadingVideoList <- map["additionalvideo"]
+        short_biography <- map["short_biography"]
     }
     
     

@@ -29,6 +29,10 @@ class DashboardViewController: UIViewController,UIGestureRecognizerDelegate {
 
         roundImgView(imgView: settingsImgView)
         GenericMethods.setProfileImage(imageView: profilePicImgView)
+        profilePicImgView.layer.shadowColor = UIColor.lightGray.cgColor
+        profilePicImgView.layer.shadowOpacity = 1.0
+        profilePicImgView.layer.shadowRadius = 2.5
+        profilePicImgView.layer.shadowOffset = CGSize(width: 0, height: 2)
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profilePageNavigationMethod))
         tapGesture.numberOfTapsRequired = 1
@@ -120,6 +124,11 @@ extension DashboardViewController:UICollectionViewDelegate,UICollectionViewDataS
             
             let appointVC = self.storyboard?.instantiateViewController(withIdentifier: "appointVC") as! AppointmentsViewController
             self.navigationController?.pushViewController(appointVC, animated: true)
+        case 1:
+            
+            let scheduleVC = self.storyboard?.instantiateViewController(withIdentifier: "scheduleVC") as! ScheduleViewController
+            self.navigationController?.pushViewController(scheduleVC, animated: true)
+            
         default:
             break
         }

@@ -24,7 +24,7 @@ class APIManager
     let updateKeyURLSuffix = ""
     let addSpecialitySuffix = "Speciality"
     let deletePicSuffix = "fileremove"
-    let updateProfileSuffix = "update"
+    let updateProfileSuffix = "Update"
     
     func consolePrintValues(url:String,parameters:Dictionary<String, Any>)
     {
@@ -350,12 +350,12 @@ class APIManager
     }
     func updateProfileDetailsAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:ProfileUpdateModel?, _ error:Error?)-> Void)
     {
-        let updateProfileAPIURL = baseURL + updateProfileSuffix
+        let updateProfileAPIURL = fileUploadBaseURL + updateProfileSuffix
         //        let headers: HTTPHeaders = [ "Authorization": Authorization]
         consolePrintValues(url: updateProfileAPIURL, parameters: parameters)
         
         Alamofire.request(updateProfileAPIURL, method: .post, parameters: parameters, headers: nil)
-            .validate(contentType: ["application/json"]).responseJSON(completionHandler: { (response) in
+            .validate(contentType: ["application/json","text/html"]).responseJSON(completionHandler: { (response) in
                 print(response as Any)
             })
             .responseObject { (response: DataResponse<ProfileUpdateModel>) in

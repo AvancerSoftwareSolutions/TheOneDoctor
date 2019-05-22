@@ -31,6 +31,7 @@ class SpecialityListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         self.doneBtnInst.transform = CGAffineTransform(scaleX: 0.0, y: 0.0)
         tableView.tableFooterView = UIView()
         popupView.layer.cornerRadius = 10.0

@@ -7,45 +7,95 @@
 // addScheduleVC
 
 import UIKit
+import Alamofire
 
 class AddScheduleViewController: UIViewController {
 
+    
+    //MARK:- Vairables
+    var addNormalScheduleCell:AddNormalScheduleTVC? = nil
+    var fromTime = ""
+    var toTime = ""
+    var patientHrs = ""
+    var weekDays = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let addBtn = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addScheduleBtnClick))
-        let editBtn = UIBarButtonItem(image: UIImage(named: "EditProfPic.png"), style: .plain, target: self, action: #selector(editScheduleBtnClick))
-        let svgHoldingView = UIView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
-        GenericMethods.setLeftViewWithSVG(svgView: svgHoldingView, with: "filter", color: UIColor.white)
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(filterBtnClick))
+        self.title = "Add Schedule"
+        
+        let label = UILabel(frame: CGRect(x: 0, y: 0, width: 70, height: 30))
+        label.text = "Done"
+        label.font = UIFont.systemFont(ofSize: 13.0)
+        label.textAlignment = .center
+        label.textColor = .white
+        label.backgroundColor = .clear
+        label.layer.borderColor = UIColor.white.cgColor
+        label.layer.borderWidth = 0.5
+        label.layer.cornerRadius = 10.0
+        label.layer.masksToBounds = true
+        label.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(addScheduleBtnMethod))
         tapGesture.numberOfTapsRequired = 1
-        svgHoldingView.addGestureRecognizer(tapGesture)
-        self.navigationItem.rightBarButtonItems = [addBtn,editBtn,UIBarButtonItem.init(customView: svgHoldingView)]
+        label.addGestureRecognizer(tapGesture)
+        
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(customView: label)
+        
+        
         
 
         // Do any additional setup after loading the view.
     }
-    @objc func filterBtnClick()
+    
+    @objc func addScheduleBtnMethod()
     {
         
     }
-    @objc func addScheduleBtnClick()
+    @objc func fromTimeBtnMethod(btn:UIButton)
     {
         
     }
-    @objc func editScheduleBtnClick()
+    @objc func toTimeBtnMethod(btn:UIButton)
     {
         
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    @objc func patientHrsBtnMethod(btn:UIButton)
+    {
+        
     }
-    */
+    
 
+
+}
+extension AddScheduleViewController:UITableViewDelegate,UITableViewDataSource
+{
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        
+        return weekDays.count
+    }
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        addNormalScheduleCell = tableView.dequeueReusableCell(withIdentifier: "addNormalScheduleCell") as? AddNormalScheduleTVC
+        if addNormalScheduleCell == nil
+        {
+            addNormalScheduleCell = AddNormalScheduleTVC(style: .default, reuseIdentifier: "addNormalScheduleCell")
+        }
+        
+        addNormalScheduleCell?.weekDayLabel.text = weekDays[indexPath.row]
+       
+       addNormalScheduleCell?.fromTimeBtnInstance.tag = indexPath.row
+        addNormalScheduleCell?.fromTimeBtnInstance.addTarget(self, action: #selector(fromTimeBtnMethod(btn:)), for: .touchUpInside)
+        addNormalScheduleCell?.toTimeBtnInstance.tag = indexPath.row
+        addNormalScheduleCell?.toTimeBtnInstance.addTarget(self, action: #selector(toTimeBtnMethod(btn:)), for: .touchUpInside)
+        addNormalScheduleCell?.patientHrsBtnInstance.tag = indexPath.row
+        addNormalScheduleCell?.patientHrsBtnInstance.addTarget(self, action: #selector(patientHrsBtnMethod(btn:)), for: .touchUpInside)
+        
+        return addNormalScheduleCell!
+    }
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 150
+    }
 }

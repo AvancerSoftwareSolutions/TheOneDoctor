@@ -40,6 +40,7 @@
 		1F4C669A228434D700453B2E /* EditProfPic.png in Resources */ = {isa = PBXBuildFile; fileRef = 1F4C6699228434D700453B2E /* EditProfPic.png */; };
 		1F4C669E228438C300453B2E /* SpecialityListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F4C669D228438C300453B2E /* SpecialityListViewController.swift */; };
 		1FA27EA622829AB600759E6A /* emptyProfile.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FA27EA522829AB500759E6A /* emptyProfile.png */; };
+		1FB56D0A22952EEA005A70B4 /* AddNormalScheduleTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB56D0922952EEA005A70B4 /* AddNormalScheduleTVC.swift */; };
 		1FB8F39B2281455E006AF087 /* CreateAPIKeyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB8F39A2281455E006AF087 /* CreateAPIKeyModel.swift */; };
 		1FB8F39D2281471A006AF087 /* UpdateKeyAPIModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB8F39C2281471A006AF087 /* UpdateKeyAPIModel.swift */; };
 		1FB8F3A1228167F9006AF087 /* StatusDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB8F3A0228167F9006AF087 /* StatusDataModel.swift */; };
@@ -61,6 +62,8 @@
 		1FC65AEC228D39EF00F889C9 /* AppointmentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FC65AEB228D39EF00F889C9 /* AppointmentsViewController.swift */; };
 		1FC65AEE228D450300F889C9 /* filter.svg in Resources */ = {isa = PBXBuildFile; fileRef = 1FC65AED228D450200F889C9 /* filter.svg */; };
 		1FC65AF1228D5F8400F889C9 /* ProfileSpecialityDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FC65AF0228D5F8400F889C9 /* ProfileSpecialityDataModel.swift */; };
+		1FF88A222295122A00A5C28A /* CalendarDateCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FF88A202295122A00A5C28A /* CalendarDateCollectionViewCell.swift */; };
+		1FF88A232295122A00A5C28A /* CalendarDateCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1FF88A212295122A00A5C28A /* CalendarDateCollectionViewCell.xib */; };
 		1FF8E5482282A58C0060D7FC /* Schedule.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FF8E5422282A5890060D7FC /* Schedule.png */; };
 		1FF8E5492282A58C0060D7FC /* Appoint.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FF8E5432282A5890060D7FC /* Appoint.png */; };
 		1FF8E54A2282A58C0060D7FC /* Watch.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FF8E5442282A5890060D7FC /* Watch.png */; };
@@ -118,6 +121,7 @@
 		1F4C6699228434D700453B2E /* EditProfPic.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = EditProfPic.png; sourceTree = "<group>"; };
 		1F4C669D228438C300453B2E /* SpecialityListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpecialityListViewController.swift; sourceTree = "<group>"; };
 		1FA27EA522829AB500759E6A /* emptyProfile.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = emptyProfile.png; sourceTree = "<group>"; };
+		1FB56D0922952EEA005A70B4 /* AddNormalScheduleTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNormalScheduleTVC.swift; sourceTree = "<group>"; };
 		1FB8F39A2281455E006AF087 /* CreateAPIKeyModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAPIKeyModel.swift; sourceTree = "<group>"; };
 		1FB8F39C2281471A006AF087 /* UpdateKeyAPIModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateKeyAPIModel.swift; sourceTree = "<group>"; };
 		1FB8F3A0228167F9006AF087 /* StatusDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusDataModel.swift; sourceTree = "<group>"; };
@@ -139,6 +143,8 @@
 		1FC65AEB228D39EF00F889C9 /* AppointmentsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentsViewController.swift; sourceTree = "<group>"; };
 		1FC65AED228D450200F889C9 /* filter.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = filter.svg; sourceTree = "<group>"; };
 		1FC65AF0228D5F8400F889C9 /* ProfileSpecialityDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSpecialityDataModel.swift; sourceTree = "<group>"; };
+		1FF88A202295122A00A5C28A /* CalendarDateCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarDateCollectionViewCell.swift; sourceTree = "<group>"; };
+		1FF88A212295122A00A5C28A /* CalendarDateCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CalendarDateCollectionViewCell.xib; sourceTree = "<group>"; };
 		1FF8E5422282A5890060D7FC /* Schedule.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Schedule.png; sourceTree = "<group>"; };
 		1FF8E5432282A5890060D7FC /* Appoint.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Appoint.png; sourceTree = "<group>"; };
 		1FF8E5442282A5890060D7FC /* Watch.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Watch.png; sourceTree = "<group>"; };
@@ -433,6 +439,8 @@
 				1FBE36C022942B6C002E32BA /* AddScheduleVC */,
 				1FBE36BF22942B5F002E32BA /* AddVIPScheduleVC */,
 				1FBE36BD22942AF2002E32BA /* ScheduleViewController.swift */,
+				1FBE36CE22944877002E32BA /* AddScheduleTVC */,
+				1FBE36C92294481D002E32BA /* CalendarCVC */,
 			);
 			path = ScheduleVC;
 			sourceTree = "<group>";
@@ -449,10 +457,27 @@
 			isa = PBXGroup;
 			children = (
 				1FBE36C122942BB1002E32BA /* AddScheduleViewController.swift */,
+				1FB56D0922952EEA005A70B4 /* AddNormalScheduleTVC.swift */,
+			);
+			path = AddScheduleVC;
+			sourceTree = "<group>";
+		};
+		1FBE36C92294481D002E32BA /* CalendarCVC */ = {
+			isa = PBXGroup;
+			children = (
+				1FF88A202295122A00A5C28A /* CalendarDateCollectionViewCell.swift */,
+				1FF88A212295122A00A5C28A /* CalendarDateCollectionViewCell.xib */,
+			);
+			path = CalendarCVC;
+			sourceTree = "<group>";
+		};
+		1FBE36CE22944877002E32BA /* AddScheduleTVC */ = {
+			isa = PBXGroup;
+			children = (
 				1FBE36C52294374B002E32BA /* AddScheduleTableViewCell.swift */,
 				1FBE36C62294374B002E32BA /* AddScheduleTableViewCell.xib */,
 			);
-			path = AddScheduleVC;
+			path = AddScheduleTVC;
 			sourceTree = "<group>";
 		};
 		1FC65AE4228D309400F889C9 /* AppointmentsVC */ = {
@@ -587,6 +612,7 @@
 				1F4C669A228434D700453B2E /* EditProfPic.png in Resources */,
 				1F1BFD82228C438F0005D927 /* ProfileBGImg.png in Resources */,
 				1FF8E5502282AAF50060D7FC /* Menprofile.png in Resources */,
+				1FF88A232295122A00A5C28A /* CalendarDateCollectionViewCell.xib in Resources */,
 				1FF8E54A2282A58C0060D7FC /* Watch.png in Resources */,
 				1FF8E54D2282A58C0060D7FC /* Queue.png in Resources */,
 				1F1242442280118800B13213 /* Assets.xcassets in Resources */,
@@ -624,6 +650,7 @@
 				"${BUILT_PRODUCTS_DIR}/BSImageView/BSImageView.framework",
 				"${BUILT_PRODUCTS_DIR}/DLRadioButton/DLRadioButton.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
+				"${BUILT_PRODUCTS_DIR}/JTAppleCalendar/JTAppleCalendar.framework",
 				"${BUILT_PRODUCTS_DIR}/MBProgressHUD/MBProgressHUD.framework",
 				"${BUILT_PRODUCTS_DIR}/ObjectMapper/ObjectMapper.framework",
 				"${BUILT_PRODUCTS_DIR}/Protobuf/Protobuf.framework",
@@ -644,6 +671,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BSImageView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DLRadioButton.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/JTAppleCalendar.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MBProgressHUD.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectMapper.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
@@ -687,6 +715,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1F0D8787228E7C9C0011050E /* OpenFileViewController.swift in Sources */,
+				1FF88A222295122A00A5C28A /* CalendarDateCollectionViewCell.swift in Sources */,
 				1F124283228055F000B13213 /* APIManager.swift in Sources */,
 				1FBE36B12293BC5F002E32BA /* DeletePicturesViewController.swift in Sources */,
 				1F4C669E228438C300453B2E /* SpecialityListViewController.swift in Sources */,
@@ -723,6 +752,7 @@
 				1FBE36BA2294219A002E32BA /* ProfileUpdateModel.swift in Sources */,
 				1FC65AE8228D30E300F889C9 /* AppointmentsFilterViewController.swift in Sources */,
 				1F1242612280168500B13213 /* LoginUserDataModel.swift in Sources */,
+				1FB56D0A22952EEA005A70B4 /* AddNormalScheduleTVC.swift in Sources */,
 				1F1242552280158F00B13213 /* OTPVerificationViewController.swift in Sources */,
 				1FBE36BE22942AF2002E32BA /* ScheduleViewController.swift in Sources */,
 				1F1242682280172900B13213 /* AppConstants.swift in Sources */,

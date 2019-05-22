@@ -30,7 +30,7 @@ struct AppConstants
         return result
     }
     static let appVersion: String = "/IOS/1.1.4"
-    static let AppName: String = "Rapid Wallet"
+    static let AppName: String = "The ONE"
     static let AppstoreUrl: String = "Url of my app"
     static let GoogleApiKey : String = "Api Key"
     static let authorizationKey:String = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*?"
@@ -44,7 +44,7 @@ struct AppConstants
     //Demo
      static let BaseUrl = "http://139.59.70.228/Avancer_rapidwallet_testing/api/v1/"
     
-    //  http://rapidwallet.biz/RWDemo/s
+    //  http://rapidwallet.biz/RWDemo/
     
 //    static let BaseUrl = "http://rapidwallet.biz/RWDemo/api/v1/"
     

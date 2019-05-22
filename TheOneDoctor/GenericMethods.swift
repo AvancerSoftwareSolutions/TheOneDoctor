@@ -170,7 +170,30 @@ class GenericMethods: NSObject {
         imgView.layer.borderColor = UIColor.white.cgColor
 //        imgView.contentMode = .scaleToFill
     }
-    
+    //MARK: Remove Comma
+    class func removeCommaFromStr(str:String) ->String
+    {
+        let resstr = str.replacingOccurrences(of: ",", with: "", options: NSString.CompareOptions.literal, range: nil)
+        print("resstr\(resstr)")
+        let str = resstr.replacingOccurrences(of: "\\s+", with: "", options: .regularExpression, range: nil)
+        print("str\(str)")
+        
+        
+        //        let str = resstr.replacingOccurrences(of: " ", with: "", options: NSString.CompareOptions.literal, range: nil)
+        return str
+    }
+    //MARK: Remove Space
+    class func removeSpaceFromStr(str:String) ->String
+    {
+        let resstr = str.replacingOccurrences(of: " ", with: "", options: NSString.CompareOptions.literal, range: nil)
+        print("resstr\(resstr)")
+        let str = resstr.replacingOccurrences(of: "\\s+", with: "", options: .regularExpression, range: nil)
+        print("str\(str)")
+        
+        
+        //        let str = resstr.replacingOccurrences(of: " ", with: "", options: NSString.CompareOptions.literal, range: nil)
+        return str
+    }
     //MARK:- Button Attributes
     class func setButtonAttributes ( button:UIButton,with title:String)
     {
@@ -180,6 +203,17 @@ class GenericMethods: NSObject {
         button.setTitle(title, for: .normal)
         button.setTitleColor(UIColor.white, for: .normal)
         
+    }
+    class func shadowCellView(view:UIView)
+    {
+        view.backgroundColor = UIColor.white
+        view.layer.cornerRadius = 5.0
+        view.layer.borderColor = UIColor.lightGray.cgColor
+        view.layer.borderWidth = 0.2
+        view.layer.shadowColor = UIColor.lightGray.cgColor
+        view.layer.shadowOpacity = 1.0
+        view.layer.shadowRadius = 2.5
+        view.layer.shadowOffset = CGSize(width: 0, height: 2)
     }
     class func paddedString(_ input: String?) -> String? {
         //This adds some space around the button title just to make it look better
@@ -384,6 +418,7 @@ class GenericMethods: NSObject {
         MBProgressHUD.hide(for: view, animated: true)
         UIApplication.shared.endIgnoringInteractionEvents()
     }
+    
     class func navigateToDashboard()
     {
         let storyboard: UIStoryboard = UIStoryboard.init(name: "Main", bundle: nil)

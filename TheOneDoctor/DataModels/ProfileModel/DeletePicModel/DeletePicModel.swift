@@ -1,5 +1,5 @@
 //
-//  ProfileUpdateModel.swift
+//  DeletePicModel.swift
 //  TheOneDoctor
 //
 //  Created by MyMac on 21/05/19.
@@ -9,7 +9,7 @@
 import Foundation
 import ObjectMapper
 
-class ProfileUpdateModel:Mappable
+class DeletePicModel:Mappable
 {
     
     var status:StatusDataModel?

@@ -139,7 +139,7 @@ class WebAPIHelper: NSObject {
         
     {
         
-        do {
+        
             if ReachabilityManager.shared.isConnectedToNetwork() == false
                 
             {
@@ -150,12 +150,13 @@ class WebAPIHelper: NSObject {
                 GenericMethods.showAlertWithTitle(alertTitle: AppConstants.AppName, alertMessage: "The Internet connection appears to be offline.")
             } else {
                 print(params)
+                let apiManager = APIManager()
                 var urlPath : URL!
-                urlPath = URL(string: "\(AppConstants.BaseUrl)" + "\(methodName)")
+                urlPath = URL(string: "\(apiManager.fileUploadBaseURL)" + "\(methodName)")
                 var request = URLRequest(url: urlPath! as URL)
                 request.httpMethod = "POST"
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-                request.setValue("AvancerRapidWallet", forHTTPHeaderField: "X-API-KEY")
+                request.setValue("text/html", forHTTPHeaderField: "Content-Type")
                 request.timeoutInterval = 120 // 120 secs
                 request.httpBody = try! JSONSerialization.data(withJSONObject: params, options: [])
                 Alamofire.request(request as URLRequestConvertible).responseJSON {
@@ -168,17 +169,18 @@ class WebAPIHelper: NSObject {
                     case .success(let json):
                         GenericMethods.hideLoaderMethod(view: vc.view)
 //                        UIApplication.shared.endIgnoringInteractionEvents()
+                        success(json as AnyObject?)
                         
-                        let y: AnyObject = (json as AnyObject?)!
-                        if let str:Int = y.object(forKey: "error_code") as? Int
-                        {
-                           print(str)
-                            GenericMethods.showAlert(alertMessage: "Something Went Wrong! Please try again")
-                        }
-                        else{
-                            success(json as AnyObject?)
-
-                        }
+//                        let y: AnyObject = (json as AnyObject?)!
+//                        if let str:Int = y.object(forKey: "error_code") as? Int
+//                        {
+//                           print(str)
+//                            GenericMethods.showAlert(alertMessage: "Something Went Wrong! Please try again")
+//                        }
+//                        else{
+//                            success(json as AnyObject?)
+//
+//                        }
                         
                         
                     
@@ -191,16 +193,10 @@ class WebAPIHelper: NSObject {
                     GenericMethods.showAlertWithTitle(alertTitle: AppConstants.AppName, alertMessage: "\(error.localizedDescription)")
                    }
                     // do whatever you want here
-                }
+                    }
             }
             
-        }
-            
-        catch  {
-            
-            print("Error in catch \(error.localizedDescription)")
-            
-        }
+        
         
         
         
@@ -278,7 +274,6 @@ class WebAPIHelper: NSObject {
         if ReachabilityManager.shared.isConnectedToNetwork() == false
             
         {
-            GenericMethods.hideLoaderMethod(view: vc.view)
             GenericMethods.showAlertWithTitle(alertTitle: AppConstants.AppName, alertMessage: "The Internet connection appears to be offline.")
             
         }
@@ -288,12 +283,12 @@ class WebAPIHelper: NSObject {
 //            let headers: HTTPHeaders = [
 //                "Accept": "application/json"
 //            ]
-            let userId = UserDefaults.standard.value(forKey: "user_id") as? String ?? ""
+            let userId = UserDefaults.standard.value(forKey: "user_id") as? Int ?? 0
             Alamofire.upload(multipartFormData: { multipartFormData in
                 
                 multipartFormData.append(fileData, withName: keyname, fileName: filename, mimeType: mimeType)
                 
-                multipartFormData.append(userId.data(using: .utf8)!, withName: "doctor_id")
+                multipartFormData.append("\(userId)".data(using: .utf8)!, withName: "doctor_id")
                 
                 
             }, to: "\(apiManager.fileUploadBaseURL)\(methodName)", method: .post, headers: nil,
@@ -315,7 +310,7 @@ class WebAPIHelper: NSObject {
                         switch response.result {
                             
                         case .success(let json):
-                            GenericMethods.hideLoaderMethod(view: vc.view)
+                            
                             let y: AnyObject = (json as AnyObject?)!
                             if let str:Int = y.object(forKey: "error_code") as? Int
                             {
@@ -329,7 +324,7 @@ class WebAPIHelper: NSObject {
                             
                             
                         case .failure(let error):
-                            GenericMethods.hideLoaderMethod(view: vc.view)
+                            
                             Failure(error as NSError)
                             
                             print("failure error is \(error)")
@@ -353,7 +348,6 @@ class WebAPIHelper: NSObject {
         if ReachabilityManager.shared.isConnectedToNetwork() == false
             
         {
-            GenericMethods.hideLoaderMethod(view: vc.view)
             GenericMethods.showAlertWithTitle(alertTitle: AppConstants.AppName, alertMessage: "The Internet connection appears to be offline.")
             
         }
@@ -376,13 +370,13 @@ class WebAPIHelper: NSObject {
                 }
                 for (key, value) in body {
                     print("value is \(value)")
-                    multipartFormData.append("2".data(using: String.Encoding.utf8)!, withName: key)
+                    multipartFormData.append("\(value)".data(using: String.Encoding.utf8)!, withName: key)
                 }
             }, to: "\(apiManager.fileUploadBaseURL)\(methodName)", encodingCompletion: { (encodingResult) in
                 
                 
                     GenericMethods.hideLoading()
-                GenericMethods.hideLoaderMethod(view: vc.view)
+                
                     print(encodingResult)
                     switch encodingResult {
                         
@@ -398,7 +392,7 @@ class WebAPIHelper: NSObject {
                             switch response.result {
                                 
                             case .success(let json):
-                                GenericMethods.hideLoaderMethod(view: vc.view)
+                                
                                 let y: AnyObject = (json as AnyObject?)!
                                 if let str:Int = y.object(forKey: "error_code") as? Int
                                 {
@@ -426,6 +420,7 @@ class WebAPIHelper: NSObject {
                         print("encodingError:\(encodingError)")
                     }
                 })
+            
             /*
             Alamofire.upload(multipartFormData: { multipartFormData in
              
