@@ -18,6 +18,10 @@ class AddNormalScheduleTVC: UITableViewCell {
     
     @IBOutlet weak var weekDayLabel: UILabel!
     
+    @IBOutlet weak var fromView: UIView!
+    @IBOutlet weak var toView: UIView!
+    
+    @IBOutlet weak var refreshBtnInstance: UIButton!
     override func awakeFromNib() {
         super.awakeFromNib()
         GenericMethods.shadowCellView(view:bgView)

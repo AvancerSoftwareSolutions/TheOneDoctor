@@ -55,6 +55,8 @@ class AddScheduleTableViewCell: UITableViewCell {
         guard let validcell = cell as? CalendarDateCollectionViewCell else {
             return
         }
+        
+        
 //        if validcell.isHighlighted
 //        {
 //            validcell.backgroundColor = .red
@@ -93,24 +95,38 @@ extension AddScheduleTableViewCell:JTAppleCalendarViewDelegate,JTAppleCalendarVi
         
         cell.dateTextLabel.text = cellState.text
         
-        if Calendar.current.isDateInToday(date) {
-            cell.backgroundColor = UIColor.blue
-            cell.dateTextLabel.textColor = UIColor.orange
-            cell.achievedCountLbl.isHidden = false
-        } else {
+//        if Calendar.current.isDateInToday(date) {
+//            cell.backgroundColor = UIColor.blue
+//            cell.dateTextLabel.textColor = UIColor.orange
+//            cell.achievedCountLbl.isHidden = false
+//        }
+//        else
+//        {
             cell.backgroundColor = UIColor.white
+            cell.dateTextLabel.textColor = UIColor.darkText
             if cellState.dateBelongsTo != .thisMonth {
                 cell.dateTextLabel.textColor = UIColor.lightGray
             }
             else
             {
-                cell.dateTextLabel.textColor = UIColor.darkText
+                dateformatter.dateFormat = "yyyy-MM-dd"
+                print("date is \(dateformatter.string(from: date))")
+                let extractedDate = dateformatter.string(from: date)
+                
+                if let valueDict = AppConstants.resultDateDict.value(forKey: extractedDate) as? NSDictionary
+                {
+                    let valueDict1:NSMutableDictionary = NSMutableDictionary(dictionary: valueDict)
+                    cell.achievedCountLbl.isHidden = false
+                    cell.achievedCountLbl.text = "\(valueDict1.object(forKey: "achieved") as? Int ?? 0)"
+                }
             }
-        }
+            
+//        }
         //        cell.layer.cornerRadius = 5.0
 //        cell.layer.borderColor = UIColor.lightGray.cgColor
 //        cell.layer.borderWidth = 0.8
         
+//        print("date is \(dateformatter.string(from: date))")
         self.handleSelectedCell(cell: cell, cellState: cellState)
         return cell
         
@@ -135,7 +151,9 @@ extension AddScheduleTableViewCell:JTAppleCalendarViewDelegate,JTAppleCalendarVi
     }
     
     func calendar(_ calendar: JTAppleCalendarView, willDisplay cell: JTAppleCell, forItemAt date: Date, cellState: CellState, indexPath: IndexPath) {
+        
         self.handleSelectedCell(cell: cell, cellState: cellState)
+        
     }
     func calendar(_ calendar: JTAppleCalendarView, didSelectDate date: Date, cell: JTAppleCell?, cellState: CellState) {
         

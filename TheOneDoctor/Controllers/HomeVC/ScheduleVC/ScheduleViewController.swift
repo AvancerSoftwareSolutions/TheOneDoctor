@@ -8,6 +8,7 @@
 
 import UIKit
 import JTAppleCalendar
+import Alamofire
 
 class ScheduleViewController: UIViewController {
     
@@ -23,6 +24,10 @@ class ScheduleViewController: UIViewController {
     let todayDate = Date()
     let dateformatter = DateFormatter()
     var addScheduleCell:AddScheduleTableViewCell? = nil
+    let apiManager = APIManager()
+    var scheduleData:ScheduleModel?
+    
+    var resultDateDict:NSMutableDictionary = [:]
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,11 +47,13 @@ class ScheduleViewController: UIViewController {
         tapGesture.numberOfTapsRequired = 1
         svgHoldingView.addGestureRecognizer(tapGesture)
         self.navigationItem.rightBarButtonItems = [UIBarButtonItem.init(customView: svgHoldingView),editBtn,addBtn]
+    
         
         
         
         // Do any additional setup after loading the view.
     }
+    
     func roundLabel(lbl:UILabel,color:UIColor)
     {
         lbl.layer.cornerRadius = lbl.frame.height / 2
@@ -90,6 +97,36 @@ class ScheduleViewController: UIViewController {
     @objc func editScheduleBtnClick()
     {
         
+    }
+    
+    //MARK:- Loading Schedule
+    func loadingScheduleDetailsAPI()
+    {
+        var parameters = Dictionary<String, Any>()
+        parameters["user_id"] = UserDefaults.standard.value(forKey: "user_id") ?? 0 as Int
+        
+        GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
+        
+        apiManager.scheduleDetailsAPI(parameters: parameters) { (status, showError, response, error) in
+            
+            GenericMethods.hideLoaderMethod(view: self.view)
+            
+            if status == true {
+                self.scheduleData = response
+                if self.scheduleData?.status?.code == "0" {
+                    
+                    
+                }
+                else
+                {
+                    GenericMethods.showAlertwithPopNavigation(alertMessage: self.scheduleData?.status?.message ?? "Unable to fetch data. Please try again after sometime.", vc: self)
+                }
+            }
+            else
+            {
+                GenericMethods.showAlertwithPopNavigation(alertMessage: error?.localizedDescription ?? "Something Went Wrong. Please try again.", vc: self)
+            }
+        }
     }
 
     

@@ -118,12 +118,12 @@ class FileUpload: NSObject {
         nil)
         if UTTypeConformsTo((uti?.takeRetainedValue())!, kUTTypeImage) {
             print("This is an image!")
-            return "image"
+            return AppConstants.imageFileName
         }
         else
         {
             print("This is an video!")
-            return "video"
+            return AppConstants.videoFileName
         }
         
     }
@@ -133,7 +133,7 @@ class FileUpload: NSObject {
     {
         let fileManager = FileManager.default
         if let tDocumentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
-            let filePath =  tDocumentDirectory.appendingPathComponent("RapidWallet")
+            let filePath =  tDocumentDirectory.appendingPathComponent(AppConstants.storageFolderName)
             if !fileManager.fileExists(atPath: filePath.path) {
                 do {
                     try fileManager.createDirectory(atPath: filePath.path, withIntermediateDirectories: true, attributes: nil)
@@ -162,7 +162,7 @@ class FileUpload: NSObject {
     {
         let fileManager = FileManager.default
         if let tDocumentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
-            let filePath =  tDocumentDirectory.appendingPathComponent("RapidWallet")
+            let filePath =  tDocumentDirectory.appendingPathComponent(AppConstants.storageFolderName)
             if fileManager.fileExists(atPath: filePath.path) {
                 do {
                     try fileManager.removeItem(at: filePath)
@@ -178,7 +178,7 @@ class FileUpload: NSObject {
         var localFilesArray:NSArray = []
         let fileManager = FileManager.default
         if let tDocumentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
-            let filePath =  tDocumentDirectory.appendingPathComponent("RapidWallet")
+            let filePath =  tDocumentDirectory.appendingPathComponent(AppConstants.storageFolderName)
             print(filePath)
             print(filePath.path)
             print(filePath.pathComponents)
@@ -234,17 +234,17 @@ class FileUpload: NSObject {
             })
         }
     }
-    class func showcamera(imagePicker:UIImagePickerController,vc:UIViewController) {
+    class func showcamera(type:String,imagePicker:UIImagePickerController,vc:UIViewController) {
         let authStatus: AVAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: .video)
         if authStatus == .authorized {
-            FileUpload.openCamera(imagePicker: imagePicker, vc: vc)
+            FileUpload.openCamera(type: type, imagePicker: imagePicker, vc: vc)
         } else if authStatus == .notDetermined {
             //NSLog(@"%@", @"Camera access not determined. Ask for permission.");
             
             AVCaptureDevice.requestAccess(for: .video, completionHandler: { granted in
                 if granted {
                     //NSLog(@"Granted access to %@", AVMediaTypeVideo);
-                    FileUpload.openCamera(imagePicker: imagePicker, vc: vc)
+                    FileUpload.openCamera(type: type, imagePicker: imagePicker, vc: vc)
                 } else {
                     //NSLog(@"Not granted access to %@", AVMediaTypeVideo);
                     FileUpload.camDenied(vc:vc)
@@ -264,12 +264,20 @@ class FileUpload: NSObject {
             
         }
     }
-    class func openCamera(imagePicker:UIImagePickerController,vc:UIViewController)
+    class func openCamera(type:String,imagePicker:UIImagePickerController,vc:UIViewController)
     {
         if(UIImagePickerController .isSourceTypeAvailable(UIImagePickerController.SourceType.camera))
         {
             imagePicker.sourceType = UIImagePickerController.SourceType.camera
-            imagePicker.mediaTypes = [kUTTypeImage as String,kUTTypeMovie as String,kUTTypeVideo as String]
+            if type == "picture"
+            {
+                imagePicker.mediaTypes = [kUTTypeImage as String]
+            }
+            else
+            {
+               imagePicker.mediaTypes = [kUTTypeImage as String,kUTTypeMovie as String,kUTTypeVideo as String]
+            }
+            
             imagePicker.allowsEditing = false
             imagePicker.videoQuality = UIImagePickerController.QualityType.typeHigh
             vc.present(imagePicker, animated: true, completion: nil)
@@ -314,9 +322,7 @@ class FileUpload: NSObject {
         
         let alert = UIAlertController(title: "Error", message: "It looks like your privacy settings are preventing us from accessing your camera to take Photos. You can fix this by doing the following:\n\n1. Touch the Settings button below to open the Settings of this app.\n\n2. Turn the Camera on.\n\n3. Open this app and try again.", preferredStyle: .alert)
         let settingsAction = UIAlertAction(title: "Settings", style: .default, handler: { action in
-            defer {
-            }
-            do {
+            
                 //NSLog(@"tapped Settings");
                 //                let canOpenSettings: Bool = UIApplication.openSettingsURLString != nil
                 //                if canOpenSettings {
@@ -324,10 +330,7 @@ class FileUpload: NSObject {
                 
                 UIApplication.shared.open(url!, options: [:], completionHandler: nil)
                 //                }
-            }
-            catch let exception {
-                print(exception)
-            }
+            
         })
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         
@@ -335,7 +338,7 @@ class FileUpload: NSObject {
         alert.addAction(cancelAction)
         vc.present(alert, animated: true)
     }
-    class func openGallary(imagePicker:UIImagePickerController,vc:UIViewController)
+    class func openGallary(type:String,imagePicker:UIImagePickerController,vc:UIViewController)
     {
 //        let vc = BSImagePickerViewController()
 //        vc.bs_presentImagePickerController(vc, animated: true, select: { (asset:PHAsset) in
@@ -353,7 +356,15 @@ class FileUpload: NSObject {
 //        }, completion: nil)
         
         imagePicker.sourceType = UIImagePickerController.SourceType.photoLibrary
-        imagePicker.mediaTypes = [kUTTypeImage as String,kUTTypeVideo as String]
+        if type == "picture"
+        {
+            imagePicker.mediaTypes = [kUTTypeImage as String]
+        }
+        else
+        {
+            imagePicker.mediaTypes = [kUTTypeImage as String,kUTTypeMovie as String,kUTTypeVideo as String]
+        }
+        
         imagePicker.mediaTypes = UIImagePickerController.availableMediaTypes(for: .photoLibrary)!
         imagePicker.allowsEditing = false
         imagePicker.videoQuality = UIImagePickerController.QualityType.typeHigh

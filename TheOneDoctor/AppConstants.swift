@@ -33,8 +33,13 @@ struct AppConstants
     static let AppName: String = "The ONE"
     static let AppstoreUrl: String = "Url of my app"
     static let GoogleApiKey : String = "Api Key"
-    static let authorizationKey:String = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*?"
-
+    static let storageFolderName : String = "TheONE"
+    static let imageFileName: String = "image"
+    static let videoFileName: String = "video"
+    static let docImgListplaceHolderImg = UIImage(named: "LoaderImage")
+    static let errorLoadingImg = UIImage(named: "ErrorImage")
+    static var resultDateDict:NSMutableDictionary = [:]
+    
 //  ****************************************************************************
     
     //local

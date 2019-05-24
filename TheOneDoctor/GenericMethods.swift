@@ -335,14 +335,14 @@ class GenericMethods: NSObject {
             }
         }
     }
-    class func setProfileImage(imageView: UIImageView)
+    class func setProfileImage(imageView: UIImageView,borderColor:UIColor)
     {
         imageView.layer.cornerRadius = imageView.frame.size.height / 2
         imageView.layer.borderWidth = 0.2
         
         imageView.clipsToBounds = true
         imageView.layer.masksToBounds = true
-        imageView.layer.borderColor = UIColor.white.cgColor
+        imageView.layer.borderColor = borderColor.cgColor
         imageView.contentMode = .scaleToFill
         imageView.image = nil
         let gender = UserDefaults.standard.value(forKey: "gender") as? String ?? ""
@@ -364,6 +364,7 @@ class GenericMethods: NSObject {
             }
             else{
                 print(error?.localizedDescription as Any)
+                imageView.contentMode = .center
                 imageView.image = placeHolderImg
                 
             }
@@ -413,6 +414,67 @@ class GenericMethods: NSObject {
         loadingNotification.mode = MBProgressHUDMode.indeterminate
         loadingNotification.label.text = message
     }
+    // MARK:- 24 hrs to 12 hrs
+    class func convert24hrto12hrFormat(dateStr:String) -> String
+    {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "HH:mm"
+        
+        guard let date = dateFormatter.date(from: dateStr) else
+        {
+            return "00:00 AM"
+        }
+        dateFormatter.dateFormat = "h:mm a"
+        let Date12 = dateFormatter.string(from: date)
+//        print("12 hour formatted Date:",Date12)
+        if Date12 == "12:00 AM"
+        {
+            return "00:00 AM"
+        }
+        return Date12
+    }
+    // MARK:- 24 hrs to 12 hrs
+    class func convertHrstoMinsFormat(dateStr:String) -> String
+    {
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "HH:mm"
+        
+        
+        guard let date = dateFormatter.date(from: dateStr) else
+        {
+            return "0 mins"
+        }
+        dateFormatter.dateFormat = "h"
+        let hour = dateFormatter.string(from: date)
+        dateFormatter.dateFormat = "mm"
+        let minute = dateFormatter.string(from: date)
+        
+        let outputStr = "\(hour)hrs \(minute)mins"
+        if outputStr == "12hrs 00mins"
+        {
+            return "0 mins"
+        }
+        else if outputStr.contains("12hrs")
+        {
+            return "\(minute)mins"
+        }
+        else if outputStr.contains("00mins")
+        {
+            return "\(hour)hrs"
+        }
+        return outputStr
+
+    }
+    
+    //MARK Date to 12 hrs
+    class func convertDateto12hrFormat(dateStr:Date) -> String
+    {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "h:mm a"
+        let date = dateFormatter.string(from: dateStr)
+        return date
+    }
     class func hideLoaderMethod(view:UIView)
     {
         MBProgressHUD.hide(for: view, animated: true)
@@ -428,10 +490,20 @@ class GenericMethods: NSObject {
         appDelegate?.window?.makeKeyAndVisible()
         
     }
+    class func navigateToLogin()
+    {
+        let storyboard: UIStoryboard = UIStoryboard.init(name: "Main", bundle: nil)
+        let loginVC = storyboard.instantiateViewController(withIdentifier: "loginVC") as? LoginViewController
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        appDelegate?.window?.rootViewController = loginVC
+        appDelegate?.window?.makeKeyAndVisible()
+    }
+    
     //MARK:- Getting thumbnail from Video
     class func createThumbnailOfVideoFromRemoteUrl(url: String,imgView:UIImageView,playImgView:UIImageView) {
-//        DispatchQueue.global(qos: .userInitiated).async {
-            //Wrap thumbnail generation code here
+        let ckeckUrl = FileUpload.checkImgOrVideofromURL(filePath: url)
+        if ckeckUrl == AppConstants.videoFileName
+        {
             let asset = AVAsset(url: URL(string: url)!)
             let assetImgGenerate = AVAssetImageGenerator(asset: asset)
             assetImgGenerate.appliesPreferredTrackTransform = true
@@ -448,33 +520,42 @@ class GenericMethods: NSObject {
                 }
                 
             } catch {
-//                print(error.localizedDescription)
+                print(error.localizedDescription)
+                imgView.contentMode = .center
+                imgView.image = AppConstants.errorLoadingImg
+            }
+        }
+        else
+        {
+            DispatchQueue.main.async {
+                playImgView.isHidden = true
+                imgView.contentMode = .scaleAspectFit
+                imgView.image = nil
+                imgView.sd_setImage(with: URL(string: url), placeholderImage: AppConstants.docImgListplaceHolderImg,options: SDWebImageOptions(rawValue: 0), completed: { (image, error, cacheType, imageURL) in
+                    
+                    if error == nil
+                    {
+                        imgView.image = image
+                        
+                    }
+                    else{
+                        print("error is \(error?.localizedDescription as Any)")
+                        imgView.contentMode = .center
+                        imgView.image = AppConstants.errorLoadingImg
+                        
+                    }
+                    
+                    // Perform operation.
+                })
                 
-                DispatchQueue.main.async {
-                    playImgView.isHidden = true
-                    imgView.contentMode = .scaleAspectFit
-                    imgView.image = nil
-                    imgView.sd_setImage(with: URL(string: url), placeholderImage: UIImage(named: "emptyProfile.png"),options: SDWebImageOptions(rawValue: 0), completed: { (image, error, cacheType, imageURL) in
-                        
-                        if error == nil
-                        {
-                            imgView.image = image
-                            
-                        }
-                        else{
-                            print("error is \(error?.localizedDescription as Any)")
-                            imgView.image = UIImage(named: "emptyProfile.png")
-                            
-                        }
-                        
-                        // Perform operation.
-                    })
-                }
                 
                 
                 
             }
-//        }
+        }
+        
+                
+        
         
     }
     // MARK:  Encrypt Method

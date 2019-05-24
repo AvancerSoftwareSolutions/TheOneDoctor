@@ -186,11 +186,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         else
         {
-            let storyboard: UIStoryboard = UIStoryboard.init(name: "Main", bundle: nil)
-            let loginVC = storyboard.instantiateViewController(withIdentifier: "loginVC") as? LoginViewController
-            let appDelegate = UIApplication.shared.delegate as? AppDelegate
-            appDelegate?.window?.rootViewController = loginVC
-            appDelegate?.window?.makeKeyAndVisible()
+            GenericMethods.navigateToLogin()
         }
     }
     func jsonConversion(_ key: Any?) {
@@ -361,7 +357,43 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         }
         
     }
-    
+    func messaging(_ messaging: Messaging, didReceive remoteMessage: MessagingRemoteMessage) {
+        print("applicationReceivedRemoteMessage")
+        print(remoteMessage)
+        print("appdata \(remoteMessage.appData)")
+        
+        
+        guard let data =
+            try? JSONSerialization.data(withJSONObject: remoteMessage.appData, options: .prettyPrinted),
+            let prettyPrinted = String(data: data, encoding: .utf8) else { return }
+        print("Received direct channel message:\n\(prettyPrinted)")
+        var alertacceptDict: [AnyHashable : Any]? = nil
+        
+        alertacceptDict = try! JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [AnyHashable : Any]
+        if let aDict = alertacceptDict {
+            print("responseDict \(aDict)")
+        }
+        if let body = alertacceptDict?["body"] {
+            print("body is \("\(body)")")
+        }
+        if let title = alertacceptDict?["title"] {
+            print("title is \("\(title)")")
+        }
+        if let ClinicName = alertacceptDict?["Clinic Name"] {
+            print("Clinic Name is \("\(ClinicName)")")
+        }
+        if let Address = alertacceptDict?["Address"] {
+            print("Address is \("\(Address)")")
+        }
+    }
+    func application(received remoteMessage: MessagingRemoteMessage) {
+        print("Received Remote Message: 3\nCheck In:\n")
+        debugPrint(remoteMessage.appData)
+        print("Received Remote Message: 3\nCheck Out:\n")
+        
+        
+        
+    }
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         print("willPresent")
         
@@ -409,9 +441,9 @@ extension AppDelegate : MessagingDelegate {
     
     
     // Receive data message on iOS 10 devices while app is in the foreground.
-    func application(received remoteMessage: MessagingRemoteMessage) {
-        debugPrint(remoteMessage.appData)
-    }
+//    func application(received remoteMessage: MessagingRemoteMessage) {
+//        debugPrint(remoteMessage.appData)
+//    }
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
         print("Firebase registration token: \(fcmToken)")
         AppConstants.fcmToken = fcmToken

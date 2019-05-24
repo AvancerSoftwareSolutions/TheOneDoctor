@@ -39,6 +39,12 @@
 		1F209A052280675900C48120 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1F209A042280675900C48120 /* GoogleService-Info.plist */; };
 		1F4C669A228434D700453B2E /* EditProfPic.png in Resources */ = {isa = PBXBuildFile; fileRef = 1F4C6699228434D700453B2E /* EditProfPic.png */; };
 		1F4C669E228438C300453B2E /* SpecialityListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F4C669D228438C300453B2E /* SpecialityListViewController.swift */; };
+		1F55DB812297C5EB00B92E6B /* ScheduleJson.json in Resources */ = {isa = PBXBuildFile; fileRef = 1F55DB802297C5EB00B92E6B /* ScheduleJson.json */; };
+		1F55DB8322982B5A00B92E6B /* ScheduleDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F55DB8222982B5A00B92E6B /* ScheduleDataModel.swift */; };
+		1F55DB8522982C4700B92E6B /* ScheduleClinicDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F55DB8422982C4700B92E6B /* ScheduleClinicDataModel.swift */; };
+		1F55DB89229832DA00B92E6B /* AppointmentsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F55DB88229832DA00B92E6B /* AppointmentsModel.swift */; };
+		1F55DB8B229832EE00B92E6B /* AppointmentsDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F55DB8A229832EE00B92E6B /* AppointmentsDataModel.swift */; };
+		1F55DB8D2298331200B92E6B /* AppointmentsFilterModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F55DB8C2298331200B92E6B /* AppointmentsFilterModel.swift */; };
 		1FA27EA622829AB600759E6A /* emptyProfile.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FA27EA522829AB500759E6A /* emptyProfile.png */; };
 		1FB56D0A22952EEA005A70B4 /* AddNormalScheduleTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB56D0922952EEA005A70B4 /* AddNormalScheduleTVC.swift */; };
 		1FB8F39B2281455E006AF087 /* CreateAPIKeyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB8F39A2281455E006AF087 /* CreateAPIKeyModel.swift */; };
@@ -57,6 +63,17 @@
 		1FBE36C422942BCA002E32BA /* AddVIPScheduleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FBE36C322942BCA002E32BA /* AddVIPScheduleViewController.swift */; };
 		1FBE36C72294374B002E32BA /* AddScheduleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FBE36C52294374B002E32BA /* AddScheduleTableViewCell.swift */; };
 		1FBE36C82294374B002E32BA /* AddScheduleTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1FBE36C62294374B002E32BA /* AddScheduleTableViewCell.xib */; };
+		1FC341812296621C00634EAD /* loaderImg.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FC3417F2296621B00634EAD /* loaderImg.png */; };
+		1FC341822296621C00634EAD /* errorImg.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FC341802296621C00634EAD /* errorImg.png */; };
+		1FC341842296A7C500634EAD /* Email.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FC341832296A7C500634EAD /* Email.png */; };
+		1FC341862296A8D700634EAD /* edit.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FC341852296A8D600634EAD /* edit.png */; };
+		1FC341882296A91300634EAD /* Settings.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FC341872296A91200634EAD /* Settings.png */; };
+		1FC3418A2296AA1100634EAD /* editing.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FC341892296AA1000634EAD /* editing.png */; };
+		1FC3418D2296C17900634EAD /* ScheduleModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FC3418C2296C17900634EAD /* ScheduleModel.swift */; };
+		1FC341902296C1BF00634EAD /* AddScheduleModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FC3418F2296C1BF00634EAD /* AddScheduleModel.swift */; };
+		1FC341942296C1EC00634EAD /* AddVIPScheduleModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FC341932296C1EC00634EAD /* AddVIPScheduleModel.swift */; };
+		1FC3419E2296DFFD00634EAD /* reload.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FC3419D2296DFFD00634EAD /* reload.png */; };
+		1FC341A02296E96900634EAD /* AddScheduleDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FC3419F2296E96900634EAD /* AddScheduleDataModel.swift */; };
 		1FC65AE8228D30E300F889C9 /* AppointmentsFilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FC65AE7228D30E300F889C9 /* AppointmentsFilterViewController.swift */; };
 		1FC65AEA228D34D400F889C9 /* AppointmentsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FC65AE9228D34D400F889C9 /* AppointmentsTableViewCell.swift */; };
 		1FC65AEC228D39EF00F889C9 /* AppointmentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FC65AEB228D39EF00F889C9 /* AppointmentsViewController.swift */; };
@@ -120,6 +137,12 @@
 		1F209A062280676400C48120 /* TheOneDoctor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TheOneDoctor.entitlements; sourceTree = "<group>"; };
 		1F4C6699228434D700453B2E /* EditProfPic.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = EditProfPic.png; sourceTree = "<group>"; };
 		1F4C669D228438C300453B2E /* SpecialityListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpecialityListViewController.swift; sourceTree = "<group>"; };
+		1F55DB802297C5EB00B92E6B /* ScheduleJson.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ScheduleJson.json; sourceTree = "<group>"; };
+		1F55DB8222982B5A00B92E6B /* ScheduleDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleDataModel.swift; sourceTree = "<group>"; };
+		1F55DB8422982C4700B92E6B /* ScheduleClinicDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleClinicDataModel.swift; sourceTree = "<group>"; };
+		1F55DB88229832DA00B92E6B /* AppointmentsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppointmentsModel.swift; path = TheOneDoctor/DataModels/ScheduleModel/AppointmentsModel.swift; sourceTree = SOURCE_ROOT; };
+		1F55DB8A229832EE00B92E6B /* AppointmentsDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentsDataModel.swift; sourceTree = "<group>"; };
+		1F55DB8C2298331200B92E6B /* AppointmentsFilterModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentsFilterModel.swift; sourceTree = "<group>"; };
 		1FA27EA522829AB500759E6A /* emptyProfile.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = emptyProfile.png; sourceTree = "<group>"; };
 		1FB56D0922952EEA005A70B4 /* AddNormalScheduleTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNormalScheduleTVC.swift; sourceTree = "<group>"; };
 		1FB8F39A2281455E006AF087 /* CreateAPIKeyModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAPIKeyModel.swift; sourceTree = "<group>"; };
@@ -138,6 +161,17 @@
 		1FBE36C322942BCA002E32BA /* AddVIPScheduleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddVIPScheduleViewController.swift; sourceTree = "<group>"; };
 		1FBE36C52294374B002E32BA /* AddScheduleTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddScheduleTableViewCell.swift; sourceTree = "<group>"; };
 		1FBE36C62294374B002E32BA /* AddScheduleTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AddScheduleTableViewCell.xib; sourceTree = "<group>"; };
+		1FC3417F2296621B00634EAD /* loaderImg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = loaderImg.png; sourceTree = "<group>"; };
+		1FC341802296621C00634EAD /* errorImg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = errorImg.png; sourceTree = "<group>"; };
+		1FC341832296A7C500634EAD /* Email.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Email.png; sourceTree = "<group>"; };
+		1FC341852296A8D600634EAD /* edit.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = edit.png; sourceTree = "<group>"; };
+		1FC341872296A91200634EAD /* Settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Settings.png; sourceTree = "<group>"; };
+		1FC341892296AA1000634EAD /* editing.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = editing.png; sourceTree = "<group>"; };
+		1FC3418C2296C17900634EAD /* ScheduleModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleModel.swift; sourceTree = "<group>"; };
+		1FC3418F2296C1BF00634EAD /* AddScheduleModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddScheduleModel.swift; sourceTree = "<group>"; };
+		1FC341932296C1EC00634EAD /* AddVIPScheduleModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddVIPScheduleModel.swift; sourceTree = "<group>"; };
+		1FC3419D2296DFFD00634EAD /* reload.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = reload.png; sourceTree = "<group>"; };
+		1FC3419F2296E96900634EAD /* AddScheduleDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddScheduleDataModel.swift; sourceTree = "<group>"; };
 		1FC65AE7228D30E300F889C9 /* AppointmentsFilterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentsFilterViewController.swift; sourceTree = "<group>"; };
 		1FC65AE9228D34D400F889C9 /* AppointmentsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentsTableViewCell.swift; sourceTree = "<group>"; };
 		1FC65AEB228D39EF00F889C9 /* AppointmentsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentsViewController.swift; sourceTree = "<group>"; };
@@ -223,6 +257,7 @@
 				1F1242652280172800B13213 /* AppConstants.swift */,
 				1F209A042280675900C48120 /* GoogleService-Info.plist */,
 				1F1242662280172800B13213 /* FileUpload.swift */,
+				1F55DB802297C5EB00B92E6B /* ScheduleJson.json */,
 				1F1242672280172900B13213 /* GenericMethods.swift */,
 			);
 			path = TheOneDoctor;
@@ -263,6 +298,8 @@
 		1F124251228014BC00B13213 /* DataModels */ = {
 			isa = PBXGroup;
 			children = (
+				1F55DB87229832CF00B92E6B /* AppointmentsModel */,
+				1FC3418B2296C16100634EAD /* ScheduleModel */,
 				1FB8F3A322818AC0006AF087 /* ProfileModel */,
 				1FB8F3992281453A006AF087 /* APIKeyModel */,
 				1FB8F3A222816C48006AF087 /* StatusDataModel */,
@@ -337,8 +374,15 @@
 			children = (
 				1FF8E5412282A5680060D7FC /* DoctorDashboard */,
 				1F4C6699228434D700453B2E /* EditProfPic.png */,
+				1FC341832296A7C500634EAD /* Email.png */,
+				1FC341852296A8D600634EAD /* edit.png */,
+				1FC341892296AA1000634EAD /* editing.png */,
+				1FC341802296621C00634EAD /* errorImg.png */,
+				1FC341872296A91200634EAD /* Settings.png */,
+				1FC3417F2296621B00634EAD /* loaderImg.png */,
 				1FA27EA522829AB500759E6A /* emptyProfile.png */,
 				1F1BFD81228C438E0005D927 /* ProfileBGImg.png */,
+				1FC3419D2296DFFD00634EAD /* reload.png */,
 				1FF8E54E2282AAF40060D7FC /* Menprofile.png */,
 				1FF8E54F2282AAF40060D7FC /* Womenprofile.png */,
 				1F12427A2280399100B13213 /* homeBg01.png */,
@@ -383,6 +427,16 @@
 				1FF8E5572282E3300060D7FC /* DoctorSpecialityCollectionViewCell.xib */,
 			);
 			path = DoctorSpecialityCell;
+			sourceTree = "<group>";
+		};
+		1F55DB87229832CF00B92E6B /* AppointmentsModel */ = {
+			isa = PBXGroup;
+			children = (
+				1F55DB88229832DA00B92E6B /* AppointmentsModel.swift */,
+				1F55DB8A229832EE00B92E6B /* AppointmentsDataModel.swift */,
+				1F55DB8C2298331200B92E6B /* AppointmentsFilterModel.swift */,
+			);
+			path = AppointmentsModel;
 			sourceTree = "<group>";
 		};
 		1FB8F3992281453A006AF087 /* APIKeyModel */ = {
@@ -478,6 +532,35 @@
 				1FBE36C62294374B002E32BA /* AddScheduleTableViewCell.xib */,
 			);
 			path = AddScheduleTVC;
+			sourceTree = "<group>";
+		};
+		1FC3418B2296C16100634EAD /* ScheduleModel */ = {
+			isa = PBXGroup;
+			children = (
+				1FC341922296C1D200634EAD /* AddVIPScheduleModel */,
+				1FC3418E2296C19E00634EAD /* AddScheduleModel */,
+				1FC3418C2296C17900634EAD /* ScheduleModel.swift */,
+				1F55DB8222982B5A00B92E6B /* ScheduleDataModel.swift */,
+				1F55DB8422982C4700B92E6B /* ScheduleClinicDataModel.swift */,
+			);
+			path = ScheduleModel;
+			sourceTree = "<group>";
+		};
+		1FC3418E2296C19E00634EAD /* AddScheduleModel */ = {
+			isa = PBXGroup;
+			children = (
+				1FC3418F2296C1BF00634EAD /* AddScheduleModel.swift */,
+				1FC3419F2296E96900634EAD /* AddScheduleDataModel.swift */,
+			);
+			path = AddScheduleModel;
+			sourceTree = "<group>";
+		};
+		1FC341922296C1D200634EAD /* AddVIPScheduleModel */ = {
+			isa = PBXGroup;
+			children = (
+				1FC341932296C1EC00634EAD /* AddVIPScheduleModel.swift */,
+			);
+			path = AddVIPScheduleModel;
 			sourceTree = "<group>";
 		};
 		1FC65AE4228D309400F889C9 /* AppointmentsVC */ = {
@@ -605,6 +688,7 @@
 				1FA27EA622829AB600759E6A /* emptyProfile.png in Resources */,
 				1FF8E5492282A58C0060D7FC /* Appoint.png in Resources */,
 				1FF8E55D2282F9060060D7FC /* DoctorPicturesCollectionViewCell.xib in Resources */,
+				1FC341822296621C00634EAD /* errorImg.png in Resources */,
 				1FF8E54C2282A58C0060D7FC /* Revenue.png in Resources */,
 				1F1242472280118800B13213 /* LaunchScreen.storyboard in Resources */,
 				1F12427B2280399100B13213 /* logo.png in Resources */,
@@ -613,13 +697,20 @@
 				1F1BFD82228C438F0005D927 /* ProfileBGImg.png in Resources */,
 				1FF8E5502282AAF50060D7FC /* Menprofile.png in Resources */,
 				1FF88A232295122A00A5C28A /* CalendarDateCollectionViewCell.xib in Resources */,
+				1FC3418A2296AA1100634EAD /* editing.png in Resources */,
 				1FF8E54A2282A58C0060D7FC /* Watch.png in Resources */,
 				1FF8E54D2282A58C0060D7FC /* Queue.png in Resources */,
 				1F1242442280118800B13213 /* Assets.xcassets in Resources */,
+				1FC341812296621C00634EAD /* loaderImg.png in Resources */,
+				1FC341842296A7C500634EAD /* Email.png in Resources */,
 				1FF8E5592282E3300060D7FC /* DoctorSpecialityCollectionViewCell.xib in Resources */,
 				1FF8E5512282AAF50060D7FC /* Womenprofile.png in Resources */,
+				1FC3419E2296DFFD00634EAD /* reload.png in Resources */,
 				1FBE36B52293D651002E32BA /* closeBtn.png in Resources */,
+				1FC341882296A91300634EAD /* Settings.png in Resources */,
+				1F55DB812297C5EB00B92E6B /* ScheduleJson.json in Resources */,
 				1F12427C2280399100B13213 /* homeBg01.png in Resources */,
+				1FC341862296A8D700634EAD /* edit.png in Resources */,
 				1FC65AEE228D450300F889C9 /* filter.svg in Resources */,
 				1FF8E5482282A58C0060D7FC /* Schedule.png in Resources */,
 				1FF8E5552282D2070060D7FC /* addImg.png in Resources */,
@@ -717,8 +808,11 @@
 				1F0D8787228E7C9C0011050E /* OpenFileViewController.swift in Sources */,
 				1FF88A222295122A00A5C28A /* CalendarDateCollectionViewCell.swift in Sources */,
 				1F124283228055F000B13213 /* APIManager.swift in Sources */,
+				1F55DB8D2298331200B92E6B /* AppointmentsFilterModel.swift in Sources */,
 				1FBE36B12293BC5F002E32BA /* DeletePicturesViewController.swift in Sources */,
 				1F4C669E228438C300453B2E /* SpecialityListViewController.swift in Sources */,
+				1F55DB89229832DA00B92E6B /* AppointmentsModel.swift in Sources */,
+				1F55DB8B229832EE00B92E6B /* AppointmentsDataModel.swift in Sources */,
 				1FB8F3A92281B283006AF087 /* DashboardCollectionViewCell.swift in Sources */,
 				1F12427F2280551500B13213 /* SendOTPModel.swift in Sources */,
 				1FBE36C222942BB1002E32BA /* AddScheduleViewController.swift in Sources */,
@@ -739,6 +833,10 @@
 				1F12425F2280166F00B13213 /* LoginModel.swift in Sources */,
 				1F12425C228015E100B13213 /* DashboardViewController.swift in Sources */,
 				1FBE36C422942BCA002E32BA /* AddVIPScheduleViewController.swift in Sources */,
+				1FC341902296C1BF00634EAD /* AddScheduleModel.swift in Sources */,
+				1FC341A02296E96900634EAD /* AddScheduleDataModel.swift in Sources */,
+				1F55DB8522982C4700B92E6B /* ScheduleClinicDataModel.swift in Sources */,
+				1FC341942296C1EC00634EAD /* AddVIPScheduleModel.swift in Sources */,
 				1F124272228018F900B13213 /* ReachabilityManager.swift in Sources */,
 				1F12426A2280172900B13213 /* GenericMethods.swift in Sources */,
 				1F12423A2280118600B13213 /* AppDelegate.swift in Sources */,
@@ -746,10 +844,12 @@
 				1F124259228015BE00B13213 /* ProfileViewController.swift in Sources */,
 				1FBE36C72294374B002E32BA /* AddScheduleTableViewCell.swift in Sources */,
 				1FF8E55F228304390060D7FC /* DashboardNavigateVC.swift in Sources */,
+				1FC3418D2296C17900634EAD /* ScheduleModel.swift in Sources */,
 				1F1242422280118600B13213 /* TheOneDoctor.xcdatamodeld in Sources */,
 				1FF8E55C2282F9060060D7FC /* DoctorPicturesCollectionViewCell.swift in Sources */,
 				1FB8F3A522818ADB006AF087 /* ProfileModel.swift in Sources */,
 				1FBE36BA2294219A002E32BA /* ProfileUpdateModel.swift in Sources */,
+				1F55DB8322982B5A00B92E6B /* ScheduleDataModel.swift in Sources */,
 				1FC65AE8228D30E300F889C9 /* AppointmentsFilterViewController.swift in Sources */,
 				1F1242612280168500B13213 /* LoginUserDataModel.swift in Sources */,
 				1FB56D0A22952EEA005A70B4 /* AddNormalScheduleTVC.swift in Sources */,

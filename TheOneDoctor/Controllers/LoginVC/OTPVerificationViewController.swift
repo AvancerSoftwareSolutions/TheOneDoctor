@@ -26,6 +26,7 @@ class OTPVerificationViewController: UIViewController {
     let apiManager = APIManager()
     var loginData:LoginModel?
     var loginUserData:LoginUserDataModel?
+    var sendOTPData:SendOTPModel?
     
     
     override func viewDidLoad() {
@@ -44,6 +45,9 @@ class OTPVerificationViewController: UIViewController {
         numberToolbar.barStyle = .default
         numberToolbar.items = [UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil), UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(self.doneWithNumberPad))]
         numberToolbar.sizeToFit()
+        tf1.inputAccessoryView = numberToolbar
+        tf2.inputAccessoryView = numberToolbar
+        tf3.inputAccessoryView = numberToolbar
         tf4.inputAccessoryView = numberToolbar
         // Do any additional setup after loading the view.
     }
@@ -56,37 +60,102 @@ class OTPVerificationViewController: UIViewController {
     }
     @objc func doneWithNumberPad()
     {
-        pinValidationMethod()
+        self.view.endEditing(true)
+        if pinValidationMethod()
+        {
+            verifyMethod()
+        }
     }
-    func pinValidationMethod()
+    func pinValidationMethod() -> Bool
     {
         pinString = ""
         if GenericMethods.isStringEmpty(tf1.text) || GenericMethods.isStringEmpty(tf2.text) || GenericMethods.isStringEmpty(tf3.text) || GenericMethods.isStringEmpty(tf4.text)
         {
-            GenericMethods.showAlert(alertMessage: "Please enter valid pin")
-            return
+            GenericMethods.showAlert(alertMessage: "Please enter valid OTP")
+            return false
         }
         let _ = tf4.resignFirstResponder()
         print("\(tf1.text!)\(tf2.text!)\(tf3.text!)\(tf4.text!)")
         let pin = "\(tf1.text!)\(tf2.text!)\(tf3.text!)\(tf4.text!)"
         print("pin \(pin)")
         pinString = pin
+        return true
     }
 
 
     // MARK: - IBActions
     
-    @IBAction func resendOTPBtnClick(_ sender: Any) {
+    @IBAction func resendOTPBtnClick(_ sender: Any)
+    {
+        
+        let randomNumber = AppConstants.fourDigitNumber
+        
+        
+        var parameters = Dictionary<String, Any>()
+        parameters["mobile"] = mobileNumber
+        parameters["Type"] = "Login"
+        parameters["OTP"] = randomNumber
+        
+        GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
+        apiManager.sendOTPAPI(parameters: parameters) { (status, showError, response, error) in
+            
+            GenericMethods.hideLoaderMethod(view: self.view)
+            
+            if status == true {
+                self.sendOTPData = response
+                
+                if self.sendOTPData?.status?.code == "0" {
+                    //MARK: Login Success Details
+                    
+                    self.otp = randomNumber
+                    let digits = self.otp.compactMap{Int(String($0))}
+                    self.tf1.text = "\(digits[0])"
+                    self.tf2.text = "\(digits[1])"
+                    self.tf3.text = "\(digits[2])"
+                    self.tf4.text = "\(digits[3])"
+                    let alert = UIAlertController(title: nil, message: self.sendOTPData?.status?.message ?? "", preferredStyle: .alert)
+                    
+                    UIApplication.shared.topMostViewController()?.present(alert, animated: true)
+                    let duration: Int = 1 // duration in seconds
+                    
+                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Double(duration) * Double(NSEC_PER_SEC)) / Double(NSEC_PER_SEC), execute: {
+                        alert.dismiss(animated: true)
+                        // dashboardVC
+                        
+                    })
+                    
+                    
+                    
+                }
+                else
+                {
+                    GenericMethods.showAlert(alertMessage: self.sendOTPData?.status?.message ?? "Unable to fetch data. Please try again after sometime.")
+                }
+                
+            }
+            else {
+                GenericMethods.showAlert(alertMessage:error?.localizedDescription ?? "")
+                
+            }
+        }
         
     }
     @IBAction func verifyBtnClick(_ sender: Any) {
+        if pinValidationMethod()
+        {
+           verifyMethod()
+        }
+    }
+    func verifyMethod()
+    {
+        self.view.endEditing(true)
         if GenericMethods.isStringEmpty(self.pinString)
         {
             GenericMethods.showAlert(alertMessage: "Please enter valid OTP")
         }
         else if otp != pinString
         {
-            GenericMethods.showAlert(alertMessage: "Incorrect OTP")
+            GenericMethods.showAlert(alertMessage: "Please enter valid OTP")
         }
         else
         {

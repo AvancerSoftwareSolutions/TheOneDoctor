@@ -269,7 +269,7 @@ class WebAPIHelper: NSObject {
         
     }
 
-    class func postMethodFileUpload(fileData:Data,filename:String,mimeType:String,methodName:String,keyname:String,vc:UIViewController,success: @escaping (AnyObject?)->Void, Failure: @escaping (NSError) ->Void)
+    class func postMethodFileUpload(shownProgress:MBProgressHUD,fileData:Data,filename:String,mimeType:String,methodName:String,keyname:String,vc:UIViewController,success: @escaping (AnyObject?)->Void, Failure: @escaping (NSError) ->Void)
     {
         if ReachabilityManager.shared.isConnectedToNetwork() == false
             
@@ -301,6 +301,11 @@ class WebAPIHelper: NSObject {
                 case .success(let upload, _, _):
                     print(upload.response as Any)
                     print("response Data is \(upload.responseData as Any)")
+                    upload.uploadProgress { progress in
+                        
+                        
+                        shownProgress.progress = Float(progress.fractionCompleted)
+                    }
                     upload.responseJSON { response in
                         
 //                        print("response is \(response.response as Any)")
@@ -342,7 +347,7 @@ class WebAPIHelper: NSObject {
         }
             
     }
-    class func addDoctorPicFileUpload(fileData:[Data],filename:[String],mimeType:[String],methodName:String,vc:UIViewController,success: @escaping (AnyObject?)->Void, Failure: @escaping (NSError) ->Void)
+    class func addDoctorPicFileUpload(shownProgress:MBProgressHUD,fileData:[Data],filename:[String],mimeType:[String],methodName:String,vc:UIViewController,success: @escaping (AnyObject?)->Void, Failure: @escaping (NSError) ->Void)
     {
         let apiManager = APIManager()
         if ReachabilityManager.shared.isConnectedToNetwork() == false
@@ -383,6 +388,11 @@ class WebAPIHelper: NSObject {
                     case .success(let upload, _, _):
                         print(upload.response as Any)
                         print("response Data is \(upload.responseData as Any)")
+                        upload.uploadProgress { progress in
+                            
+                            
+                            shownProgress.progress = Float(progress.fractionCompleted)
+                        }
                         upload.responseJSON { response in
                             
                             //                        print("response is \(response.response as Any)")
@@ -392,6 +402,7 @@ class WebAPIHelper: NSObject {
                             switch response.result {
                                 
                             case .success(let json):
+                                GenericMethods.hideLoaderMethod(view: vc.view)
                                 
                                 let y: AnyObject = (json as AnyObject?)!
                                 if let str:Int = y.object(forKey: "error_code") as? Int
@@ -420,6 +431,9 @@ class WebAPIHelper: NSObject {
                         print("encodingError:\(encodingError)")
                     }
                 })
+            
+            
+            
             
             /*
             Alamofire.upload(multipartFormData: { multipartFormData in
@@ -495,7 +509,7 @@ class WebAPIHelper: NSObject {
         
         func getSaveFileUrl(fileName: String) -> URL {
             let filePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            let documentsURL =  filePath.appendingPathComponent("RapidWallet")
+            let documentsURL =  filePath.appendingPathComponent(AppConstants.storageFolderName)
             let nameUrl = URL(string: fileName)
             let fileURL = documentsURL.appendingPathComponent((nameUrl?.lastPathComponent)!).appendingPathExtension("xls")
             NSLog(fileURL.absoluteString)
@@ -539,7 +553,7 @@ class WebAPIHelper: NSObject {
         
         func getSaveFileUrl(fileName: String) -> URL {
             let filePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            let documentsURL =  filePath.appendingPathComponent("RapidWallet")
+            let documentsURL =  filePath.appendingPathComponent(AppConstants.storageFolderName)
             let nameUrl = URL(string: fileName)
             let fileURL = documentsURL.appendingPathComponent((nameUrl?.lastPathComponent)!).appendingPathExtension("xls")
             NSLog(fileURL.absoluteString)

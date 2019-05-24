@@ -10,7 +10,12 @@ import UIKit
 import Alamofire
 
 class AddScheduleViewController: UIViewController {
-
+    
+    //MARK:- IBOutlets
+    @IBOutlet weak var addScheduleTableView: UITableView!
+    @IBOutlet weak var datePicker: UIDatePicker!
+    @IBOutlet weak var datePickerContainerView: UIView!
+    
     
     //MARK:- Vairables
     var addNormalScheduleCell:AddNormalScheduleTVC? = nil
@@ -19,10 +24,96 @@ class AddScheduleViewController: UIViewController {
     var patientHrs = ""
     var weekDays = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
     
+    var updateDaysArray:NSMutableArray = []
+    var timeFormatter = DateFormatter()
+    var patientHrsFormatter = DateFormatter()
+    var patientMinFormatter = DateFormatter()
+    
+    
+    var addScheduleData:AddScheduleModel?
+    let apiManager = APIManager()
+    
+    var selectedIndexPath = IndexPath()
+    var selectedBtn = ""
+    
+    var resetTime = "00:00 AM"
+    var resetHrs = "0 mins"
+    var userId = 0
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        
+        timeFormatter.dateFormat = "h:mm a"
+        patientHrsFormatter.dateFormat = "h"
+        patientMinFormatter.dateFormat = "mm"
+        
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        userId = UserDefaults.standard.value(forKey: "user_id") as? Int ?? 0
+            
+        
+        updateDaysArray = [[
+            "doctor_id" : userId,
+            "available_days" : "Sunday",
+            "start_time" : "00:00",
+            "end_time" : "00:00",
+            "per_patient_time" : "00:00",
+            "deleted_status" : 0,
+            "type" : "0",
+            ],[
+                "doctor_id" : userId,
+                "available_days" : "Monday",
+                "start_time" : "00:00",
+                "end_time" : "00:00",
+                "per_patient_time" : "00:00",
+                "deleted_status" : 0,
+                "type" : "0",
+            ],[
+                "doctor_id" : userId,
+                "available_days" : "Tuesday",
+                "start_time" : "00:00",
+                "end_time" : "00:00",
+                "per_patient_time" : "00:00",
+                "deleted_status" : 0,
+                "type" : "0",
+            ],[
+                "doctor_id" : userId,
+                "available_days" : "Wednesday",
+                "start_time" : "00:00",
+                "end_time" : "00:00",
+                "per_patient_time" : "00:00",
+                "deleted_status" : 0,
+                "type" : "0",
+            ],[
+                "doctor_id" : userId,
+                "available_days" : "Thursday",
+                "start_time" : "00:00",
+                "end_time" : "00:00",
+                "per_patient_time" : "00:00",
+                "deleted_status" : 0,
+                "type" :"0",
+            ],[
+                "doctor_id" : userId,
+                "available_days" : "Friday",
+                "start_time" : "00:00",
+                "end_time" : "00:00",
+                "per_patient_time" : "00:00",
+                "deleted_status" : 0,
+                "type" : "0",
+            ],[
+                "doctor_id" : userId,
+                "available_days" : "Saturday",
+                "start_time" : "00:00",
+                "end_time" : "00:00",
+                "per_patient_time" : "00:00",
+                "deleted_status" : 0,
+                "type" : "0",
+            ]]
+        datePicker.layer.addBorder(edge: .top, color: UIColor.lightGray, thickness: 1.0)
+        datePickerContainerView.isHidden = true
         self.title = "Add Schedule"
         
         let label = UILabel(frame: CGRect(x: 0, y: 0, width: 70, height: 30))
@@ -36,36 +127,222 @@ class AddScheduleViewController: UIViewController {
         label.layer.cornerRadius = 10.0
         label.layer.masksToBounds = true
         label.isUserInteractionEnabled = true
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(addScheduleBtnMethod))
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(doneBtnMethod))
         tapGesture.numberOfTapsRequired = 1
         label.addGestureRecognizer(tapGesture)
         
         self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(customView: label)
         
+        loadingAddScheduleDetailsAPI(type: 0, array: [""])
         
+//        loadingProfileDetailsAPI(type: 0)
         
 
         // Do any additional setup after loading the view.
     }
     
-    @objc func addScheduleBtnMethod()
+    @objc func doneBtnMethod()
     {
         
-    }
-    @objc func fromTimeBtnMethod(btn:UIButton)
-    {
         
-    }
-    @objc func toTimeBtnMethod(btn:UIButton)
-    {
+        for i in 0..<updateDaysArray.count
+        {
+            let startTime = (self.updateDaysArray[i]  as AnyObject).value(forKey: "start_time") as! String
+            let endTime = (self.updateDaysArray[i]  as AnyObject).value(forKey: "end_time") as! String
+            let hrsTime = (self.updateDaysArray[i]  as AnyObject).value(forKey: "per_patient_time") as! String
+            let type = (self.updateDaysArray[i]  as AnyObject).value(forKey: "type") as! String
+            let deleted_status = (self.updateDaysArray[i]  as AnyObject).value(forKey: "deleted_status") as! Int
+            
+            if type == "1" && deleted_status == 0
+            {
+                if (startTime == "00:00" || endTime == "00:00" || hrsTime == "00:00")
+                {
+                    GenericMethods.showAlert(alertMessage: "fill all details of \((self.updateDaysArray[i]  as AnyObject).value(forKey: "available_days") as! String)")
+                    return
+                }
+            }
+            
+            if ((self.updateDaysArray[i]  as AnyObject).value(forKey: "type") as? String != self.addScheduleData?.scheduleData?[i].type) && ((self.updateDaysArray[i]  as AnyObject).value(forKey: "deleted_status") as? Int == 1)
+                {
+                    if self.addScheduleData?.scheduleData?[i].deleteStatus == (self.updateDaysArray[i]  as AnyObject).value(forKey: "deleted_status") as? Int
+                    {
+                        (self.updateDaysArray[i]  as AnyObject).setValue("0", forKey: "type")
+                    }
+                    
+                }
+            
+        }
+        print("updateDaysArray \(updateDaysArray)")
         
-    }
-    @objc func patientHrsBtnMethod(btn:UIButton)
-    {
+        loadingAddScheduleDetailsAPI(type: 1, array: updateDaysArray)
         
     }
     
+    @objc func fromTimeBtnMethod(btn:UIButton)
+    {
+        selectedBtn = "from"
+        datePickerContainerView.isHidden = false
+        datePicker.datePickerMode = .time
+        selectedIndexPath = IndexPath(row: btn.tag, section: 0)
 
+    }
+    @objc func toTimeBtnMethod(btn:UIButton)
+    {
+        selectedBtn = "to"
+        datePickerContainerView.isHidden = false
+        datePicker.datePickerMode = .time
+        selectedIndexPath = IndexPath(row: btn.tag, section: 0)
+
+    }
+    @objc func patientHrsBtnMethod(btn:UIButton)
+    {
+        selectedBtn = "patientHrs"
+        datePickerContainerView.isHidden = false
+        datePicker.datePickerMode = .countDownTimer
+        selectedIndexPath = IndexPath(row: btn.tag, section: 0)
+        
+    }
+    
+    @objc func refreshBtnMethod(btn:UIButton)
+    {
+        selectedIndexPath = IndexPath(row: btn.tag, section: 0)
+        guard let cell = addScheduleTableView.cellForRow(at: selectedIndexPath) as? AddNormalScheduleTVC else
+        {
+            return
+        }
+        cell.labelView.backgroundColor = AppConstants.appGreenColor
+        cell.fromTimeBtnInstance.setTitle(resetTime, for: .normal)
+        cell.toTimeBtnInstance.setTitle(resetTime, for: .normal)
+        cell.patientHrsBtnInstance.setTitle(resetHrs, for: .normal)
+        (self.updateDaysArray[selectedIndexPath.row]  as AnyObject).setValue(1, forKey: "deleted_status")
+        (self.updateDaysArray[selectedIndexPath.row]  as AnyObject).setValue("1", forKey: "type")
+        
+        (self.updateDaysArray[selectedIndexPath.row]  as AnyObject).setValue(resetTime, forKey: "start_time")
+        (self.updateDaysArray[selectedIndexPath.row]  as AnyObject).setValue(resetTime, forKey: "end_time")
+        (self.updateDaysArray[selectedIndexPath.row]  as AnyObject).setValue(resetTime, forKey: "per_patient_time")
+
+    }
+    
+    //MARK:- IBActions
+    @IBAction func cancelBtnClick(_ sender: Any) {
+        datePickerContainerView.isHidden = true
+    }
+    
+    @IBAction func doneBtnClick(_ sender: Any) {
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "HH:mm"
+        
+        guard let cell = addScheduleTableView.cellForRow(at: selectedIndexPath) as? AddNormalScheduleTVC else
+        {
+            datePickerContainerView.isHidden = true
+            return
+        }
+        
+        cell.labelView.backgroundColor = UIColor.darkGray
+        switch selectedBtn {
+        case "from":
+            (self.updateDaysArray[selectedIndexPath.row]  as AnyObject).setValue(dateFormatter.string(from: datePicker.date), forKey: "start_time")
+            (self.updateDaysArray[selectedIndexPath.row]  as AnyObject).setValue("1", forKey: "type")
+            (self.updateDaysArray[selectedIndexPath.row]  as AnyObject).setValue(0, forKey: "deleted_status")
+
+            
+        case "to":
+            
+            (self.updateDaysArray[selectedIndexPath.row]  as AnyObject).setValue(dateFormatter.string(from: datePicker.date), forKey: "end_time")
+            (self.updateDaysArray[selectedIndexPath.row]  as AnyObject).setValue("1", forKey: "type")
+            (self.updateDaysArray[selectedIndexPath.row]  as AnyObject).setValue(0, forKey: "deleted_status")
+            
+        case "patientHrs":
+            
+            
+            (self.updateDaysArray[selectedIndexPath.row]  as AnyObject).setValue(dateFormatter.string(from: datePicker.date), forKey: "per_patient_time")
+            (self.updateDaysArray[selectedIndexPath.row]  as AnyObject).setValue("1", forKey: "type")
+            (self.updateDaysArray[selectedIndexPath.row]  as AnyObject).setValue(0, forKey: "deleted_status")
+            
+        default:
+            break
+        }
+        datePickerContainerView.isHidden = true
+        addScheduleTableView.reloadData()
+    }
+    
+    //MARK: - Loading AddSchedule
+    func loadingAddScheduleDetailsAPI(type:Int,array:NSMutableArray)
+    {
+        var sendingArray = array
+        if type == 1
+        {
+            let uploadingArray:NSMutableArray = NSMutableArray(array: array)
+            for i in 0..<uploadingArray.count
+            {
+                if (self.updateDaysArray[i]  as AnyObject).value(forKey: "type") as? String == "1"
+                {
+                    (uploadingArray[i] as AnyObject).setValue(1, forKey: "type")
+                }
+                else
+                {
+                    (uploadingArray[i] as AnyObject).setValue(0, forKey: "type")
+                }
+                
+            }
+            sendingArray = uploadingArray
+        }
+        var parameters = Dictionary<String, Any>()
+        parameters["doctor_id"] = userId
+        parameters["available_days"] = sendingArray
+        
+        GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
+        
+        apiManager.addNormalScheduleDetailsAPI(parameters: parameters) { (status, showError, response, error) in
+            
+            GenericMethods.hideLoaderMethod(view: self.view)
+            
+            if status == true {
+                self.addScheduleData = response
+                if self.addScheduleData?.status?.code == "0" {
+                    if type == 1
+                    {
+                        GenericMethods.showAlertwithPopNavigation(alertMessage: "Sucess", vc: self)
+                    }
+                    else
+                    {
+                        self.updateDaysArray = []
+                        for i in 0..<(self.addScheduleData?.scheduleData?.count ?? 0)
+                        {
+                            let dict:NSMutableDictionary = [:]
+                            dict.setValue(self.addScheduleData?.scheduleData?[i].doctorId, forKey: "doctor_id")
+                            dict.setValue(self.addScheduleData?.scheduleData?[i].availableDays, forKey: "available_days")
+                            dict.setValue(self.addScheduleData?.scheduleData?[i].startTime, forKey: "start_time")
+                            dict.setValue(self.addScheduleData?.scheduleData?[i].endTime, forKey: "end_time")
+                            dict.setValue(self.addScheduleData?.scheduleData?[i].patientHrsTime, forKey: "per_patient_time")
+                            dict.setValue(self.addScheduleData?.scheduleData?[i].deleteStatus, forKey: "deleted_status")
+                            dict.setValue(self.addScheduleData?.scheduleData?[i].type, forKey: "type")
+                            //                        dict.setValue(0, forKey: "type")
+                            self.updateDaysArray.add(dict)
+                        }
+                        print("updateArr \(self.updateDaysArray)")
+                        
+                        self.addScheduleTableView.reloadData()
+                    }
+                    
+                    
+                }
+                else
+                {
+                    GenericMethods.showAlertwithPopNavigation(alertMessage: self.addScheduleData?.status?.message ?? "Unable to fetch data. Please try again after sometime.", vc: self)
+                    
+                }
+                
+                
+            }
+            else {
+                GenericMethods.showAlertwithPopNavigation(alertMessage: error?.localizedDescription ?? "Something Went Wrong. Please try again.", vc: self)
+                
+                
+            }
+        }
+    }
 
 }
 extension AddScheduleViewController:UITableViewDelegate,UITableViewDataSource
@@ -75,9 +352,10 @@ extension AddScheduleViewController:UITableViewDelegate,UITableViewDataSource
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return weekDays.count
+        return updateDaysArray.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         addNormalScheduleCell = tableView.dequeueReusableCell(withIdentifier: "addNormalScheduleCell") as? AddNormalScheduleTVC
         if addNormalScheduleCell == nil
         {
@@ -90,8 +368,27 @@ extension AddScheduleViewController:UITableViewDelegate,UITableViewDataSource
         addNormalScheduleCell?.fromTimeBtnInstance.addTarget(self, action: #selector(fromTimeBtnMethod(btn:)), for: .touchUpInside)
         addNormalScheduleCell?.toTimeBtnInstance.tag = indexPath.row
         addNormalScheduleCell?.toTimeBtnInstance.addTarget(self, action: #selector(toTimeBtnMethod(btn:)), for: .touchUpInside)
+        addNormalScheduleCell?.patientHrsBtnInstance.titleLabel?.adjustsFontSizeToFitWidth = true
         addNormalScheduleCell?.patientHrsBtnInstance.tag = indexPath.row
         addNormalScheduleCell?.patientHrsBtnInstance.addTarget(self, action: #selector(patientHrsBtnMethod(btn:)), for: .touchUpInside)
+        addNormalScheduleCell?.refreshBtnInstance.tag = indexPath.row
+        addNormalScheduleCell?.refreshBtnInstance.addTarget(self, action: #selector(refreshBtnMethod(btn:)), for: .touchUpInside)
+        addNormalScheduleCell?.weekDayLabel.text = (self.updateDaysArray[indexPath.row] as? [AnyHashable:Any])? ["available_days"] as? String ?? ""
+        
+        
+        if (self.updateDaysArray[indexPath.row] as? [AnyHashable:Any])? ["deleted_status"] as? Int ?? 1 == 0
+        {  // Schedule // active
+            addNormalScheduleCell?.labelView.backgroundColor = AppConstants.appdarkGrayColor
+        }
+        else
+        { //Unschedule
+            addNormalScheduleCell?.labelView.backgroundColor = AppConstants.appGreenColor
+            
+        }
+        addNormalScheduleCell?.fromTimeBtnInstance.setTitle(GenericMethods.convert24hrto12hrFormat(dateStr: (self.updateDaysArray[indexPath.row] as? [AnyHashable:Any])? ["start_time"] as? String ?? "00:00 AM"), for: .normal)
+        addNormalScheduleCell?.toTimeBtnInstance.setTitle(GenericMethods.convert24hrto12hrFormat(dateStr: (self.updateDaysArray[indexPath.row] as? [AnyHashable:Any])? ["end_time"] as? String ?? "00:00 AM"), for: .normal)
+        addNormalScheduleCell?.patientHrsBtnInstance.setTitle(GenericMethods.convertHrstoMinsFormat(dateStr: (self.updateDaysArray[indexPath.row] as? [AnyHashable:Any])? ["per_patient_time"] as? String ?? "00:00 AM"), for: .normal)
+        
         
         return addNormalScheduleCell!
     }

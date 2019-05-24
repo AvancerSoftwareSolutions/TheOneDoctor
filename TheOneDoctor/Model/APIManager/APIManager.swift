@@ -13,7 +13,7 @@ import AlamofireObjectMapper
 class APIManager
 {
     //MARK:- Base Url & Suffixes 
-    let baseURL = "http://159.89.162.140:3112/api/doctor/"
+    let baseURL = "http://159.89.162.140:3112/api/Doctor/"
     let fileUploadBaseURL = "http://159.89.162.140/Mongo/HMSNew/API/Doctor/"
     let Authorization = "Basic YWRtaW46MTIzNA=="
     
@@ -25,6 +25,8 @@ class APIManager
     let addSpecialitySuffix = "Speciality"
     let deletePicSuffix = "fileremove"
     let updateProfileSuffix = "Update"
+    let scheduleSuffix = ""
+    let addNormalScheduleSuffix = "Schedule"
     
     func consolePrintValues(url:String,parameters:Dictionary<String, Any>)
     {
@@ -372,6 +374,105 @@ class APIManager
                             
                             UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
                             self.updateProfileDetailsAPI(parameters: parameters, completion: completion)
+                            
+                            
+                        }
+                        else {
+                            print("Failed")
+                            
+                        }
+                    }
+                }
+                else
+                {
+                    switch response.result {
+                        
+                    case .success:
+                        let responseData = response.result.value
+                        completion(true, false, responseData, nil)
+                        
+                    case .failure(let error):
+                        completion(false, true, nil, error)
+                    }
+                }
+                
+        }
+    }
+    
+    func scheduleDetailsAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:ScheduleModel?, _ error:Error?)-> Void)
+    {
+        let scheduleAPIURL = baseURL + scheduleSuffix
+        //        let headers: HTTPHeaders = [ "Authorization": Authorization]
+        consolePrintValues(url: scheduleAPIURL, parameters: parameters)
+        
+        Alamofire.request(scheduleAPIURL, method: .post, parameters: parameters, headers: nil)
+            .validate(contentType: ["application/json"]).responseJSON(completionHandler: { (response) in
+                print(response as Any)
+            })
+            .responseObject { (response: DataResponse<ScheduleModel>) in
+                let i =  response.response?.statusCode
+                
+                if i==402{
+                    let apiManager = APIManager()
+                    apiManager.createAPIKey{ (status, showError, response, error) in
+                        var createApiKey: CreateAPIKeyModel?
+                        if status == true {
+                            print("Sucess")
+                            
+                            createApiKey = response
+                            
+                            UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
+                            self.scheduleDetailsAPI(parameters: parameters, completion: completion)
+                            
+                            
+                        }
+                        else {
+                            print("Failed")
+                            
+                        }
+                    }
+                }
+                else
+                {
+                    switch response.result {
+                        
+                    case .success:
+                        let responseData = response.result.value
+                        completion(true, false, responseData, nil)
+                        
+                    case .failure(let error):
+                        completion(false, true, nil, error)
+                    }
+                }
+                
+        }
+    }
+    
+    func addNormalScheduleDetailsAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:AddScheduleModel?, _ error:Error?)-> Void)
+    {
+        let addNormalScheduleAPIURL = baseURL + addNormalScheduleSuffix
+        //        let headers: HTTPHeaders = [ "Authorization": Authorization]
+        consolePrintValues(url: addNormalScheduleAPIURL, parameters: parameters)
+        
+        Alamofire.request(addNormalScheduleAPIURL, method: .post, parameters: parameters, headers: nil)
+            .validate(contentType: ["application/json"])
+            .responseJSON(completionHandler: { (response) in
+                print(response as Any)
+            })
+            .responseObject { (response: DataResponse<AddScheduleModel>) in
+                let i =  response.response?.statusCode
+                
+                if i==402{
+                    let apiManager = APIManager()
+                    apiManager.createAPIKey{ (status, showError, response, error) in
+                        var createApiKey: CreateAPIKeyModel?
+                        if status == true {
+                            print("Sucess")
+                            
+                            createApiKey = response
+                            
+                            UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
+                            self.addNormalScheduleDetailsAPI(parameters: parameters, completion: completion)
                             
                             
                         }

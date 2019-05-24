@@ -13,6 +13,7 @@ import ACFloatingTextfield_Swift
 import Photos
 import MobileCoreServices
 import BSImagePicker
+import SDWebImage
 
 class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UIImagePickerControllerDelegate, UINavigationControllerDelegate,UIDocumentInteractionControllerDelegate,sendSpecialityListValuesDelegate,sendDeletePicDelegate {
     
@@ -80,6 +81,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
     var otp = ""
     var isPictureUpload:Bool = false
     
+    
     var mobileNumber = ""
     var email = ""
     var short_biography = ""
@@ -129,7 +131,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
         subSpecialityCollectionView.register(UINib(nibName: "DoctorSpecialityCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "docSpecialityCell")
         doctorPicturesCollectionView.register(UINib(nibName: "DoctorPicturesCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "docPicturesCell")
         
-        GenericMethods.setProfileImage(imageView: profileImgView)
+        GenericMethods.setProfileImage(imageView: profileImgView,borderColor:UIColor.white)
         GenericMethods.setLeftViewWithSVG(svgView: mobileIconView, with: "phone", color: AppConstants.appGreenColor)
         
         roundButton(button: profilePicBtnInstance)
@@ -141,13 +143,16 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
         biographyTextView.layer.borderWidth = 1.0
         biographyTextView.layer.cornerRadius = 5.0
         
-        
+        let mobileNumberToolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: 320, height: 50))
+        mobileNumberToolbar.barStyle = .default
+        mobileNumberToolbar.items = [UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil), UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(self.doneWithMobile))]
+        mobileNumberToolbar.sizeToFit()
         
         let numberToolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: 320, height: 50))
         numberToolbar.barStyle = .default
         numberToolbar.items = [UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil), UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(self.doneWithNumberPad))]
         numberToolbar.sizeToFit()
-        mobileTF.inputAccessoryView = numberToolbar
+        mobileTF.inputAccessoryView = mobileNumberToolbar
         otpTF.inputAccessoryView = numberToolbar
         biographyTextView.inputAccessoryView = numberToolbar
 
@@ -169,10 +174,17 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
     @objc func doneWithNumberPad()
     {
         let _ = biographyTextView.resignFirstResponder()
-        let _ = mobileTF.resignFirstResponder()
+        
         let _ = otpTF.resignFirstResponder()
     }
-    
+    @objc func doneWithMobile()
+    {
+        let _ = mobileTF.resignFirstResponder()
+        if mobileTF.text!.count == 8 && mobileTF.text! != self.mobileNumber
+        {
+            sendOTPMethod()
+        }
+    }
     
     override func viewDidLayoutSubviews() {
         scrollViewInstance.contentSize = CGSize(width: scrollViewInstance.frame.width, height: addPicUploadBtnInstance.frame.origin.y+addPicUploadBtnInstance.frame.height+10)
@@ -270,7 +282,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
 
 //                    self.reloadHeaderView()
                     
-                    GenericMethods.setProfileImage(imageView: self.profileImgView)
+                    GenericMethods.setProfileImage(imageView: self.profileImgView,borderColor:UIColor.white)
 
                     
                     guard let arr1 = self.profileData?.profileData?.additionalPictureList,let arr2 = self.profileData?.profileData?.additionalVideoList
@@ -300,13 +312,16 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                 }
                 else
                 {
-                    GenericMethods.showAlert(alertMessage: self.profileData?.status?.message ?? "Unable to fetch data. Please try again after sometime.")
+                    GenericMethods.showAlertwithPopNavigation(alertMessage: self.profileData?.status?.message ?? "Unable to fetch data. Please try again after sometime.", vc: self)
+//                    GenericMethods.showAlert(alertMessage: self.profileData?.status?.message ?? "Unable to fetch data. Please try again after sometime.")
                 }
                 
                 
             }
             else {
-                GenericMethods.showAlert(alertMessage:error?.localizedDescription ?? "")
+                GenericMethods.showAlertwithPopNavigation(alertMessage: error?.localizedDescription ?? "Something Went Wrong. Please try again.", vc: self)
+               
+               
                 
             }
         }
@@ -503,7 +518,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                 {
                     let fileManager = FileManager.default
                     if let tDocumentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
-                        let filePath =  tDocumentDirectory.appendingPathComponent("TheONE")
+                        let filePath =  tDocumentDirectory.appendingPathComponent(AppConstants.storageFolderName)
                         if !fileManager.fileExists(atPath: filePath.path) {
                             do {
                                 try fileManager.createDirectory(atPath: filePath.path, withIntermediateDirectories: true, attributes: nil)
@@ -517,7 +532,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                         }
                         NSLog("Document directory is \(filePath)")
                         
-                        let fileURL = filePath.appendingPathComponent("Imageon\(GenericMethods.removeSpaceFromStr(str: "\(GenericMethods.currentDateTime())"))")
+                        let fileURL = filePath.appendingPathComponent("Imageon\(GenericMethods.removeSpaceFromStr(str: "\(GenericMethods.currentDateTime()).jpeg"))")
                         print(fileURL)
                         //writing
                         do {
@@ -607,7 +622,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                     
                     let fileManager = FileManager.default
                     if let tDocumentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
-                        let filePath =  tDocumentDirectory.appendingPathComponent("TheONE")
+                        let filePath =  tDocumentDirectory.appendingPathComponent(AppConstants.storageFolderName)
                         if !fileManager.fileExists(atPath: filePath.path) {
                             do {
                                 try fileManager.createDirectory(atPath: filePath.path, withIntermediateDirectories: true, attributes: nil)
@@ -621,7 +636,8 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                         }
                         NSLog("Document directory is \(filePath)")
                         
-                        let fileURL = filePath.appendingPathComponent("Imageon\(GenericMethods.removeSpaceFromStr(str: "\(GenericMethods.currentDateTime())"))")
+                        var fileURL = filePath.appendingPathComponent("Imageon\(GenericMethods.removeSpaceFromStr(str: "\(GenericMethods.currentDateTime()).jpeg"))")
+//                        let fileURL  = filePathURL.appendPathExtension("jpeg")
                         print(fileURL)
                         //writing
                         do {
@@ -641,8 +657,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                                 
                                 self.addDocFilesUpload()
                             }
-                            //                            postMethodFileUpload(fileData: imageData!, filename: fileURL.lastPathComponent, mimeType: "\(FileUpload.mimeTypeForPath(path: fileURL.path))")
-                            //                            FileUpload.removeFileDataToLocal()
+                            
                         }
                         catch {
                             print("failed to write data")
@@ -713,6 +728,19 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
         picker.isNavigationBarHidden = false
         self.dismiss(animated: true, completion: nil)
     }
+    func navigateToEditPictureVC()
+    {
+        let deletePicVC = self.storyboard?.instantiateViewController(withIdentifier: "deletePicVC") as! DeletePicturesViewController
+        deletePicVC.picturesArray = self.doctorMediaArray
+        deletePicVC.uploadPicturesArray = self.uploadingMediaArray
+        deletePicVC.delegate = self
+        let navigateVC = UINavigationController(rootViewController: deletePicVC)
+        navigateVC.navigationBar.barTintColor = AppConstants.appGreenColor
+        navigateVC.navigationBar.tintColor = UIColor.white
+        navigateVC.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.white]
+        
+        self.present(navigateVC, animated: true, completion: nil)
+    }
     // MARK: - IBActions
     
     @IBAction func profilePicbtnClick(_ sender: Any) {
@@ -720,12 +748,12 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
         let alert = UIAlertController(title: "Choose Image", message: nil, preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: "Camera", style: .default, handler: { _ in
             self.imagePicker.delegate = self
-            FileUpload.showcamera(imagePicker: self.imagePicker, vc: self)
+            FileUpload.showcamera(type: "picture", imagePicker: self.imagePicker, vc: self)
         }))
         
         alert.addAction(UIAlertAction(title: "Gallery", style: .default, handler: { _ in
             self.imagePicker.delegate = self
-            FileUpload.openGallary(imagePicker: self.imagePicker, vc: self)
+            FileUpload.openGallary(type:"picture",imagePicker: self.imagePicker, vc: self)
             
             
             
@@ -761,70 +789,71 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
         
     }
     @IBAction func docAddiPicUploadBtnClick(_ sender: Any) {
-        
-        self.uploadType = 1
-        let alert = UIAlertController(title: "Choose Image", message: nil, preferredStyle: .actionSheet)
-        alert.addAction(UIAlertAction(title: "Camera", style: .default, handler: { _ in
-            self.imagePicker.delegate = self
-            FileUpload.showcamera(imagePicker: self.imagePicker, vc: self)
-        }))
-        
-        alert.addAction(UIAlertAction(title: "Gallery", style: .default, handler: { _ in
-//            self.imagePicker.delegate = self
-//            FileUpload.openGallary(imagePicker: self.imagePicker, vc: self, assets: self.selectedAssets)
-            
-            let vc = BSImagePickerViewController()
-            self.bs_presentImagePickerController(vc, animated: true, select: { (asset:PHAsset) in
-                
-            }, deselect: { (asset:PHAsset) in
-                
-            }, cancel: { (assets:[PHAsset]) in
-                
-            }, finish: { (outputassets:[PHAsset]) in
-                self.selectedAssets = []
-                for i in 0..<outputassets.count
-                {
-                    self.selectedAssets.append(outputassets[i])
-                }
-                print("selectedAssets \(self.selectedAssets)")
-                self.gettingValuesFromPHAsset(assetsArr: self.selectedAssets)
-                
-            }, completion: nil)
-            
-        }))
-        
-        
-        alert.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil))
-        
-        /*If you want work actionsheet on ipad
-         then you have to use popoverPresentationController to present the actionsheet,
-         otherwise app will crash on iPad */
-        switch UIDevice.current.userInterfaceIdiom {
-        case .pad:
-            alert.popoverPresentationController?.sourceView = self.view
-            alert.popoverPresentationController?.sourceRect = self.view.bounds
-            alert.popoverPresentationController?.permittedArrowDirections = .up
-            
-        default:
-            break
+        let maxCount = Int(self.profileData?.profileData?.maxcount ?? "") ?? 0
+        if uploadingMediaArray.count == maxCount
+        {
+            GenericMethods.showYesOrNoAlertWithCompletionHandler(alertTitle: "The ONE", alertMessage: "You already have maximum additional pictures. Do you want to delete existing to add more pictures?") { (alertAction) in
+                self.navigateToEditPictureVC()
+            }
         }
-        
-        
-        self.present(alert, animated: true, completion: nil)
+        else
+        {
+            self.uploadType = 1
+            let alert = UIAlertController(title: "Choose Image", message: nil, preferredStyle: .actionSheet)
+            alert.addAction(UIAlertAction(title: "Camera", style: .default, handler: { _ in
+                self.imagePicker.delegate = self
+                FileUpload.showcamera(type:"media",imagePicker: self.imagePicker, vc: self)
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Gallery", style: .default, handler: { _ in
+                //            self.imagePicker.delegate = self
+                //            FileUpload.openGallary(imagePicker: self.imagePicker, vc: self, assets: self.selectedAssets)
+                
+                let vc = BSImagePickerViewController()
+                vc.maxNumberOfSelections = maxCount - self.uploadingMediaArray.count
+                self.bs_presentImagePickerController(vc, animated: true, select: { (asset:PHAsset) in
+                    
+                }, deselect: { (asset:PHAsset) in
+                    
+                }, cancel: { (assets:[PHAsset]) in
+                    
+                }, finish: { (outputassets:[PHAsset]) in
+                    self.selectedAssets = []
+                    for i in 0..<outputassets.count
+                    {
+                        self.selectedAssets.append(outputassets[i])
+                    }
+                    print("selectedAssets \(self.selectedAssets)")
+                    self.gettingValuesFromPHAsset(assetsArr: self.selectedAssets)
+                    
+                }, completion: nil)
+                
+            }))
+            
+            
+            alert.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil))
+            
+            /*If you want work actionsheet on ipad
+             then you have to use popoverPresentationController to present the actionsheet,
+             otherwise app will crash on iPad */
+            switch UIDevice.current.userInterfaceIdiom {
+            case .pad:
+                alert.popoverPresentationController?.sourceView = self.view
+                alert.popoverPresentationController?.sourceRect = self.view.bounds
+                alert.popoverPresentationController?.permittedArrowDirections = .up
+                
+            default:
+                break
+            }
+            
+            self.present(alert, animated: true, completion: nil)
+        }
+
     }
     @IBAction func editPicturesBtnClick(_ sender: Any) {
-        let deletePicVC = self.storyboard?.instantiateViewController(withIdentifier: "deletePicVC") as! DeletePicturesViewController
-        deletePicVC.picturesArray = self.doctorMediaArray
-        deletePicVC.uploadPicturesArray = self.uploadingMediaArray
-        deletePicVC.delegate = self
-        let navigateVC = UINavigationController(rootViewController: deletePicVC)
-        navigateVC.navigationBar.barTintColor = AppConstants.appGreenColor
-        navigateVC.navigationBar.tintColor = UIColor.white
-        navigateVC.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.white]
-
-        self.present(navigateVC, animated: true, completion: nil)
+        navigateToEditPictureVC()
     }
-    
+    //MARK : Textfield Editing Methods
     @IBAction func otpTFEditingChange(_ sender: UITextField) {
 //        if sender.text!.count == 4
 //        {
@@ -840,14 +869,14 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
 //        }
     }
     @IBAction func mobileEditingChange(_ sender: UITextField) {
-//        if sender.text!.count == 8
-//        {
-//            if sender.text != self.mobileNumber
-//            {
-//                sendOTPMethod()
-//            }
-//
-//        }
+        if sender.text!.count == 8
+        {
+            if sender.text != self.mobileNumber
+            {
+                sendOTPMethod()
+            }
+
+        }
     }
     
     //MARK:- Delegate Method
@@ -927,8 +956,13 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
     func updateProfPicUpload(fileData:Data,filename:String,mimeType:String,keyname:String)
     {
         //MARK:- Profile picture upload
-        GenericMethods.showLoaderMethod(shownView: self.view, message: "Uploading")
-        WebAPIHelper.postMethodFileUpload(fileData: fileData, filename: filename, mimeType: mimeType, methodName: "upload", keyname: "file", vc: self, success: { (response) in
+//        GenericMethods.showLoaderMethod(shownView: self.view, message: "Uploading")
+        UIApplication.shared.beginIgnoringInteractionEvents()
+        let loadingProfileNotification = MBProgressHUD.showAdded(to: self.view, animated: true)
+        loadingProfileNotification.mode = MBProgressHUDMode.annularDeterminate
+        loadingProfileNotification.label.text = "Uploading"
+        
+        WebAPIHelper.postMethodFileUpload(shownProgress:loadingProfileNotification,fileData: fileData, filename: filename, mimeType: mimeType, methodName: "upload", keyname: "file", vc: self, success: { (response) in
              print("response \(response as Any)")
             GenericMethods.hideLoaderMethod(view: self.view)
             let responseObject: AnyObject = (response as AnyObject?)!
@@ -937,10 +971,10 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                 GenericMethods.showAlert(alertMessage: "Something Went Wrong! Please try again")
                 return
             }
-            if (status as AnyObject).object(forKey: "code") as? Int == 0
+            if (status as AnyObject).object(forKey: "code") as? String == "0"
             {
                 UserDefaults.standard.set(responseObject.object(forKey: "picturepath") as? String ?? "", forKey: "user_image")
-                GenericMethods.setProfileImage(imageView: self.profileImgView)
+                GenericMethods.setProfileImage(imageView: self.profileImgView,borderColor:UIColor.white)
                 self.picture = responseObject.object(forKey: "profile") as? String ?? ""
                 GenericMethods.showAlertMethod(alertMessage: "\(responseObject.object(forKey: "message") as? String ?? "Success")")
             }
@@ -954,71 +988,58 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
             print(error.localizedDescription)
             })
         
-//        WebAPIHelper.postMethodMultipleFileUpload(fileData: fileDataArr, filename: fileNameArr, mimeType: mimeTypeArr, methodName: "multipleupload", vc: self, success: { (response) in
-//            print("response \(response as Any)")
-//        }, Failure: { (error) in
-//            print(error.localizedDescription)
-//        })
-        
-        /*
-         
-         WebAPIHelper.postMethodFileUpload(fileData: fileData, filename: filename, mimeType: mimeType, methodName: "vendorapi/fileupload", vc: self, success: { (response) in
-         
-         if response?.object(forKey: "status") as! Int == 0
-         {
-         GenericMethods.showAlert(alertMessage: "\(response?.object(forKey: "message") as! String)")
-         
-         }
-         else
-         {
-         if response?.object(forKey: "status") as! Bool == true
-         {
-         //                    let detailsDict:NSMutableDictionary = NSMutableDictionary(dictionary: response?.object(forKey: "response") as! Dictionary)
-         //
-         //                    let uploadFileDict:NSMutableDictionary = NSMutableDictionary(dictionary: detailsDict.object(forKey: "upload_file_details") as! Dictionary)
-         //                    self.uploadfileStr = detailsDict.object(forKey: "upload_file_path") as? String ?? ""
-         //                    self.documentFileLbl.isHidden = false
-         //                    self.documentFileLbl.text = "\(uploadFileDict.object(forKey: "name") as! String)"
-         //                    self.documentUploadBtnInst.setTitle("Uploaded", for: .normal)
-         //                    self.documentUploadBtnInst.isEnabled = false
-         //                    self.documentDeleteBtnInst.isHidden = false
-         //
-         //                    FileUpload.saveFileDataToLocal(fileData: fileData, fileStr: self.uploadfileStr)
-         }
-         }
-         
-         }, Failure: { (error) in
-         print(error.localizedDescription)
-         })
-         */
+
     }
     func addDocFilesUpload()
     {
         //MARK:- Additional Pictures upload
         self.isPictureUpload = true
         
-        GenericMethods.showLoaderMethod(shownView: self.view, message: "Uploading")
+//        GenericMethods.showLoaderMethod(shownView: self.view, message: "Uploading")
+        
+        UIApplication.shared.beginIgnoringInteractionEvents()
+        let loadingNotification = MBProgressHUD.showAdded(to: self.view, animated: true)
+        loadingNotification.mode = MBProgressHUDMode.annularDeterminate
+        loadingNotification.label.text = "Uploading"
+        
         
         print("fileDataArr \(fileDataArr)\n fileNameArr \(fileNameArr)\n mimeTypeArr \(mimeTypeArr)\n")
         
-        WebAPIHelper.addDoctorPicFileUpload(fileData: fileDataArr, filename: fileNameArr, mimeType: mimeTypeArr, methodName: "multipleupload", vc: self, success: { (response) in
+        WebAPIHelper.addDoctorPicFileUpload(shownProgress:loadingNotification,fileData: fileDataArr, filename: fileNameArr, mimeType: mimeTypeArr, methodName: "multipleupload", vc: self, success: { (response) in
             print("response \(response as Any)")
             GenericMethods.hideLoaderMethod(view: self.view)
-            let picPathArray:[String] = response?.object(forKey: "picturepath") as! [String]
             
-            for i in 0..<picPathArray.count
+            let responseObject: AnyObject = (response as AnyObject?)!
+            guard let status = responseObject.object(forKey: "status") else
             {
-               self.doctorMediaArray.add(picPathArray[i])
+                GenericMethods.showAlert(alertMessage: "Something Went Wrong! Please try again")
+                return
+            }
+            if (status as AnyObject).object(forKey: "code") as? String == "0"
+            {
+                let picPathArray:[String] = response?.object(forKey: "picturepath") as! [String]
+                
+                for i in 0..<picPathArray.count
+                {
+                    self.doctorMediaArray.add(picPathArray[i])
+                }
+                
+                let uploadingDataArray:[String] = response?.object(forKey: "data") as! [String]
+                
+                for i in 0..<uploadingDataArray.count
+                {
+                    self.uploadingMediaArray.add(uploadingDataArray[i])
+                }
+                FileUpload.removeFileDataToLocal()
+                self.doctorPicturesCollectionView.reloadData()
+                GenericMethods.showAlert(alertMessage: "Uploaded sucessfully")
+            }
+            else
+            {
+                GenericMethods.showAlert(alertMessage: "Something Went Wrong! Please try again")
             }
             
-            let uploadingDataArray:[String] = response?.object(forKey: "data") as! [String]
             
-            for i in 0..<uploadingDataArray.count
-            {
-                self.uploadingMediaArray.add(uploadingDataArray[i])
-            }
-            
-            self.doctorPicturesCollectionView.reloadData()
             
         }, Failure: { (error) in
             print(error.localizedDescription)
@@ -1027,6 +1048,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
     func otpSuccessMethod()
     {
         self.otp = self.randomNumber
+        self.otpTF.text = self.otp
         self.otpHgtConst.constant = 45
         self.otpTopConst.constant = 15
         let _ = self.otpTF.becomeFirstResponder()
@@ -1043,7 +1065,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
         
         GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
         apiManager.sendOTPAPI(parameters: parameters) { (status, showError, response, error) in
-            
+            self.view.endEditing(true)
             GenericMethods.hideLoaderMethod(view: self.view)
             
             if status == true {
@@ -1077,6 +1099,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
     }
     @objc func profileUpdateMethod()
     {
+        self.view.endEditing(true)
         if GenericMethods.isStringEmpty(emailTF.text)
         {
             GenericMethods.showAlert(alertMessage: "Please enter mail id")
@@ -1243,6 +1266,7 @@ extension ProfileViewController:UICollectionViewDelegate,UICollectionViewDataSou
             docPicturesCell = collectionView.dequeueReusableCell(withReuseIdentifier: "docPicturesCell", for: indexPath) as? DoctorPicturesCollectionViewCell
             GenericMethods.createThumbnailOfVideoFromRemoteUrl(url: self.doctorMediaArray[indexPath.item] as? String ?? "",imgView: docPicturesCell!.DocPicImgView,playImgView: docPicturesCell!.playImgView)
             
+            
             return docPicturesCell!
             
         default:
@@ -1337,7 +1361,6 @@ extension ProfileViewController:UITextFieldDelegate
             {
                 otpTopConst.constant = 15
                 otpHgtConst.constant = 45
-                
                 return true
             }
             
@@ -1367,11 +1390,12 @@ extension ProfileViewController:UITextFieldDelegate
     }
     func textFieldDidEndEditing(_ textField: UITextField) {
         switch textField {
-        case mobileTF:
-            if textField.text!.count == 8 && textField.text! != self.mobileNumber
-            {
-                sendOTPMethod()
-            }
+//        case mobileTF:
+            
+//            if textField.text!.count == 8 && textField.text! != self.mobileNumber
+//            {
+//                sendOTPMethod()
+//            }
         case otpTF:
             if textField.text!.count == 4
             {
