@@ -30,19 +30,19 @@
                                     <constraint firstAttribute="height" constant="70" id="coS-qw-KsG"/>
                                 </constraints>
                             </imageView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label Label Label LabelLabelLabelLabelLabelLabelLabel" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="N9O-q6-Po9">
-                                <rect key="frame" x="86" y="10" width="206" height="40"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="N9O-q6-Po9">
+                                <rect key="frame" x="86" y="12" width="206" height="36"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="40" id="0dO-fx-RgD"/>
+                                    <constraint firstAttribute="height" constant="36" id="0dO-fx-RgD"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="16"/>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="15"/>
                                 <color key="textColor" name="AppGreenColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eKy-BG-Ydt">
-                                <rect key="frame" x="86" y="58" width="206" height="21"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eKy-BG-Ydt">
+                                <rect key="frame" x="86" y="48" width="206" height="35"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="21" id="6JR-n2-qZ6"/>
+                                    <constraint firstAttribute="height" constant="35" id="6JR-n2-qZ6"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                 <nil key="textColor"/>
@@ -51,7 +51,7 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="eKy-BG-Ydt" firstAttribute="top" secondItem="N9O-q6-Po9" secondAttribute="bottom" constant="8" id="8mq-D1-Dwb"/>
+                            <constraint firstItem="eKy-BG-Ydt" firstAttribute="top" secondItem="N9O-q6-Po9" secondAttribute="bottom" id="8mq-D1-Dwb"/>
                             <constraint firstItem="eKy-BG-Ydt" firstAttribute="leading" secondItem="QXX-Li-wtd" secondAttribute="trailing" constant="8" id="BjQ-WF-qio"/>
                             <constraint firstItem="QXX-Li-wtd" firstAttribute="leading" secondItem="gD9-7s-kDy" secondAttribute="leading" constant="8" id="Jk7-Vx-CQ1"/>
                             <constraint firstAttribute="trailing" secondItem="eKy-BG-Ydt" secondAttribute="trailing" constant="8" id="Uds-bd-i0S"/>
@@ -191,10 +191,10 @@
                                     <constraint firstItem="OLw-q7-gL4" firstAttribute="leading" secondItem="8Um-Zu-Dih" secondAttribute="leading" id="vfp-HE-GmE"/>
                                 </constraints>
                             </view>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" pagingEnabled="YES" showsVerticalScrollIndicator="NO" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="v10-np-jqK" customClass="JTAppleCalendarView" customModule="JTAppleCalendar">
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" pagingEnabled="YES" showsVerticalScrollIndicator="NO" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="v10-np-jqK" customClass="JTAppleCalendarView" customModule="JTAppleCalendar">
                                 <rect key="frame" x="0.0" y="78" width="300" height="250"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="k8Q-7D-hVf">
+                                <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="3" id="k8Q-7D-hVf">
                                     <size key="itemSize" width="50" height="50"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
@@ -230,7 +230,12 @@
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
+                <outlet property="calendarContainerView" destination="5q8-q5-BfH" id="4O1-3X-3Aj"/>
                 <outlet property="calendarView" destination="v10-np-jqK" id="Wfq-NX-Mzl"/>
+                <outlet property="clinicAddressLbl" destination="eKy-BG-Ydt" id="E62-bx-PnO"/>
+                <outlet property="clinicBgView" destination="gD9-7s-kDy" id="6DD-KH-RLL"/>
+                <outlet property="clinicImgView" destination="QXX-Li-wtd" id="ot7-0L-7Hx"/>
+                <outlet property="clinicName" destination="N9O-q6-Po9" id="0e7-9R-h8s"/>
                 <outlet property="currentDateLbl" destination="J21-YI-jAk" id="24F-Wg-Gi2"/>
                 <outlet property="nextMonthBtnInstance" destination="RbM-Fg-hWO" id="Y5K-TM-8iF"/>
                 <outlet property="previousMothBtnInstance" destination="qxd-5u-v0T" id="rxW-JU-Y82"/>

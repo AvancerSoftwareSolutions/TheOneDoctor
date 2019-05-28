@@ -1,28 +1,29 @@
 //
-//  AppointmentsModel.swift
+//  SessionScheduleModel.swift
 //  TheOneDoctor
 //
-//  Created by MyMac on 24/05/19.
+//  Created by MyMac on 26/05/19.
 //  Copyright © 2019 MyMac. All rights reserved.
 //
 
 import Foundation
 import ObjectMapper
 
-class AppointmentsModel:Mappable
+class SessionScheduleModel:Mappable
 {
     
     var status:StatusDataModel?
-    var appointmentsData:Array<AppointmentsDataModel>?
-    var filterData:Array<AppointmentsFilterModel>?
+    var sessionData:Array<SessionScheduleDataModel>?
+    
+    
+    
     required init?(map: Map) {
         
     }
     
     func mapping(map: Map) {
         status <- map["status"]
-        appointmentsData <- map["result"]
-        filterData <- map["Filter"]
+        sessionData <- map["data"]
         
     }
     

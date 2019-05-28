@@ -122,7 +122,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             } else if let result = result {
                 print("Remote instance ID token: \(result.token)")
                 print("DCS: " + result.token)
+                
                 UserDefaults.standard.set(result.token, forKey: "device_token")
+                print(UserDefaults.standard.value(forKey: "device_token") as? String ?? "empty")
                 
                 //                if let token = InstanceID.instanceID().token() {
                 //                    print("DCS: " + token)
@@ -234,7 +236,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         device_token = device_token.replacingOccurrences(of: ">", with: "")
         device_token = device_token.replacingOccurrences(of: "<", with: "")
         print("device token is \(device_token)")
-        UserDefaults.standard.set(device_token, forKey: "device_token")
+//        UserDefaults.standard.set(device_token, forKey: "device_token")
         ConnectToFCM()
         
     }

@@ -43,9 +43,9 @@ class AddScheduleViewController: UIViewController {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         
-        timeFormatter.dateFormat = "h:mm a"
-        patientHrsFormatter.dateFormat = "h"
-        patientMinFormatter.dateFormat = "mm"
+        timeFormatter.dateFormat = AppConstants.time12HoursInMeridianFormat
+        patientHrsFormatter.dateFormat = AppConstants.timeHoursFormat
+        patientMinFormatter.dateFormat = AppConstants.timeMinFormat
         
     }
     
@@ -143,14 +143,14 @@ class AddScheduleViewController: UIViewController {
     
     @objc func doneBtnMethod()
     {
-        
+        print("updateDaysArraydone \(updateDaysArray)")
         
         for i in 0..<updateDaysArray.count
         {
             let startTime = (self.updateDaysArray[i]  as AnyObject).value(forKey: "start_time") as! String
             let endTime = (self.updateDaysArray[i]  as AnyObject).value(forKey: "end_time") as! String
             let hrsTime = (self.updateDaysArray[i]  as AnyObject).value(forKey: "per_patient_time") as! String
-            let type = (self.updateDaysArray[i]  as AnyObject).value(forKey: "type") as! String
+            let type = "\((self.updateDaysArray[i]  as AnyObject).value(forKey: "type") )"
             let deleted_status = (self.updateDaysArray[i]  as AnyObject).value(forKey: "deleted_status") as! Int
             
             if type == "1" && deleted_status == 0
@@ -173,8 +173,11 @@ class AddScheduleViewController: UIViewController {
             
         }
         print("updateDaysArray \(updateDaysArray)")
+//        print((self.updateDaysArray[0]  as AnyObject).value(forKey: "type") as! String)
+        let sendingArr = NSMutableArray(array: updateDaysArray)
+        AppConstants.updateDaysArray = NSMutableArray(array: self.updateDaysArray)
         
-        loadingAddScheduleDetailsAPI(type: 1, array: updateDaysArray)
+        loadingAddScheduleDetailsAPI(type: 1, array: sendingArr)
         
     }
     
@@ -213,7 +216,7 @@ class AddScheduleViewController: UIViewController {
         cell.labelView.backgroundColor = AppConstants.appGreenColor
         cell.fromTimeBtnInstance.setTitle(resetTime, for: .normal)
         cell.toTimeBtnInstance.setTitle(resetTime, for: .normal)
-        cell.patientHrsBtnInstance.setTitle(resetHrs, for: .normal)
+//        cell.patientHrsBtnInstance.setTitle(resetHrs, for: .normal)
         (self.updateDaysArray[selectedIndexPath.row]  as AnyObject).setValue(1, forKey: "deleted_status")
         (self.updateDaysArray[selectedIndexPath.row]  as AnyObject).setValue("1", forKey: "type")
         
@@ -231,7 +234,7 @@ class AddScheduleViewController: UIViewController {
     @IBAction func doneBtnClick(_ sender: Any) {
         
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "HH:mm"
+        dateFormatter.dateFormat = AppConstants.time24HoursFormat
         
         guard let cell = addScheduleTableView.cellForRow(at: selectedIndexPath) as? AddNormalScheduleTVC else
         {
@@ -266,17 +269,43 @@ class AddScheduleViewController: UIViewController {
         datePickerContainerView.isHidden = true
         addScheduleTableView.reloadData()
     }
-    
+    func convertArraytoJsonString(arr:NSMutableArray) -> String
+    {
+        do {
+            
+            //Convert to Data
+            let jsonData = try JSONSerialization.data(withJSONObject: arr, options: JSONSerialization.WritingOptions.prettyPrinted)
+            
+            //Convert back to string. Usually only do this for debugging
+            if let jsonString = String(data: jsonData, encoding: String.Encoding.utf8) {
+                print(jsonString)
+                return jsonString
+            }
+            return ""
+            
+            //            //In production, you usually want to try and cast as the root data structure. Here we are casting as a dictionary. If the root object is an array cast as [Any].
+            //            var json = try JSONSerialization.jsonObject(with: jsonData, options: JSONSerialization.ReadingOptions.mutableContainers) as? [String: Any]
+            
+            
+        } catch {
+            print("cannot ")
+            return ""
+        }
+    }
     //MARK: - Loading AddSchedule
     func loadingAddScheduleDetailsAPI(type:Int,array:NSMutableArray)
     {
-        var sendingArray = array
+
+        var sendingArray:NSMutableArray = NSMutableArray(array: array)
+
+        var sendingArrayStr = ""
         if type == 1
         {
-            let uploadingArray:NSMutableArray = NSMutableArray(array: array)
+            let uploadingArray:NSMutableArray = NSMutableArray(array: sendingArray)
+            
             for i in 0..<uploadingArray.count
             {
-                if (self.updateDaysArray[i]  as AnyObject).value(forKey: "type") as? String == "1"
+                if (uploadingArray[i]  as AnyObject).value(forKey: "type") as? String == "1"
                 {
                     (uploadingArray[i] as AnyObject).setValue(1, forKey: "type")
                 }
@@ -287,10 +316,18 @@ class AddScheduleViewController: UIViewController {
                 
             }
             sendingArray = uploadingArray
+            sendingArrayStr = convertArraytoJsonString(arr: sendingArray)
+
+            print("updateDaysArray2 \(updateDaysArray)")
+            updateDaysArray = NSMutableArray(array: AppConstants.updateDaysArray)
         }
+        
+        
+        
+        
         var parameters = Dictionary<String, Any>()
         parameters["doctor_id"] = userId
-        parameters["available_days"] = sendingArray
+        parameters["available_days"] = sendingArrayStr
         
         GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
         
@@ -303,24 +340,39 @@ class AddScheduleViewController: UIViewController {
                 if self.addScheduleData?.status?.code == "0" {
                     if type == 1
                     {
-                        GenericMethods.showAlertwithPopNavigation(alertMessage: "Sucess", vc: self)
+//                        GenericMethods.showAlert(alertMessage: self.addScheduleData?.status?.message ?? "Unable to fetch data. Please try again after sometime.")
+                        GenericMethods.showAlertwithPopNavigation(alertMessage: self.addScheduleData?.status?.message ?? "Success", vc: self)
                     }
                     else
                     {
                         self.updateDaysArray = []
+                        var patientHrsFromServer = ""
                         for i in 0..<(self.addScheduleData?.scheduleData?.count ?? 0)
                         {
+                            
                             let dict:NSMutableDictionary = [:]
+                            
+                            
                             dict.setValue(self.addScheduleData?.scheduleData?[i].doctorId, forKey: "doctor_id")
                             dict.setValue(self.addScheduleData?.scheduleData?[i].availableDays, forKey: "available_days")
                             dict.setValue(self.addScheduleData?.scheduleData?[i].startTime, forKey: "start_time")
                             dict.setValue(self.addScheduleData?.scheduleData?[i].endTime, forKey: "end_time")
-                            dict.setValue(self.addScheduleData?.scheduleData?[i].patientHrsTime, forKey: "per_patient_time")
+                            
                             dict.setValue(self.addScheduleData?.scheduleData?[i].deleteStatus, forKey: "deleted_status")
+                            dict.setValue("00:00", forKey: "per_patient_time")
                             dict.setValue(self.addScheduleData?.scheduleData?[i].type, forKey: "type")
+                            if self.addScheduleData?.scheduleData?[i].patientHrsTime != "00:00"
+                            {
+                                patientHrsFromServer = self.addScheduleData?.scheduleData?[i].patientHrsTime ?? "00:00"
+                            }
                             //                        dict.setValue(0, forKey: "type")
                             self.updateDaysArray.add(dict)
                         }
+                        for i in 0..<self.updateDaysArray.count
+                        {
+                            (self.updateDaysArray[i] as AnyObject).setValue(patientHrsFromServer, forKey: "per_patient_time")
+                        }
+                        
                         print("updateArr \(self.updateDaysArray)")
                         
                         self.addScheduleTableView.reloadData()
@@ -330,7 +382,8 @@ class AddScheduleViewController: UIViewController {
                 }
                 else
                 {
-                    GenericMethods.showAlertwithPopNavigation(alertMessage: self.addScheduleData?.status?.message ?? "Unable to fetch data. Please try again after sometime.", vc: self)
+                    GenericMethods.showAlert(alertMessage: self.addScheduleData?.status?.message ?? "Unable to fetch data. Please try again after sometime.")
+                    
                     
                 }
                 
@@ -368,9 +421,14 @@ extension AddScheduleViewController:UITableViewDelegate,UITableViewDataSource
         addNormalScheduleCell?.fromTimeBtnInstance.addTarget(self, action: #selector(fromTimeBtnMethod(btn:)), for: .touchUpInside)
         addNormalScheduleCell?.toTimeBtnInstance.tag = indexPath.row
         addNormalScheduleCell?.toTimeBtnInstance.addTarget(self, action: #selector(toTimeBtnMethod(btn:)), for: .touchUpInside)
+       
         addNormalScheduleCell?.patientHrsBtnInstance.titleLabel?.adjustsFontSizeToFitWidth = true
         addNormalScheduleCell?.patientHrsBtnInstance.tag = indexPath.row
-        addNormalScheduleCell?.patientHrsBtnInstance.addTarget(self, action: #selector(patientHrsBtnMethod(btn:)), for: .touchUpInside)
+//        addNormalScheduleCell?.patientHrsBtnInstance.setTitle(self.addScheduleData?.scheduleData?[0].patientHrsTime ?? "", for: .normal)
+        
+        
+        addNormalScheduleCell?.patientHrsBtnInstance.setTitle(GenericMethods.convertHrstoMinsFormat(dateStr: (self.updateDaysArray[indexPath.row] as? [AnyHashable:Any])? ["per_patient_time"] as? String ?? "00:00 AM"), for: .normal)
+//        addNormalScheduleCell?.patientHrsBtnInstance.addTarget(self, action: #selector(patientHrsBtnMethod(btn:)), for: .touchUpInside)
         addNormalScheduleCell?.refreshBtnInstance.tag = indexPath.row
         addNormalScheduleCell?.refreshBtnInstance.addTarget(self, action: #selector(refreshBtnMethod(btn:)), for: .touchUpInside)
         addNormalScheduleCell?.weekDayLabel.text = (self.updateDaysArray[indexPath.row] as? [AnyHashable:Any])? ["available_days"] as? String ?? ""
@@ -387,7 +445,7 @@ extension AddScheduleViewController:UITableViewDelegate,UITableViewDataSource
         }
         addNormalScheduleCell?.fromTimeBtnInstance.setTitle(GenericMethods.convert24hrto12hrFormat(dateStr: (self.updateDaysArray[indexPath.row] as? [AnyHashable:Any])? ["start_time"] as? String ?? "00:00 AM"), for: .normal)
         addNormalScheduleCell?.toTimeBtnInstance.setTitle(GenericMethods.convert24hrto12hrFormat(dateStr: (self.updateDaysArray[indexPath.row] as? [AnyHashable:Any])? ["end_time"] as? String ?? "00:00 AM"), for: .normal)
-        addNormalScheduleCell?.patientHrsBtnInstance.setTitle(GenericMethods.convertHrstoMinsFormat(dateStr: (self.updateDaysArray[indexPath.row] as? [AnyHashable:Any])? ["per_patient_time"] as? String ?? "00:00 AM"), for: .normal)
+        
         
         
         return addNormalScheduleCell!

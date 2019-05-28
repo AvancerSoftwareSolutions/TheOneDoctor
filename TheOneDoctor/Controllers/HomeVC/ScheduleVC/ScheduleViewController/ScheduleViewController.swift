@@ -16,6 +16,7 @@ class ScheduleViewController: UIViewController {
     @IBOutlet weak var fullBookedLbl: UILabel!
     @IBOutlet weak var bookingInProgressLbl: UILabel!
     @IBOutlet weak var bookingYetStartLbl: UILabel!
+    @IBOutlet weak var noSlotLbl: UILabel!
     
     @IBOutlet weak var scheduleTableView: UITableView!
     
@@ -37,8 +38,12 @@ class ScheduleViewController: UIViewController {
         
         roundLabel(lbl: fullBookedLbl, color: UIColor.red)
         roundLabel(lbl: bookingInProgressLbl, color: UIColor.yellow)
-        roundLabel(lbl: bookingYetStartLbl, color: UIColor.white)
+        roundLabel(lbl: bookingYetStartLbl, color: UIColor.green)
+        roundLabel(lbl: noSlotLbl, color: UIColor.orange)
         
+        bookingYetStartLbl.layer.borderColor = UIColor.lightGray.cgColor
+        bookingYetStartLbl.layer.borderWidth = 0.2
+
         let addBtn = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addScheduleBtnClick))
         let editBtn = UIBarButtonItem(image: UIImage(named: "EditProfPic.png"), style: .plain, target: self, action: #selector(editScheduleBtnClick))
         let svgHoldingView = UIView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
@@ -48,6 +53,7 @@ class ScheduleViewController: UIViewController {
         svgHoldingView.addGestureRecognizer(tapGesture)
         self.navigationItem.rightBarButtonItems = [UIBarButtonItem.init(customView: svgHoldingView),editBtn,addBtn]
     
+        loadingScheduleDetailsAPI()
         
         
         
@@ -97,13 +103,23 @@ class ScheduleViewController: UIViewController {
     @objc func editScheduleBtnClick()
     {
         
+//        let rescheduleVC = self.storyboard?.instantiateViewController(withIdentifier: "rescheduleVC") as! RescheduleViewController
+//        self.navigationController?.pushViewController(rescheduleVC, animated: true)
     }
-    
+    func searchFromArray(searchKey:String,searchString:String,array:NSMutableArray)
+    {
+        let predicate = NSPredicate(format: "\(searchKey) CONTAINS[C] %@", "\(searchString)" )
+        let orPredi: NSPredicate? = NSCompoundPredicate(orPredicateWithSubpredicates: [predicate])
+        
+        let arr = array.filtered(using: orPredi!)
+//        print ("arr = \(arr)")
+        //        imageStr = (array[0]as? [AnyHashable:Any])? ["FlagPng"] as? String ?? ""
+    }
     //MARK:- Loading Schedule
     func loadingScheduleDetailsAPI()
     {
         var parameters = Dictionary<String, Any>()
-        parameters["user_id"] = UserDefaults.standard.value(forKey: "user_id") ?? 0 as Int
+        parameters["doctor_id"] = UserDefaults.standard.value(forKey: "user_id") ?? 0 as Int
         
         GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
         
@@ -114,8 +130,14 @@ class ScheduleViewController: UIViewController {
             if status == true {
                 self.scheduleData = response
                 if self.scheduleData?.status?.code == "0" {
+                    AppConstants.resultDateArray = []
+                    AppConstants.resultDateArray = NSMutableArray(array: self.scheduleData?.dateDict ?? [""])
+                    print("first array \(AppConstants.resultDateArray[0])")
                     
+                    self.searchFromArray(searchKey: "date", searchString: "2019-05-25", array: AppConstants.resultDateArray)
                     
+                    self.scheduleTableView.reloadData()
+                    self.addScheduleCell?.calendarView.reloadData()
                 }
                 else
                 {
@@ -148,7 +170,35 @@ extension ScheduleViewController:UITableViewDelegate,UITableViewDataSource
         {
             addScheduleCell = AddScheduleTableViewCell(style: .default, reuseIdentifier: "addScheduleCell")
         }
+        addScheduleCell?.clinicName.text = scheduleData?.clinicData?.clinicName ?? ""
+        addScheduleCell?.clinicAddressLbl.text = scheduleData?.clinicData?.clinicAddress ?? ""
+        addScheduleCell?.clinicAddressLbl.addImage(imageName: "location.png", afterLabel: false)
         
+        addScheduleCell?.clinicImgView.layer.cornerRadius = addScheduleCell!.clinicImgView.frame.size.height / 2
+        addScheduleCell?.clinicImgView.layer.borderWidth = 0.2
+        
+        addScheduleCell?.clinicImgView.clipsToBounds = true
+        addScheduleCell?.clinicImgView.layer.masksToBounds = true
+        addScheduleCell?.clinicImgView.layer.borderColor = UIColor.white.cgColor
+        
+        addScheduleCell?.clinicImgView.contentMode = .scaleAspectFit
+        addScheduleCell?.clinicImgView.image = nil
+        addScheduleCell?.clinicImgView.sd_setImage(with: URL(string: scheduleData?.clinicData?.clinicPicture ?? ""), placeholderImage: AppConstants.imgPlaceholder,options: SDWebImageOptions(rawValue: 0), completed: { (image, error, cacheType, imageURL) in
+            
+            if error == nil
+            {
+                self.addScheduleCell?.clinicImgView.image = image
+                
+            }
+            else{
+                print("error is \(error?.localizedDescription as Any)")
+                self.addScheduleCell?.clinicImgView.contentMode = .center
+                self.addScheduleCell?.clinicImgView.image = AppConstants.imgPlaceholder
+                
+            }
+            
+            // Perform operation.
+        })
         
         return addScheduleCell!
         

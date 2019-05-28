@@ -1,28 +1,25 @@
 //
-//  AppointmentsModel.swift
+//  AddVIPScheduleModel.swift
 //  TheOneDoctor
 //
-//  Created by MyMac on 24/05/19.
+//  Created by MyMac on 23/05/19.
 //  Copyright © 2019 MyMac. All rights reserved.
 //
 
 import Foundation
 import ObjectMapper
 
-class AppointmentsModel:Mappable
+class AddVIPScheduleModel:Mappable
 {
     
     var status:StatusDataModel?
-    var appointmentsData:Array<AppointmentsDataModel>?
-    var filterData:Array<AppointmentsFilterModel>?
+    
     required init?(map: Map) {
         
     }
     
     func mapping(map: Map) {
         status <- map["status"]
-        appointmentsData <- map["result"]
-        filterData <- map["Filter"]
         
     }
     

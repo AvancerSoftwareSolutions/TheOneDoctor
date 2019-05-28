@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="slotsCell" id="KGk-i7-Jjw" customClass="SlotsTableViewCell" customModule="TheOneDoctor" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nLC-Eu-Ohc">
+                        <rect key="frame" x="5" y="5" width="310" height="33"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="A4z-CV-0tk">
+                                <rect key="frame" x="0.0" y="0.0" width="310" height="33"/>
+                                <state key="normal" title="Button">
+                                    <color key="titleColor" name="AppGreenColor"/>
+                                </state>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="A4z-CV-0tk" secondAttribute="trailing" id="KMT-kG-VqT"/>
+                            <constraint firstItem="A4z-CV-0tk" firstAttribute="top" secondItem="nLC-Eu-Ohc" secondAttribute="top" id="Qzi-xK-cXt"/>
+                            <constraint firstAttribute="bottom" secondItem="A4z-CV-0tk" secondAttribute="bottom" id="VAZ-d4-yI0"/>
+                            <constraint firstItem="A4z-CV-0tk" firstAttribute="leading" secondItem="nLC-Eu-Ohc" secondAttribute="leading" id="ewI-kj-axm"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="nLC-Eu-Ohc" secondAttribute="bottom" constant="5.5" id="3Bs-ag-e2R"/>
+                    <constraint firstAttribute="trailing" secondItem="nLC-Eu-Ohc" secondAttribute="trailing" constant="5" id="Hdm-Cd-FMj"/>
+                    <constraint firstItem="nLC-Eu-Ohc" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="5" id="Irn-Qn-MpX"/>
+                    <constraint firstItem="nLC-Eu-Ohc" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="5" id="Taf-Bv-WEs"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <connections>
+                <outlet property="bgView" destination="nLC-Eu-Ohc" id="Yfj-9O-0Ta"/>
+                <outlet property="titleBtnInstance" destination="A4z-CV-0tk" id="Jcl-U2-LXT"/>
+            </connections>
+            <point key="canvasLocation" x="131.8840579710145" y="110.49107142857143"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <namedColor name="AppGreenColor">
+            <color red="0.53725490196078429" green="0.72549019607843135" blue="0.24705882352941178" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>

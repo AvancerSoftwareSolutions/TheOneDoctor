@@ -40,7 +40,7 @@ class DashboardViewController: UIViewController,UIGestureRecognizerDelegate {
         profileContainerView.layer.shadowOffset = CGSize.zero
         profileContainerView.layer.shadowRadius = 2
         profileContainerView.layer.shadowPath = UIBezierPath(roundedRect: profileContainerView.bounds, cornerRadius: cornerRadius).cgPath
-        GenericMethods.setProfileImage(imageView: profilePicImgView,borderColor:UIColor.lightGray)
+        
         
 //
 //
@@ -135,6 +135,7 @@ class DashboardViewController: UIViewController,UIGestureRecognizerDelegate {
         imgView.layer.masksToBounds = true
     }
     override func viewWillAppear(_ animated: Bool) {
+        GenericMethods.setProfileImage(imageView: profilePicImgView,borderColor:UIColor.lightGray)
         navigationController?.navigationBar.isHidden = true
     }
     override func viewWillDisappear(_ animated: Bool) {
@@ -189,6 +190,7 @@ extension DashboardViewController:UICollectionViewDelegate,UICollectionViewDataS
             
             let appointVC = self.storyboard?.instantiateViewController(withIdentifier: "appointVC") as! AppointmentsViewController
             self.navigationController?.pushViewController(appointVC, animated: true)
+            
         case 1:
             
             let scheduleVC = self.storyboard?.instantiateViewController(withIdentifier: "scheduleVC") as! ScheduleViewController

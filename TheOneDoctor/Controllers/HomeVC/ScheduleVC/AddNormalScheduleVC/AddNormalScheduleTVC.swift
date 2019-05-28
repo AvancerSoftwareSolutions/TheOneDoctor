@@ -26,6 +26,7 @@ class AddNormalScheduleTVC: UITableViewCell {
         super.awakeFromNib()
         GenericMethods.shadowCellView(view:bgView)
         
+//        patientHrsBtnInstance.isEnabled = false
         // Initialization code
     }
 

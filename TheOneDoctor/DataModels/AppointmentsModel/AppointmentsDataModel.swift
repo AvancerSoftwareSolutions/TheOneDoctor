@@ -19,6 +19,7 @@ class AppointmentsDataModel:Mappable
     var type:String?
     var fromTime:String?
     var status:String?
+    var appointmentId:String?
     
     required init?(map: Map) {
         
@@ -32,6 +33,7 @@ class AppointmentsDataModel:Mappable
         type <- map["type"]
         fromTime <- map["From"]
         status <- map["status"]
+        appointmentId <- map["appointment_id"]
     }
     
     init() {

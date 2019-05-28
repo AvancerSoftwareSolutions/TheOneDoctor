@@ -16,6 +16,8 @@ class CalendarDateCollectionViewCell: JTAppleCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
+        self.layer.cornerRadius = 5.0
+        self.layer.masksToBounds = true
         // Initialization code
     }
 

@@ -449,7 +449,6 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
     {
         
         let predicate = NSPredicate(format: "\(searchKey) contains[cd] %@", searchString)
-        // change it to "coupon_code == @" for checking equality.
         
         let indexes = array.indexesOfObjects(options: []) { (dictionary, index, stop) -> Bool in
             return predicate.evaluate(with: dictionary)
@@ -976,7 +975,8 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                 UserDefaults.standard.set(responseObject.object(forKey: "picturepath") as? String ?? "", forKey: "user_image")
                 GenericMethods.setProfileImage(imageView: self.profileImgView,borderColor:UIColor.white)
                 self.picture = responseObject.object(forKey: "profile") as? String ?? ""
-                GenericMethods.showAlertMethod(alertMessage: "\(responseObject.object(forKey: "message") as? String ?? "Success")")
+                
+                GenericMethods.showAlertMethod(alertMessage: "\((status as AnyObject).object(forKey: "message") as? String ?? "Success")")
             }
             else
             {

@@ -14,7 +14,8 @@ class AppointmentsFilterModel:Mappable
     
     var age:Array<String>?
     var appointments:Array<String>?
-    var clinicList:Array<String>?
+    var clinicList:Array<AppointmentsClinicFilterModel>?
+    
     required init?(map: Map) {
         
     }

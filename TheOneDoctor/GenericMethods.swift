@@ -13,7 +13,46 @@ import Alamofire
 import Photos
 import SwiftSVG
 import SDWebImage
-
+extension UILabel
+{
+    func addImage(imageName: String, afterLabel bolAfterLabel: Bool = false)
+    {
+        let attachment: NSTextAttachment = NSTextAttachment()
+        attachment.image = UIImage(named: imageName)
+        
+        let lFontSize = round(self.font.pointSize * 1.32)
+        let lRatio = attachment.image!.size.width / attachment.image!.size.height
+        
+        attachment.bounds = CGRect(x: 0, y: ((self.font.capHeight - lFontSize) / 2).rounded(), width: lRatio * lFontSize, height: lFontSize)
+        
+        let attachmentString = NSAttributedString(attachment: attachment)
+        
+        //        let attachmentString: NSAttributedString = NSAttributedString(attachment: attachment)
+        
+        if (bolAfterLabel)
+        {
+            let strLabelText: NSMutableAttributedString = NSMutableAttributedString(string: self.text!)
+            strLabelText.append(attachmentString)
+            
+            self.attributedText = strLabelText
+        }
+        else
+        {
+            let strLabelText: NSAttributedString = NSAttributedString(string: self.text!)
+            let mutableAttachmentString: NSMutableAttributedString = NSMutableAttributedString(attributedString: attachmentString)
+            mutableAttachmentString.append(strLabelText)
+            
+            self.attributedText = mutableAttachmentString
+        }
+    }
+    
+    func removeImage()
+    {
+        let text = self.text
+        self.attributedText = nil
+        self.text = text
+    }
+}
 extension CALayer {
     
     func addBorder(edge: UIRectEdge, color: UIColor, thickness: CGFloat) {
@@ -193,6 +232,15 @@ class GenericMethods: NSObject {
         
         //        let str = resstr.replacingOccurrences(of: " ", with: "", options: NSString.CompareOptions.literal, range: nil)
         return str
+    }
+    class func roundedCornerTextView(textView:UITextView)
+    {
+        textView.layer.cornerRadius = 5.0
+        textView.layer.masksToBounds = true
+        textView.layer.borderColor = AppConstants.appdarkGrayColor.cgColor
+        textView.layer.borderWidth = 1.0
+        textView.keyboardType = .asciiCapable
+        
     }
     //MARK:- Button Attributes
     class func setButtonAttributes ( button:UIButton,with title:String)
@@ -418,13 +466,13 @@ class GenericMethods: NSObject {
     class func convert24hrto12hrFormat(dateStr:String) -> String
     {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "HH:mm"
+        dateFormatter.dateFormat = AppConstants.time24HoursFormat
         
         guard let date = dateFormatter.date(from: dateStr) else
         {
             return "00:00 AM"
         }
-        dateFormatter.dateFormat = "h:mm a"
+        dateFormatter.dateFormat = AppConstants.time12HoursInMeridianFormat
         let Date12 = dateFormatter.string(from: date)
 //        print("12 hour formatted Date:",Date12)
         if Date12 == "12:00 AM"
@@ -433,21 +481,36 @@ class GenericMethods: NSObject {
         }
         return Date12
     }
+    // MARK:- 12 hrs to 24 hrs
+    class func convert12hrto24hrFormat(dateStr:String) -> String
+    {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = AppConstants.time12HoursInMeridianFormat
+        
+        guard let date = dateFormatter.date(from: dateStr) else
+        {
+            return "00:00"
+        }
+        dateFormatter.dateFormat = AppConstants.time24HoursFormat
+        let Date12 = dateFormatter.string(from: date)
+        //        print("12 hour formatted Date:",Date12)
+        return Date12
+    }
     // MARK:- 24 hrs to 12 hrs
     class func convertHrstoMinsFormat(dateStr:String) -> String
     {
         
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "HH:mm"
+        dateFormatter.dateFormat = AppConstants.time24HoursFormat
         
         
         guard let date = dateFormatter.date(from: dateStr) else
         {
             return "0 mins"
         }
-        dateFormatter.dateFormat = "h"
+        dateFormatter.dateFormat = AppConstants.timeHoursFormat
         let hour = dateFormatter.string(from: date)
-        dateFormatter.dateFormat = "mm"
+        dateFormatter.dateFormat = AppConstants.timeMinFormat
         let minute = dateFormatter.string(from: date)
         
         let outputStr = "\(hour)hrs \(minute)mins"
@@ -471,10 +534,47 @@ class GenericMethods: NSObject {
     class func convertDateto12hrFormat(dateStr:Date) -> String
     {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "h:mm a"
+        dateFormatter.dateFormat = AppConstants.time12HoursInMeridianFormat
         let date = dateFormatter.string(from: dateStr)
         return date
     }
+    
+    class func dateFormatting(createdDateStr:String,dateFormat:String) -> String
+    {
+        if GenericMethods.isStringEmpty(createdDateStr) || createdDateStr.isEmpty || createdDateStr == "0"
+        {
+            return ""
+        }
+        let createdDateFormatter = DateFormatter()
+        createdDateFormatter.dateFormat = AppConstants.defaultDateFormat
+        let requesteddate = createdDateFormatter.date(from: createdDateStr)
+        createdDateFormatter.dateFormat = dateFormat
+        let str = createdDateFormatter.string(from: requesteddate!)
+        if GenericMethods.isStringEmpty(str) || str.isEmpty || createdDateStr == "0"
+        {
+            return ""
+        }
+        return str
+    }
+    
+    class func changeDateFormatting(createdDateStr:String,inputDateFormat:String,resultDateFormat:String) -> String
+    {
+        if GenericMethods.isStringEmpty(createdDateStr) || createdDateStr.isEmpty || createdDateStr == "0"
+        {
+            return ""
+        }
+        let createdDateFormatter = DateFormatter()
+        createdDateFormatter.dateFormat = inputDateFormat
+        let requesteddate = createdDateFormatter.date(from: createdDateStr)
+        createdDateFormatter.dateFormat = resultDateFormat
+        let str = createdDateFormatter.string(from: requesteddate!)
+        if GenericMethods.isStringEmpty(str) || str.isEmpty || createdDateStr == "0"
+        {
+            return ""
+        }
+        return str
+    }
+    
     class func hideLoaderMethod(view:UIView)
     {
         MBProgressHUD.hide(for: view, animated: true)
@@ -1186,7 +1286,7 @@ class GenericMethods: NSObject {
     {
         let date = NSDate()
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd hh:mm:ss"
+        dateFormatter.dateFormat = AppConstants.defaultDateFormat
         dateFormatter.timeZone = TimeZone.current
         let datestr = dateFormatter.string(from: date as Date)
         dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
@@ -1255,7 +1355,12 @@ class GenericMethods: NSObject {
         let defaults = UserDefaults.standard
         let dictionary = defaults.dictionaryRepresentation()
         dictionary.keys.forEach { key in
-            defaults.removeObject(forKey: key)
+            print(key)
+            if key != "device_token"
+            {
+               defaults.removeObject(forKey: key)
+            }
+            
         }
         
     }

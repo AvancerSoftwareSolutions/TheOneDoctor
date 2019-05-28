@@ -36,12 +36,13 @@ class LoginViewController: UIViewController {
         // Do any additional setup after loading the view.
     }
     override func viewWillAppear(_ animated: Bool) {
-        
+        print("device_token \(UserDefaults.standard.value(forKey: "device_token") as? String ?? "empty")")
     }
     @objc func doneWithNumberPad()
     {
         let _ = mobileTF.resignFirstResponder()
     }
+    
     // MARK: - IBActions
     
     @IBAction func sendOTPBtnClick(_ sender: Any) {

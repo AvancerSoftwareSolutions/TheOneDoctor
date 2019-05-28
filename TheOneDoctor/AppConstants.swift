@@ -38,8 +38,9 @@ struct AppConstants
     static let videoFileName: String = "video"
     static let docImgListplaceHolderImg = UIImage(named: "LoaderImage")
     static let errorLoadingImg = UIImage(named: "ErrorImage")
+    static let imgPlaceholder = UIImage(named: "emptyProfile.png")
     static var resultDateDict:NSMutableDictionary = [:]
-    
+    static var resultDateArray:NSMutableArray = []
 //  ****************************************************************************
     
     //local
@@ -78,6 +79,8 @@ struct AppConstants
     static let appGreenColor:UIColor = #colorLiteral(red: 0.537254902, green: 0.7254901961, blue: 0.2470588235, alpha: 1) // 89B93F // R-137 B-185 G-63
     
     static let appdarkGrayColor:UIColor = #colorLiteral(red: 0.2588235294, green: 0.2549019608, blue: 0.262745098, alpha: 1) //424143 - darkGray
+    static let appyellowColor:UIColor = #colorLiteral(red: 1, green: 0.8256910443, blue: 0, alpha: 1) // FFCB04 // R-225 B-4 G-203
+    
     static let khudColour:UIColor =  UIColor(red: 100/255.0 , green: 166/255.0, blue: 35/255.0, alpha: 1) 
     static var changeViewClick:Bool = false
     
@@ -88,7 +91,8 @@ struct AppConstants
     static var leftMenuLoad:Bool = false
     static var isNotified:Bool = false
     
-    static var childArray:NSMutableArray = []
+    static var updateDaysArray:NSMutableArray = []
+    
     static var leftGrandChildArray:NSMutableArray = []
     static var middleGrandChildArray:NSMutableArray = []
     static var rightGrandChildArray:NSMutableArray = []
@@ -97,15 +101,29 @@ struct AppConstants
     
 
 //  ****************************************************************************
+    
+    //MARK:- DateFormats
+    
+    static let monthDayFormat = "MMM yyyy"
+    static let postDateFormat = "yyyy-MM-dd"
+    static let dayMonthYearFormat = "E, MMM d"
+    static let defaultDateFormat = "yyyy-MM-dd HH:mm:ss"
+    static let monthYearFormat = "MM-yyyy"
+    static let time12HoursInMeridianFormat = "h:mm a"
+    static let timeHoursFormat = "h"
+    static let timeMinFormat = "mm"
+    static let time24HoursFormat = "HH:mm"
+    static let titleDateFormat = "d, MMM yyyy"
+    static let dayFormat = "EEEE"
 
     static let isiPad: Bool = (UIDevice.current.userInterfaceIdiom == .pad ? true : false)
-    static let defaultDateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+//    static let defaultDateFormat = "yyyy-MM-dd'T'HH:mm:ss"
     static let defaultDateFormatWithOutSeconds = "yyyy-MM-dd'T'HH:mm"
     static let dateFormatWithFwdSlashMonthStart = "MM/dd/yyyy"
     static let dateFormatWithShortMonthAndDay = "EEEE, MMM d yyyy"
     static let dateFormatWithShortMonth = "MMM dd, yyyy"
     static let timeFormat = "HH:mm:ss"
-    static let time12HoursInMeridianFormat = "h:mm a"
+    
     static let differentDateFormatWithMeridian = "MM/dd/yyyy hh:mm aa"
 
     static let DefaultUserId = "00000000-0000-0000-0000-000000000000"

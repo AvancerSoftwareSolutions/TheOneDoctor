@@ -13,7 +13,7 @@ class ScheduleModel:Mappable
 {
     
     var status:StatusDataModel?
-    var dateDict:Array<ScheduleDataModel>?
+    var dateDict:Array<Any>?
     var clinicData:ScheduleClinicDataModel?
     var startDate:String?
     var endDate:String?
@@ -27,6 +27,7 @@ class ScheduleModel:Mappable
         dateDict <- map["Data"]
         startDate <- map["StartDate"]
         endDate <- map["EndDate"]
+        clinicData <- map["ClinicData"]
     }
     
     init() {
