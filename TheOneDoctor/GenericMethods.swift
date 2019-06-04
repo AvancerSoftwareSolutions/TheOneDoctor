@@ -13,6 +13,11 @@ import Alamofire
 import Photos
 import SwiftSVG
 import SDWebImage
+extension Date {
+    var localizedDescription: String {
+        return description(with: .current)
+    }
+}
 extension UILabel
 {
     func addImage(imageName: String, afterLabel bolAfterLabel: Bool = false)
@@ -461,6 +466,48 @@ class GenericMethods: NSObject {
         let loadingNotification = MBProgressHUD.showAdded(to: shownView, animated: true)
         loadingNotification.mode = MBProgressHUDMode.indeterminate
         loadingNotification.label.text = message
+    }
+    // MARK:- Date Methods
+    class func currentDateTimeString() -> String
+    {
+        let date = NSDate()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = AppConstants.time24HoursFormat
+        dateFormatter.timeZone = TimeZone.current
+        let datestr = dateFormatter.string(from: date as Date)
+//        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        print("datestring\(datestr)")
+        return datestr
+        
+    }
+    class func currentDateTime() -> Date
+    {
+        let date = NSDate()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = AppConstants.defaultDateFormat
+        dateFormatter.timeZone = TimeZone.current
+        let datestr = dateFormatter.string(from: date as Date)
+//        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        print("datestr\(datestr)")
+        //        print("dateDate\(dateFormatter.date(from: datestr)!)")
+        guard let currentDate = dateFormatter.date(from: datestr)
+            else
+        {
+            return Date()
+        }
+        print("currentDate\(currentDate)")
+        return currentDate
+    }
+    class func stringToDate(dateString:String)-> Date
+    {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat =  AppConstants.time24HoursFormat
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        
+//        let item = "7:00 PM"
+        let date = dateFormatter.date(from: dateString)
+        print("Start: \(String(describing: date))") // Start: Optional(2000-01-01 19:00:00 +0000)
+        return date!
     }
     // MARK:- 24 hrs to 12 hrs
     class func convert24hrto12hrFormat(dateStr:String) -> String
@@ -1282,24 +1329,7 @@ class GenericMethods: NSObject {
             }
         })
     }
-    class func currentDateTime() -> Date
-    {
-        let date = NSDate()
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = AppConstants.defaultDateFormat
-        dateFormatter.timeZone = TimeZone.current
-        let datestr = dateFormatter.string(from: date as Date)
-        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-        print("datestr\(datestr)")
-        //        print("dateDate\(dateFormatter.date(from: datestr)!)")
-        guard let currentDate = dateFormatter.date(from: datestr)
-            else
-        {
-            return Date()
-        }
-        print("currentDate\(currentDate)")
-        return currentDate
-    }
+    
     //MARK: AlertController
     class func showAlertMethod(alertMessage: String)
     {

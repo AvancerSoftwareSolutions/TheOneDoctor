@@ -117,7 +117,7 @@ class AddScheduleViewController: UIViewController {
             ]]
         datePicker.layer.addBorder(edge: .top, color: UIColor.lightGray, thickness: 1.0)
         datePickerContainerView.isHidden = true
-        self.title = "Add Schedule"
+        self.title = "Change Schedule"
         
         let label = UILabel(frame: CGRect(x: 0, y: 0, width: 70, height: 30))
         label.text = "Done"
@@ -423,6 +423,7 @@ class AddScheduleViewController: UIViewController {
         parameters["doctor_id"] = userId
         parameters["schedule"] = self.addScheduleData?.scheduleData?.toJSONString() ?? ""
         parameters["appointment"] = self.addScheduleData?.appointment?.toJSONString()  ?? ""
+        parameters["VIPSchedule"] = self.addScheduleData?.vipSchedule?.toJSONString()  ?? ""
         
         GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
         

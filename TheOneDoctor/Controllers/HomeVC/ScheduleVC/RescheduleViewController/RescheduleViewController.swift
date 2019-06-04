@@ -11,7 +11,23 @@ import UIKit
 class RescheduleViewController: UIViewController {
 
     //MARK:- IBOutlets
-    @IBOutlet weak var rescheduleTableView: UITableView!
+    
+    @IBOutlet weak var monthChangeView: UIView!
+    @IBOutlet weak var monthDayView: UIView!
+    @IBOutlet weak var monthDayLbl: UILabel!
+    @IBOutlet weak var nextMonthBtnInst: UIButton!
+    @IBOutlet weak var previousMonthBtnInst: UIButton!
+    @IBOutlet weak var rescheduleCollectionView: UICollectionView!
+    @IBOutlet weak var stackViewHgtConst: NSLayoutConstraint! //40
+    @IBOutlet weak var stackView: UIStackView!
+    @IBOutlet weak var rescheduleBtnInst: UIButton!
+    @IBOutlet weak var unavailableTodayBtnInst: UIButton!
+    @IBOutlet weak var makeAvailableBtnInst: UIButton!
+    @IBOutlet weak var editButtonInst: UIButton!
+    
+    @IBOutlet weak var cancelScheduleBtnInst: UIButton!
+    @IBOutlet weak var cancelBtnHgtConst: NSLayoutConstraint! // 40
+    @IBOutlet weak var collectionViewHgtConst: NSLayoutConstraint! // 100
     
     
     //MARK:- Variables
@@ -20,34 +36,47 @@ class RescheduleViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = "Edit Schedule"
-        rescheduleTableView.tableFooterView = UIView()
         
+        roundBtn(btn: cancelScheduleBtnInst)
+        roundBtn(btn: rescheduleBtnInst)
+        roundBtn(btn: unavailableTodayBtnInst)
+        roundBtn(btn: makeAvailableBtnInst)
+
+        cancelBtnHgtConst.constant = 0
+        makeAvailableBtnInst.isHidden = true
+        rescheduleCollectionView.isUserInteractionEnabled = false
 
         // Do any additional setup after loading the view.
     }
+    override func viewDidLayoutSubviews() {
+        let height = rescheduleCollectionView.collectionViewLayout.collectionViewContentSize.height
+        collectionViewHgtConst.constant = height;
+    }
+    func roundBtn(btn:UIButton)
+    {
+        btn.layer.cornerRadius = 5.0
+        btn.layer.masksToBounds = true
+    }
+    
+    //MARK:- IBActions
+    @IBAction func editBtnClick(_ sender: Any) {
+        rescheduleCollectionView.isUserInteractionEnabled = true
+        makeAvailableBtnInst.isHidden = true
+        stackView.isHidden = true
+        stackViewHgtConst.constant = 0
+    }
+    @IBAction func cancelScheduleBtnClick(_ sender: Any) {
+        
+        rescheduleCollectionView.isUserInteractionEnabled = false
+        
+    }
+    @IBAction func rescheduleBtnClick(_ sender: Any) {
+    }
+    @IBAction func unavailableTodayBtnClick(_ sender: Any) {
+    }
+    @IBAction func makeAvailableBtnClick(_ sender: Any) {
+    }
+    
     
 
-}
-extension RescheduleViewController:UITableViewDelegate,UITableViewDataSource
-{
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 5
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        rescheduleCell = tableView.dequeueReusableCell(withIdentifier: "rescheduleCell") as? RescheduleTableViewCell
-        if rescheduleCell == nil
-        {
-            rescheduleCell = RescheduleTableViewCell(style: .default, reuseIdentifier: "rescheduleCell")
-        }
-        
-        return rescheduleCell!
-    }
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return UITableView.automaticDimension
-    }
-    
 }

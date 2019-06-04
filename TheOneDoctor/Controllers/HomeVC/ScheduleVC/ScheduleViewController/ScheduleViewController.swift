@@ -73,7 +73,9 @@ class ScheduleViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         loadingScheduleDetailsAPI()
     }
-    
+    override func viewWillDisappear(_ animated: Bool) {
+        self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+    }
     func roundLabel(lbl:UILabel,color:UIColor)
     {
         lbl.layer.cornerRadius = lbl.frame.height / 2
@@ -129,7 +131,7 @@ class ScheduleViewController: UIViewController {
     @objc func addScheduleBtnClick()
     {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        alert.addAction(UIAlertAction(title: "Add New Schedule", style: .default, handler: { _ in
+        alert.addAction(UIAlertAction(title: "Change Schedule", style: .default, handler: { _ in
            let addScheduleVC = self.storyboard?.instantiateViewController(withIdentifier: "addScheduleVC") as! AddScheduleViewController
             self.navigationController?.pushViewController(addScheduleVC, animated: true)
         }))

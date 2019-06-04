@@ -15,6 +15,7 @@ class AddScheduleModel:Mappable
     var status:StatusDataModel?
     var scheduleData:Array<AddScheduleDataModel>?
     var appointment:Array<AppointmentScheduleModel>?
+    var vipSchedule:Array<VIPScheduleModel>?
     
     required init?(map: Map) {
         
@@ -24,6 +25,7 @@ class AddScheduleModel:Mappable
         status <- map["status"]
         scheduleData <- map["schedule"]
         appointment <- map["Appointment"]
+        vipSchedule <- map["VIPSchedule"]
     }
     
     init() {

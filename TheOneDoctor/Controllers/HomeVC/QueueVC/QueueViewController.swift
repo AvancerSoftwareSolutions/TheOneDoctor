@@ -21,6 +21,8 @@ class QueueViewController: UIViewController {
     //MARK: Variables
     var queueArray:NSMutableArray = []
     var slotsListCell:SlotsCollectionViewCell? = nil
+    var queueListData:QueueModel?
+    let apiManager = APIManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,6 +30,7 @@ class QueueViewController: UIViewController {
         self.title = "Queue"
         
         self.queueCollectionView.register(UINib(nibName: "SlotsCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "slotsListCell")
+        self.loadingQueueDetailsAPI()
 
         // Do any additional setup after loading the view.
     }
@@ -50,6 +53,46 @@ class QueueViewController: UIViewController {
         view.layer.shadowRadius = 2.5
         view.layer.shadowOffset = CGSize(width: 0, height: 2)
     }
+    
+    // MARK: - Dashboard API
+    func loadingQueueDetailsAPI()
+    {
+        var parameters = Dictionary<String, Any>()
+        parameters["doctor_id"] = UserDefaults.standard.value(forKey: "user_id") ?? 0 as Int
+        
+        GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
+        
+        apiManager.queueListDetailsAPI(parameters: parameters) { (status, showError, response, error) in
+            
+            GenericMethods.hideLoaderMethod(view: self.view)
+            
+            if status == true {
+                self.queueListData = response
+                if self.queueListData?.status?.code == "0" {
+                    //MARK: Queue Success Details
+                    
+                    self.totalPatientLbl.text = "\(self.queueListData?.appointmentData?.totalPatientCount ?? 0)"
+                    self.pendingPatientLbl.text = "\(self.queueListData?.appointmentData?.attendedCount ?? 0)"
+                    
+                    self.queueCollectionView.reloadData()
+                    
+                }
+                else
+                {
+                    GenericMethods.showAlertwithPopNavigation(alertMessage: self.queueListData?.status?.message ?? "Unable to fetch data. Please try again after sometime.", vc: self)
+                    
+                }
+                
+                
+            }
+            else {
+                GenericMethods.showAlertwithPopNavigation(alertMessage: error?.localizedDescription ?? "Something Went Wrong. Please try again.", vc: self)
+                
+                
+                
+            }
+        }
+    }
 
 
 }
@@ -60,7 +103,10 @@ extension QueueViewController:UICollectionViewDelegate,UICollectionViewDataSourc
         return 1
     }
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 50
+        if self.queueListData != nil {
+            return (self.queueListData?.appointmentData?.queueData?.count) ?? 0
+        }
+        return 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {

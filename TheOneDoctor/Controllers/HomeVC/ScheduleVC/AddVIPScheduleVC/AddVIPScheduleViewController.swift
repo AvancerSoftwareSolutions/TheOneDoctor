@@ -38,7 +38,7 @@ class AddVIPScheduleViewController: UIViewController,sendDateDelegate {
     var numberOfSlots = ""
     var selectedStr = ""
     var timeSlotTime = ""
-    var selectedDate = Date()
+    var selectedDate = GenericMethods.currentDateTime()
     var selectedType = ""
     let postDataFormatter = DateFormatter()
     
@@ -135,11 +135,15 @@ class AddVIPScheduleViewController: UIViewController,sendDateDelegate {
                         {
                             self.selectedType = "before"
                             self.timeSlotTime = self.scheduleDateData?.startTime ?? ""
+                            self.beforeSeesionView.backgroundColor = AppConstants.appGreenColor
+                            self.afterSessionView.backgroundColor = AppConstants.appdarkGrayColor
                         }
                         else
                         {
                             self.selectedType = "after"
                             self.timeSlotTime = self.scheduleDateData?.endTime ?? ""
+                            self.beforeSeesionView.backgroundColor = AppConstants.appdarkGrayColor
+                            self.afterSessionView.backgroundColor = AppConstants.appGreenColor
                         }
                         print("timeSlotTime \(self.timeSlotTime)")
                         let count = self.sessionScheduleData?.sessionData?.count ?? 0
@@ -185,6 +189,7 @@ class AddVIPScheduleViewController: UIViewController,sendDateDelegate {
         calendarVC.modalPresentationStyle = .overCurrentContext
         calendarVC.delegate = self
         calendarVC.minimumDate = GenericMethods.currentDateTime()
+        calendarVC.setDate = selectedDate
         calendarVC.maximumDate = Calendar.current.date(byAdding: .day, value: AppConstants.durationPeriod, to: GenericMethods.currentDateTime())!
         UIApplication.shared.topMostViewController()?.present(calendarVC, animated: true)
     }
@@ -341,28 +346,33 @@ class AddVIPScheduleViewController: UIViewController,sendDateDelegate {
                     self.beforeSeesionView.backgroundColor = AppConstants.appdarkGrayColor
                     self.afterSessionView.backgroundColor = AppConstants.appdarkGrayColor
                     self.slotsCVCHgtConst.constant = 0
-                    print("current time \(GenericMethods.currentDateTime()) selectedDate \(selectedDate)")
-//                    if selectedDate > GenericMethods.currentDateTime()
-//                    {
-//                        self.beforeSeesionView.isUserInteractionEnabled = true
-//                        self.afterSessionView.isUserInteractionEnabled = true
-//                    }
-//                    else
-//                    {
-//                        self.afterSessionView.isUserInteractionEnabled = true
-//                    }
+                    
+                    
                     if btnDateFormatter.string(from: selectedDate) == btnDateFormatter.string(from: GenericMethods.currentDateTime())
                     {
-                        self.afterSessionView.isUserInteractionEnabled = true
+                        let startTimeStr = GenericMethods.convert12hrto24hrFormat(dateStr: self.scheduleDateData?.startTime ?? "00:00 AM")
+                        let currentDateStr = GenericMethods.currentDateTimeString()
+                        
+                        let startDate = GenericMethods.stringToDate(dateString: startTimeStr)
+                        let currentDate = GenericMethods.stringToDate(dateString: currentDateStr)
+                        
+                        if startDate > currentDate
+                        {
+                            print("start time is greater")
+                            self.beforeSeesionView.isUserInteractionEnabled = true
+                            self.afterSessionView.isUserInteractionEnabled = true
+                        }
+                        else
+                        {
+                            print("current time is greater")
+                            self.afterSessionView.isUserInteractionEnabled = true
+                        }
                     }
                     else
                     {
                         self.beforeSeesionView.isUserInteractionEnabled = true
                         self.afterSessionView.isUserInteractionEnabled = true
                     }
-//                    self.beforeSeesionView.isUserInteractionEnabled = true
-//                    self.afterSessionView.isUserInteractionEnabled = true
-                    
                     
                 }
                 

@@ -38,7 +38,9 @@ class APIManager
     let scheduleDateSuffix = "ScheduleDataByDate"
     let slotSessionSuffix = "SlotCreate"
     let addVIPScheduleSuffix = "VIPScheduleRequest"
-    let rescheduleListSuffix = ""
+    let queueListSuffix = "QueueList"
+    let rescheduleListSuffix = "RescheduleList"
+    
     
     
     func consolePrintValues(url:String,parameters:Dictionary<String, Any>)
@@ -778,6 +780,54 @@ class APIManager
                             
                             UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
                             self.addVIPScheduleDetailsAPI(parameters: parameters, completion: completion)
+                            
+                            
+                        }
+                        else {
+                            print("Failed")
+                            
+                        }
+                    }
+                }
+                else
+                {
+                    switch response.result {
+                        
+                    case .success:
+                        let responseData = response.result.value
+                        completion(true, false, responseData, nil)
+                        
+                    case .failure(let error):
+                        completion(false, true, nil, error)
+                    }
+                }
+                
+        }
+    }
+    func queueListDetailsAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:QueueModel?, _ error:Error?)-> Void)
+    {
+        let queueListAPIURL = baseURL + queueListSuffix
+        //        let headers: HTTPHeaders = [ "Authorization": Authorization]
+        consolePrintValues(url: queueListAPIURL, parameters: parameters)
+        
+        Alamofire.request(queueListAPIURL, method: .post, parameters: parameters, headers: nil)
+            .responseJSON(completionHandler: { (response) in
+                print(response as Any)
+            })
+            .responseObject { (response: DataResponse<QueueModel>) in
+                let i =  response.response?.statusCode
+                
+                if i==402{
+                    let apiManager = APIManager()
+                    apiManager.createAPIKey{ (status, showError, response, error) in
+                        var createApiKey: CreateAPIKeyModel?
+                        if status == true {
+                            print("Sucess")
+                            
+                            createApiKey = response
+                            
+                            UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
+                            self.queueListDetailsAPI(parameters: parameters, completion: completion)
                             
                             
                         }

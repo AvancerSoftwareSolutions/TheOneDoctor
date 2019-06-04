@@ -26,6 +26,7 @@ class CalendarViewController: UIViewController {
     var fromView:String = ""
     var minimumDate = Date()
     var maximumDate = Date()
+    var setDate = Date()
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
@@ -52,7 +53,7 @@ class CalendarViewController: UIViewController {
         datePicker.addTarget(self, action: #selector(pickerChanged(_:)), for: .valueChanged)
         selectedDate = date
         monthYearStr = "\(monthYearFormatter.string(from: date))"
-        
+        datePicker.setDate(setDate, animated: true)
         
 //        if fromView == "register"
 //        {
@@ -66,18 +67,24 @@ class CalendarViewController: UIViewController {
         // Do any additional setup after loading the view.
     }
     @objc func pickerChanged(_ sender: Any?) {
-        
+
         print("datePicker \(datePicker.date)")
         dateFormatter.dateFormat = AppConstants.datePickerFormat
-        
+        print(Date().localizedDescription)
         if let date = (sender as? UIDatePicker)?.date {
             monthYearStr = "\(monthYearFormatter.string(from: date))"
             
             let datestr = dateFormatter.string(from: date as Date)
             
-            let finaldate = dateFormatter.date(from:datestr)
+            let finaldate = dateFormatter.date(from:datestr)!
             print("finaldate \(finaldate)")
-            selectedDate = date
+            dateFormatter.dateFormat = AppConstants.postDateFormat
+            
+            let selectDate = (dateFormatter.string(from: finaldate) == dateFormatter.string(from: GenericMethods.currentDateTime())) ? GenericMethods.currentDateTime() : finaldate
+            
+            selectedDate = selectDate
+            print("selectDate \(selectDate)")
+
         }
         
         print(" date description: \(selectedDate) & \(monthYearStr)")
@@ -89,10 +96,19 @@ class CalendarViewController: UIViewController {
         dateFormatter.dateFormat = AppConstants.postDateFormat
         dateFormatter.timeZone = TimeZone.current
         dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-        
-        dismiss(animated: true, completion: {
+        func sendDelegateMethod()
+        {
+            if dateFormatter.string(from: selectedDate) == dateFormatter.string(from: GenericMethods.currentDateTime())
+            {
+                self.selectedDate = GenericMethods.currentDateTime()
+            }
             
             self.delegate?.sendDate(selectedDateStr: "\(self.dateFormatter.string(from: self.selectedDate))", selectedDate: self.selectedDate)
+        }
+        dismiss(animated: true, completion: {
+            
+            sendDelegateMethod()
+            print("selectedDate \(self.selectedDate)")
         })
         
 //        dismiss(animated: true, completion: nil)

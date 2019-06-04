@@ -82,7 +82,8 @@ class AppointmentsViewController: UIViewController,sendAppointmentsFilterValuesD
         calendarVC.modalPresentationStyle = .overCurrentContext
         calendarVC.delegate = self
         calendarVC.minimumDate = Date()
-        calendarVC.maximumDate = Calendar.current.date(byAdding: .day, value: 28, to: Date())!
+        calendarVC.maximumDate = Calendar.current.date(byAdding: .day, value: AppConstants.durationPeriod, to: Date())!
+        calendarVC.setDate = GenericMethods.currentDateTime()
         UIApplication.shared.topMostViewController()?.present(calendarVC, animated: true)
 
         
@@ -161,8 +162,8 @@ class AppointmentsViewController: UIViewController,sendAppointmentsFilterValuesD
             
             if status == true {
                 self.appointmentsListData = response
-                if self.appointmentsListData?.status?.code == "0" {
-                    //MARK: Appointments Success Details
+                func setValuesMethod()
+                {
                     self.selectedDate = postDate
                     if self.selectedDate == Date()
                     {
@@ -178,11 +179,17 @@ class AppointmentsViewController: UIViewController,sendAppointmentsFilterValuesD
                     }
                     self.monthDayLbl.text = self.dateFormatter.string(from: self.selectedDate)
                     self.appointmentsTableView.reloadData()
+                }
+                if self.appointmentsListData?.status?.code == "0"{
+                    //MARK: Appointments Success Details
+                    setValuesMethod()
                     
                 }
                 else if self.appointmentsListData?.status?.code == "1"
                 {
+                    setValuesMethod()
                     GenericMethods.showAlert(alertMessage: self.appointmentsListData?.status?.message ?? "No schedule.")
+                    
                 }
                 else
                 {

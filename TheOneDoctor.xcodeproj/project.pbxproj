@@ -26,7 +26,6 @@
 		1F12425C228015E100B13213 /* DashboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F12425B228015E100B13213 /* DashboardViewController.swift */; };
 		1F12425F2280166F00B13213 /* LoginModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F12425E2280166F00B13213 /* LoginModel.swift */; };
 		1F1242612280168500B13213 /* LoginUserDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1242602280168500B13213 /* LoginUserDataModel.swift */; };
-		1F1242682280172900B13213 /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1242652280172800B13213 /* AppConstants.swift */; };
 		1F1242692280172900B13213 /* FileUpload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1242662280172800B13213 /* FileUpload.swift */; };
 		1F12426A2280172900B13213 /* GenericMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1242672280172900B13213 /* GenericMethods.swift */; };
 		1F12426E228018BE00B13213 /* UIScrollView+EmptyDataSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F12426D228018BE00B13213 /* UIScrollView+EmptyDataSet.m */; };
@@ -39,6 +38,11 @@
 		1F124283228055F000B13213 /* APIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F124282228055F000B13213 /* APIManager.swift */; };
 		1F18A69E22A4E622003A2984 /* UpdateScheduleModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F18A69D22A4E622003A2984 /* UpdateScheduleModel.swift */; };
 		1F18A6A322A5240B003A2984 /* AppointmentScheduleModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F18A6A222A5240B003A2984 /* AppointmentScheduleModel.swift */; };
+		1F1AE10622A63CF7003543BB /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1AE10522A63CF7003543BB /* AppConstants.swift */; };
+		1F1AE10F22A69CED003543BB /* QueueModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1AE10E22A69CED003543BB /* QueueModel.swift */; };
+		1F1AE11222A69E94003543BB /* VIPScheduleModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1AE11122A69E94003543BB /* VIPScheduleModel.swift */; };
+		1F1AE11422A69F64003543BB /* QueueDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1AE11322A69F64003543BB /* QueueDataModel.swift */; };
+		1F1AE11622A69FF3003543BB /* QueueAppointmentModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1AE11522A69FF3003543BB /* QueueAppointmentModel.swift */; };
 		1F1BFD82228C438F0005D927 /* ProfileBGImg.png in Resources */ = {isa = PBXBuildFile; fileRef = 1F1BFD81228C438E0005D927 /* ProfileBGImg.png */; };
 		1F209A052280675900C48120 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1F209A042280675900C48120 /* GoogleService-Info.plist */; };
 		1F351D46229F9E5100681691 /* red_wom.png in Resources */ = {isa = PBXBuildFile; fileRef = 1F351D3F229F9E5000681691 /* red_wom.png */; };
@@ -151,7 +155,6 @@
 		1F12425B228015E100B13213 /* DashboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewController.swift; sourceTree = "<group>"; };
 		1F12425E2280166F00B13213 /* LoginModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginModel.swift; sourceTree = "<group>"; };
 		1F1242602280168500B13213 /* LoginUserDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginUserDataModel.swift; sourceTree = "<group>"; };
-		1F1242652280172800B13213 /* AppConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
 		1F1242662280172800B13213 /* FileUpload.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileUpload.swift; sourceTree = "<group>"; };
 		1F1242672280172900B13213 /* GenericMethods.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GenericMethods.swift; sourceTree = "<group>"; };
 		1F12426B228018BD00B13213 /* TheOneDoctor-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TheOneDoctor-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -166,6 +169,11 @@
 		1F124282228055F000B13213 /* APIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIManager.swift; sourceTree = "<group>"; };
 		1F18A69D22A4E622003A2984 /* UpdateScheduleModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateScheduleModel.swift; sourceTree = "<group>"; };
 		1F18A6A222A5240B003A2984 /* AppointmentScheduleModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentScheduleModel.swift; sourceTree = "<group>"; };
+		1F1AE10522A63CF7003543BB /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
+		1F1AE10E22A69CED003543BB /* QueueModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueModel.swift; sourceTree = "<group>"; };
+		1F1AE11122A69E94003543BB /* VIPScheduleModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VIPScheduleModel.swift; sourceTree = "<group>"; };
+		1F1AE11322A69F64003543BB /* QueueDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueDataModel.swift; sourceTree = "<group>"; };
+		1F1AE11522A69FF3003543BB /* QueueAppointmentModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueAppointmentModel.swift; sourceTree = "<group>"; };
 		1F1BFD81228C438E0005D927 /* ProfileBGImg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ProfileBGImg.png; sourceTree = "<group>"; };
 		1F209A042280675900C48120 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		1F209A062280676400C48120 /* TheOneDoctor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TheOneDoctor.entitlements; sourceTree = "<group>"; };
@@ -322,7 +330,7 @@
 				1F12424F228014A000B13213 /* Controllers */,
 				1F124251228014BC00B13213 /* DataModels */,
 				1F1242482280118800B13213 /* Info.plist */,
-				1F1242652280172800B13213 /* AppConstants.swift */,
+				1F1AE10522A63CF7003543BB /* AppConstants.swift */,
 				1F209A042280675900C48120 /* GoogleService-Info.plist */,
 				1F1242662280172800B13213 /* FileUpload.swift */,
 				1F55DB802297C5EB00B92E6B /* ScheduleJson.json */,
@@ -371,6 +379,7 @@
 		1F124251228014BC00B13213 /* DataModels */ = {
 			isa = PBXGroup;
 			children = (
+				1F1AE10D22A69CD3003543BB /* QueueModel */,
 				1F351D5F229FA68600681691 /* DashboardModel */,
 				1F55DB87229832CF00B92E6B /* AppointmentsModel */,
 				1FC3418B2296C16100634EAD /* ScheduleModel */,
@@ -495,6 +504,16 @@
 				1F18A69D22A4E622003A2984 /* UpdateScheduleModel.swift */,
 			);
 			path = UpdateScheduleModel;
+			sourceTree = "<group>";
+		};
+		1F1AE10D22A69CD3003543BB /* QueueModel */ = {
+			isa = PBXGroup;
+			children = (
+				1F1AE10E22A69CED003543BB /* QueueModel.swift */,
+				1F1AE11522A69FF3003543BB /* QueueAppointmentModel.swift */,
+				1F1AE11322A69F64003543BB /* QueueDataModel.swift */,
+			);
+			path = QueueModel;
 			sourceTree = "<group>";
 		};
 		1F1C0F24229BAC1500A0736B /* AppointmentCells */ = {
@@ -681,6 +700,7 @@
 				1FC3418F2296C1BF00634EAD /* AddScheduleModel.swift */,
 				1FC3419F2296E96900634EAD /* AddScheduleDataModel.swift */,
 				1F18A6A222A5240B003A2984 /* AppointmentScheduleModel.swift */,
+				1F1AE11122A69E94003543BB /* VIPScheduleModel.swift */,
 			);
 			path = AddScheduleModel;
 			sourceTree = "<group>";
@@ -1024,6 +1044,7 @@
 				1F0D878A228E81640011050E /* AddSpecialityModel.swift in Sources */,
 				1F0D8793228EE9E50011050E /* SubSpecialityDataModel.swift in Sources */,
 				1FB8F39D2281471A006AF087 /* UpdateKeyAPIModel.swift in Sources */,
+				1F1AE10F22A69CED003543BB /* QueueModel.swift in Sources */,
 				1F124271228018F900B13213 /* WebAPIHelper.swift in Sources */,
 				1FE013EB229ABEDB00CA4EFC /* RescheduleModel.swift in Sources */,
 				1FB8F39B2281455E006AF087 /* CreateAPIKeyModel.swift in Sources */,
@@ -1041,14 +1062,18 @@
 				1F044E2A229E8738009CFBF5 /* SlotsCollectionViewCell.swift in Sources */,
 				1F124272228018F900B13213 /* ReachabilityManager.swift in Sources */,
 				1F18A69E22A4E622003A2984 /* UpdateScheduleModel.swift in Sources */,
+				1F1AE11222A69E94003543BB /* VIPScheduleModel.swift in Sources */,
 				1F12426A2280172900B13213 /* GenericMethods.swift in Sources */,
 				1FE013E4229AA2CE00CA4EFC /* RescheduleViewController.swift in Sources */,
+				1F1AE11622A69FF3003543BB /* QueueAppointmentModel.swift in Sources */,
 				1F18A6A322A5240B003A2984 /* AppointmentScheduleModel.swift in Sources */,
 				1F12423A2280118600B13213 /* AppDelegate.swift in Sources */,
 				1F1242692280172900B13213 /* FileUpload.swift in Sources */,
 				1F124259228015BE00B13213 /* ProfileViewController.swift in Sources */,
 				1FBE36C72294374B002E32BA /* AddScheduleTableViewCell.swift in Sources */,
+				1F1AE11422A69F64003543BB /* QueueDataModel.swift in Sources */,
 				1FF8E55F228304390060D7FC /* DashboardNavigateVC.swift in Sources */,
+				1F1AE10622A63CF7003543BB /* AppConstants.swift in Sources */,
 				1FC3418D2296C17900634EAD /* ScheduleModel.swift in Sources */,
 				1F1242422280118600B13213 /* TheOneDoctor.xcdatamodeld in Sources */,
 				1FE013D9229A681700CA4EFC /* SlotsTableViewCell.swift in Sources */,
@@ -1064,7 +1089,6 @@
 				1FB56D0A22952EEA005A70B4 /* AddNormalScheduleTVC.swift in Sources */,
 				1F1242552280158F00B13213 /* OTPVerificationViewController.swift in Sources */,
 				1FBE36BE22942AF2002E32BA /* ScheduleViewController.swift in Sources */,
-				1F1242682280172900B13213 /* AppConstants.swift in Sources */,
 				1F12426E228018BE00B13213 /* UIScrollView+EmptyDataSet.m in Sources */,
 				1F0C2981228AD07C00C575DB /* SpecialityTableViewCell.swift in Sources */,
 				1FBE36B32293BCCF002E32BA /* DeletePicturesCollectionViewCell.swift in Sources */,
