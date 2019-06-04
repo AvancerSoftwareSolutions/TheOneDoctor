@@ -13,20 +13,39 @@ class RescheduleTableViewCell: UITableViewCell {
     @IBOutlet weak var editBtnInstance: UIButton!
     @IBOutlet weak var unavailableBtnInstance: UIButton!
     @IBOutlet weak var collectionView: UICollectionView!
+    @IBOutlet weak var bgView: UIView!
+    @IBOutlet weak var cvcHgtConst: NSLayoutConstraint! // 45
     
     
     var rescheduleData:RescheduleModel?
-    var appointfilterCell:AppointmentFilterCollectionViewCell? = nil
+    var slotsListCell:SlotsCollectionViewCell? = nil
     
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        
+        bgView.layer.cornerRadius = 5.0
+        bgView.layer.masksToBounds = true
+        GenericMethods.shadowCellView(view:bgView)
+
+        editBtnInstance.layer.cornerRadius = 5.0
+        editBtnInstance.layer.masksToBounds = true
         editBtnInstance.layer.borderColor = UIColor.white.cgColor
         editBtnInstance.layer.borderWidth = 1.0
+        
+        unavailableBtnInstance.layer.cornerRadius = 5.0
+        unavailableBtnInstance.layer.masksToBounds = true
         unavailableBtnInstance.layer.borderColor = AppConstants.appyellowColor.cgColor
         unavailableBtnInstance.layer.borderWidth = 1.0
         
-        self.collectionView.register(UINib(nibName: "AppointmentFilterCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "appointfilterCell")
+        self.collectionView.delegate = self
+        self.collectionView.dataSource = self
+        
+        self.collectionView.register(UINib(nibName: "SlotsCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "slotsListCell")
+        
+        let height = self.collectionView.collectionViewLayout.collectionViewContentSize.height
+        cvcHgtConst.constant = height;
+        
         
         
     }
@@ -47,29 +66,27 @@ extension RescheduleTableViewCell:UICollectionViewDelegate,UICollectionViewDataS
     }
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        if self.rescheduleData != nil {
-            return self.rescheduleData?.rescheduleListData?.count ?? 0
-        }
-        return 0
+//        if self.rescheduleData != nil {
+//            return self.rescheduleData?.rescheduleListData?.count ?? 10
+//        }
+        return 5
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        appointfilterCell = collectionView.dequeueReusableCell(withReuseIdentifier: "appointfilterCell", for: indexPath) as? AppointmentFilterCollectionViewCell
+        slotsListCell = collectionView.dequeueReusableCell(withReuseIdentifier: "slotsListCell", for: indexPath) as? SlotsCollectionViewCell
         
-        // appointfilterCell?.textBtn.setTitle("\(self.appointmentsListData?.filterData?[0].appointments?[indexPath.row] ?? "")", for: .normal)
-        //appointfilterCell?.textBtn.layer.borderColor = AppConstants.appGreenColor.cgColor
-//        appointfilterCell?.textBtn.setTitleColor(AppConstants.appGreenColor, for: .normal)
+        slotsListCell?.bgView.layer.cornerRadius = 10.0
+        slotsListCell?.bgView.layer.masksToBounds = true
+        slotsListCell?.slotBtnInstance.isEnabled = false
         
-        return appointfilterCell!
+        slotsListCell?.slotBtnInstance.titleLabel?.adjustsFontSizeToFitWidth = true
+        slotsListCell?.slotBtnInstance.titleLabel?.font = UIFont.systemFont(ofSize: 10.0, weight: .regular)
+        
+        return slotsListCell!
     }
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-    }
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
-    }
+    
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        
-        let cellSize:CGFloat = collectionView.frame.size.width - 20
-        return CGSize(width: cellSize / 2, height: 45)
+        return CGSize(width: 60, height: 20)
     }
 }

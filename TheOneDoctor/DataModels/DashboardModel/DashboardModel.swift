@@ -1,20 +1,20 @@
 //
-//  AddScheduleModel.swift
+//  DashboardModel.swift
 //  TheOneDoctor
 //
-//  Created by MyMac on 23/05/19.
+//  Created by MyMac on 30/05/19.
 //  Copyright © 2019 MyMac. All rights reserved.
 //
 
 import Foundation
 import ObjectMapper
 
-class AddScheduleModel:Mappable
+class DashboardModel:Mappable
 {
     
     var status:StatusDataModel?
-    var scheduleData:Array<AddScheduleDataModel>?
-    var appointment:Array<AppointmentScheduleModel>?
+    var dashboardData:Array<DashboardDataModel>?
+    var notificationCount:Int?
     
     required init?(map: Map) {
         
@@ -22,8 +22,8 @@ class AddScheduleModel:Mappable
     
     func mapping(map: Map) {
         status <- map["status"]
-        scheduleData <- map["schedule"]
-        appointment <- map["Appointment"]
+        dashboardData <- map["MainList"]
+        notificationCount <- map["notification_count"]
     }
     
     init() {

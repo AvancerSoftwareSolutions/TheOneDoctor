@@ -1290,13 +1290,14 @@ class GenericMethods: NSObject {
         dateFormatter.timeZone = TimeZone.current
         let datestr = dateFormatter.string(from: date as Date)
         dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-        //        print("datestr\(datestr)")
+        print("datestr\(datestr)")
         //        print("dateDate\(dateFormatter.date(from: datestr)!)")
         guard let currentDate = dateFormatter.date(from: datestr)
             else
         {
             return Date()
         }
+        print("currentDate\(currentDate)")
         return currentDate
     }
     //MARK: AlertController

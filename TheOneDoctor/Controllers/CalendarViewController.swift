@@ -31,8 +31,12 @@ class CalendarViewController: UIViewController {
         super.init(coder: coder)
         
         monthYearFormatter = DateFormatter()
+        monthYearFormatter.timeZone = TimeZone.current
+        monthYearFormatter.timeZone = TimeZone(secondsFromGMT: 0)
         monthYearFormatter.dateFormat = AppConstants.monthDayFormat
         dateFormatter = DateFormatter()
+        dateFormatter.timeZone = TimeZone.current
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
         dateFormatter.dateFormat = AppConstants.postDateFormat
         
     }
@@ -42,9 +46,13 @@ class CalendarViewController: UIViewController {
         popupView.layer.masksToBounds = true
         datePicker.minimumDate = minimumDate
         datePicker.maximumDate = maximumDate
+        datePicker.locale = Locale.current
+        datePicker.timeZone = TimeZone.current
+        datePicker.timeZone = TimeZone(secondsFromGMT: 0)
         datePicker.addTarget(self, action: #selector(pickerChanged(_:)), for: .valueChanged)
         selectedDate = date
         monthYearStr = "\(monthYearFormatter.string(from: date))"
+        
         
 //        if fromView == "register"
 //        {
@@ -59,11 +67,16 @@ class CalendarViewController: UIViewController {
     }
     @objc func pickerChanged(_ sender: Any?) {
         
-        if let date = (sender as? UIDatePicker)?.date {
-            print(" date description: \(dateFormatter.string(from: date))")
-        }
+        print("datePicker \(datePicker.date)")
+        dateFormatter.dateFormat = AppConstants.datePickerFormat
+        
         if let date = (sender as? UIDatePicker)?.date {
             monthYearStr = "\(monthYearFormatter.string(from: date))"
+            
+            let datestr = dateFormatter.string(from: date as Date)
+            
+            let finaldate = dateFormatter.date(from:datestr)
+            print("finaldate \(finaldate)")
             selectedDate = date
         }
         
@@ -74,8 +87,11 @@ class CalendarViewController: UIViewController {
     }
     @IBAction func doneBtnClick(_ sender: Any) {
         dateFormatter.dateFormat = AppConstants.postDateFormat
+        dateFormatter.timeZone = TimeZone.current
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
         
         dismiss(animated: true, completion: {
+            
             self.delegate?.sendDate(selectedDateStr: "\(self.dateFormatter.string(from: self.selectedDate))", selectedDate: self.selectedDate)
         })
         

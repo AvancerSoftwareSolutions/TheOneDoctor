@@ -91,13 +91,9 @@ struct AppConstants
     static var leftMenuLoad:Bool = false
     static var isNotified:Bool = false
     
-    static var updateDaysArray:NSMutableArray = []
+    static var schedulefilteredStatus = 0
     
-    static var leftGrandChildArray:NSMutableArray = []
-    static var middleGrandChildArray:NSMutableArray = []
-    static var rightGrandChildArray:NSMutableArray = []
-
-    static var paymentModeArray:NSMutableArray = ["Online","Cheque"]
+    static var updateDaysArray:NSMutableArray = []
     
 
 //  ****************************************************************************
@@ -115,6 +111,9 @@ struct AppConstants
     static let time24HoursFormat = "HH:mm"
     static let titleDateFormat = "d, MMM yyyy"
     static let dayFormat = "EEEE"
+    static let datePickerFormat = "dd-MM-yyyy HH:mm:ss Z"
+    
+    static let durationPeriod = 28
 
     static let isiPad: Bool = (UIDevice.current.userInterfaceIdiom == .pad ? true : false)
 //    static let defaultDateFormat = "yyyy-MM-dd'T'HH:mm:ss"

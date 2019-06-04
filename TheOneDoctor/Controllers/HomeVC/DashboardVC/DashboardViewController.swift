@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Alamofire
 
 class DashboardViewController: UIViewController,UIGestureRecognizerDelegate {
     
@@ -21,7 +22,9 @@ class DashboardViewController: UIViewController,UIGestureRecognizerDelegate {
     //MARK:- Variables
     
     var dashboardCell:DashboardCollectionViewCell? = nil
+    var dashBoardListData:DashboardModel?
     var textArray:NSMutableArray = []
+    let apiManager = APIManager()
     
 
     
@@ -40,17 +43,7 @@ class DashboardViewController: UIViewController,UIGestureRecognizerDelegate {
         profileContainerView.layer.shadowOffset = CGSize.zero
         profileContainerView.layer.shadowRadius = 2
         profileContainerView.layer.shadowPath = UIBezierPath(roundedRect: profileContainerView.bounds, cornerRadius: cornerRadius).cgPath
-        
-        
-//
-//
-//
-//
-//
-//        profilePicImgView.layer.shadowColor = UIColor.darkGray.cgColor
-//        profilePicImgView.layer.shadowOpacity = 1.0
-//        profilePicImgView.layer.shadowRadius = 5
-//        profilePicImgView.layer.shadowOffset = CGSize(width: 0, height: 3)
+
         
         let profileTapGesture = UITapGestureRecognizer(target: self, action: #selector(profilePageNavigationMethod))
         profileTapGesture.numberOfTapsRequired = 1
@@ -81,39 +74,10 @@ class DashboardViewController: UIViewController,UIGestureRecognizerDelegate {
         let mins24 = GenericMethods.convertHrstoMinsFormat(dateStr: "00:30")
         
         print("mins24 \(mins24)")
-        jsonInput()
+        
         // Do any additional setup after loading the view.
     }
-    func jsonInput()
-    {
-        
-        let location = "ScheduleJson"
-        let fileType = "json"
-        if let path = Bundle.main.path(forResource: location, ofType: fileType) {
-            do {
-                let jsonData = try NSData(contentsOfFile: path, options: .mappedIfSafe)
-                var alertacceptDict: [AnyHashable : Any]? = nil
-                
-                alertacceptDict = try! JSONSerialization.jsonObject(with: jsonData as Data, options: .mutableContainers) as? [AnyHashable : Any]
-                
-                if let aDict = alertacceptDict {
-                    print("responseDict \(aDict)")
-                }
-                if let body = alertacceptDict?["Date"] {
-                    print("body is \("\(body)")")
-                }
-                
-                AppConstants.resultDateDict = NSMutableDictionary(dictionary: alertacceptDict!["Date"] as! [AnyHashable : Any])
-                print("datevalue is \(String(describing: AppConstants.resultDateDict.value(forKey: "2019-05-25")))")
-            }
-            catch let error {
-                print(error.localizedDescription)
-            }}
-        else
-        {
-            print("cant found the file.")
-        }
-    }
+    
     @objc func logoutMethod()
     {
         GenericMethods.showYesOrNoAlertWithCompletionHandler(alertTitle: "Are you sure want to Logout ?", alertMessage: "") { (UIAlertAction) in
@@ -137,11 +101,50 @@ class DashboardViewController: UIViewController,UIGestureRecognizerDelegate {
     override func viewWillAppear(_ animated: Bool) {
         GenericMethods.setProfileImage(imageView: profilePicImgView,borderColor:UIColor.lightGray)
         navigationController?.navigationBar.isHidden = true
+        loadingdashBoardDetailsAPI()
     }
     override func viewWillDisappear(_ animated: Bool) {
         navigationController?.navigationBar.isHidden = false
+        self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
     }
-
+    
+    // MARK: - Dashboard API
+    func loadingdashBoardDetailsAPI()
+    {
+        var parameters = Dictionary<String, Any>()
+        parameters["user_id"] = UserDefaults.standard.value(forKey: "user_id") ?? 0 as Int
+        
+        GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
+        
+        apiManager.dashboardListDetailsAPI(parameters: parameters) { (status, showError, response, error) in
+            
+            GenericMethods.hideLoaderMethod(view: self.view)
+            
+            if status == true {
+                self.dashBoardListData = response
+                if self.dashBoardListData?.status?.code == "0" {
+                    //MARK: Dashboard Success Details
+                    
+                    self.collectionView.reloadData()
+                    
+                }
+                else
+                {
+                    GenericMethods.showAlertwithPopNavigation(alertMessage: self.dashBoardListData?.status?.message ?? "Unable to fetch data. Please try again after sometime.", vc: self)
+                    //                    GenericMethods.showAlert(alertMessage: self.profileData?.status?.message ?? "Unable to fetch data. Please try again after sometime.")
+                }
+                
+                
+            }
+            else {
+                GenericMethods.showAlertwithPopNavigation(alertMessage: error?.localizedDescription ?? "Something Went Wrong. Please try again.", vc: self)
+                
+                
+                
+            }
+        }
+    }
+    
     /*
     // MARK: - Navigation
 
@@ -161,7 +164,10 @@ extension DashboardViewController:UICollectionViewDelegate,UICollectionViewDataS
         return 1
     }
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return textArray.count
+        if self.dashBoardListData != nil {
+            return (self.dashBoardListData?.dashboardData?.count) ?? 0
+        }
+        return 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -171,8 +177,13 @@ extension DashboardViewController:UICollectionViewDelegate,UICollectionViewDataS
         dashboardCell?.bgView.layer.borderColor = UIColor.white.cgColor
         dashboardCell?.bgView.layer.borderWidth = 1.0
         
-        dashboardCell?.descriptionLbl.text = (textArray[indexPath.row] as? [AnyHashable:Any])? ["detail"] as? String
-        dashboardCell?.imgView.image = UIImage(named: (textArray[indexPath.row] as? [AnyHashable:Any])? ["image"] as? String ?? "")
+        dashboardCell?.descriptionLbl.text = dashBoardListData?.dashboardData?[indexPath.item].name
+        
+        GenericMethods.createThumbnailOfVideoFromRemoteUrl(url: dashBoardListData?.dashboardData?[indexPath.item].icon ?? "",imgView: dashboardCell!.imgView,playImgView: UIImageView())
+        
+        
+//        dashboardCell?.descriptionLbl.text = (textArray[indexPath.row] as? [AnyHashable:Any])? ["detail"] as? String
+//        dashboardCell?.imgView.image = UIImage(named: (textArray[indexPath.row] as? [AnyHashable:Any])? ["image"] as? String ?? "")
         
         return dashboardCell!
     }
@@ -195,6 +206,10 @@ extension DashboardViewController:UICollectionViewDelegate,UICollectionViewDataS
             
             let scheduleVC = self.storyboard?.instantiateViewController(withIdentifier: "scheduleVC") as! ScheduleViewController
             self.navigationController?.pushViewController(scheduleVC, animated: true)
+        case 2:
+            
+            let queueVC = self.storyboard?.instantiateViewController(withIdentifier: "queueVC") as! QueueViewController
+            self.navigationController?.pushViewController(queueVC, animated: true)
             
         default:
             break

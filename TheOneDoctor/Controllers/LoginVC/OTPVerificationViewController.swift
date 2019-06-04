@@ -208,19 +208,6 @@ class OTPVerificationViewController: UIViewController {
     {
         let storyboard: UIStoryboard = UIStoryboard.init(name: "Main", bundle: nil)
         let dashNavigateVC = storyboard.instantiateViewController(withIdentifier: "dashNavigateVC") as! DashboardNavigateVC
-//        let navigator = UINavigationController(rootViewController: dashboardVC!)
-//        navigator.navigationBar.tintColor = AppConstants.appGreenColor
-//        navigator.navigationBar.backgroundColor = AppConstants.appGreenColor
-        /*
-        navigator.navigationBar.tintColor = UIColor.clear
-        navigator.navigationBar.backgroundColor = UIColor.clear
-        navigator.navigationBar.isOpaque = true
-        navigator.navigationBar.isTranslucent = true
-        navigator.view.backgroundColor = UIColor.clear
-        navigator.navigationBar.setBackgroundImage(UIImage(), for: .default)
-        navigator.navigationBar.shadowImage = UIImage()
- */
-//        navigator.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         let appDelegate = UIApplication.shared.delegate as? AppDelegate
         appDelegate?.window?.rootViewController = dashNavigateVC
         appDelegate?.window?.makeKeyAndVisible()
@@ -253,7 +240,7 @@ extension OTPVerificationViewController:UITextFieldDelegate
             case tf3:
                 tf4.becomeFirstResponder()
             case tf4:
-                pinValidationMethod()
+                return pinValidationMethod()
             default:
                 return false
             }

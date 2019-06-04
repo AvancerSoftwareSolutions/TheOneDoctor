@@ -1,20 +1,18 @@
 //
-//  AddScheduleModel.swift
+//  RescheduleDataModel.swift
 //  TheOneDoctor
 //
-//  Created by MyMac on 23/05/19.
+//  Created by MyMac on 26/05/19.
 //  Copyright © 2019 MyMac. All rights reserved.
 //
 
 import Foundation
 import ObjectMapper
 
-class AddScheduleModel:Mappable
+class RescheduleDataModel:Mappable
 {
     
     var status:StatusDataModel?
-    var scheduleData:Array<AddScheduleDataModel>?
-    var appointment:Array<AppointmentScheduleModel>?
     
     required init?(map: Map) {
         
@@ -22,8 +20,7 @@ class AddScheduleModel:Mappable
     
     func mapping(map: Map) {
         status <- map["status"]
-        scheduleData <- map["schedule"]
-        appointment <- map["Appointment"]
+        
     }
     
     init() {

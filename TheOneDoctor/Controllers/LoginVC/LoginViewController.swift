@@ -46,6 +46,7 @@ class LoginViewController: UIViewController {
     // MARK: - IBActions
     
     @IBAction func sendOTPBtnClick(_ sender: Any) {
+        
         if GenericMethods.isStringEmpty(mobileTF.text)
         {
             GenericMethods.showAlert(alertMessage: "Please enter mobile number")
@@ -58,7 +59,6 @@ class LoginViewController: UIViewController {
         {
             
             let randomNumber = AppConstants.fourDigitNumber
-            
             
             var parameters = Dictionary<String, Any>()
             parameters["mobile"] = mobileTF.text
@@ -119,15 +119,6 @@ class LoginViewController: UIViewController {
         
     }
     
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }
 extension LoginViewController:UITextFieldDelegate

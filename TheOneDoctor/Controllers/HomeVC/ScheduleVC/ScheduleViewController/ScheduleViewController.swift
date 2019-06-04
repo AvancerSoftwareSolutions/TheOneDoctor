@@ -21,18 +21,20 @@ class ScheduleViewController: UIViewController {
     @IBOutlet weak var scheduleTableView: UITableView!
     
     //MARK:- Variables
-    
+    var filterView = UIView()
     let todayDate = Date()
     let dateformatter = DateFormatter()
     var addScheduleCell:AddScheduleTableViewCell? = nil
     let apiManager = APIManager()
     var scheduleData:ScheduleModel?
     
+    
     var resultDateDict:NSMutableDictionary = [:]
 
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = "Schedule"
+        AppConstants.schedulefilteredStatus = 0
         
         scheduleTableView.register(UINib(nibName: "AddScheduleTableViewCell", bundle: nil), forCellReuseIdentifier: "addScheduleCell")
         
@@ -46,18 +48,30 @@ class ScheduleViewController: UIViewController {
 
         let addBtn = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addScheduleBtnClick))
         let editBtn = UIBarButtonItem(image: UIImage(named: "EditProfPic.png"), style: .plain, target: self, action: #selector(editScheduleBtnClick))
+        
+        filterView = UIView(frame: CGRect(x: 28, y: 0, width: 10, height: 10))
+        filterView.backgroundColor = .red
+        filterView.layer.cornerRadius = 5
+        filterView.layer.masksToBounds = true
+        filterView.isHidden = true
+        
+        
         let svgHoldingView = UIView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
         GenericMethods.setLeftViewWithSVG(svgView: svgHoldingView, with: "filter", color: UIColor.white)
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(filterBtnClick))
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(filterBtnClick(sender:)))
         tapGesture.numberOfTapsRequired = 1
         svgHoldingView.addGestureRecognizer(tapGesture)
+        svgHoldingView.addSubview(filterView)
+        svgHoldingView.bringSubviewToFront(filterView)
+        filterView.layer.zPosition = .greatestFiniteMagnitude
+        
         self.navigationItem.rightBarButtonItems = [UIBarButtonItem.init(customView: svgHoldingView),editBtn,addBtn]
     
-        loadingScheduleDetailsAPI()
-        
-        
-        
         // Do any additional setup after loading the view.
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        loadingScheduleDetailsAPI()
     }
     
     func roundLabel(lbl:UILabel,color:UIColor)
@@ -66,9 +80,51 @@ class ScheduleViewController: UIViewController {
         lbl.layer.masksToBounds = true
         lbl.backgroundColor = color
     }
-    @objc func filterBtnClick()
+    @objc func filterBtnClick(sender:UITapGestureRecognizer)
     {
+//        filterView.isHidden = true
+        let optionsController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
+        optionsController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        
+        optionsController.view.tintColor = AppConstants.khudColour
+        
+        let subView: UIView? = optionsController.view.subviews.first
+        let alertContentView: UIView? = subView?.subviews.first
+        alertContentView?.backgroundColor = UIColor.white
+        alertContentView?.layer.cornerRadius = 5
+        optionsController.addAction(UIAlertAction(title: "Fully Booked", style: .default, handler: { (alertAction) in
+            self.filterView.isHidden = false
+            AppConstants.schedulefilteredStatus = 1
+        }))
+        optionsController.addAction(UIAlertAction(title: "Booking Inprogress", style: .default, handler: { (alertAction) in
+            self.filterView.isHidden = false
+            AppConstants.schedulefilteredStatus = 2
+        }))
+        optionsController.addAction(UIAlertAction(title: "No booking", style: .default, handler: { (alertAction) in
+            self.filterView.isHidden = false
+            AppConstants.schedulefilteredStatus = 3
+        }))
+        optionsController.addAction(UIAlertAction(title: "Slot not allocated", style: .default, handler: { (alertAction) in
+            self.filterView.isHidden = false
+            AppConstants.schedulefilteredStatus = 4
+        }))
+        optionsController.addAction(UIAlertAction(title: "Reset", style: .default, handler: { (alertAction) in
+            self.filterView.isHidden = true
+            AppConstants.schedulefilteredStatus = 5
+        }))
+        
+//        let senderView = sender
+        optionsController.modalPresentationStyle = .popover
+        
+        let popPresenter: UIPopoverPresentationController? = optionsController.popoverPresentationController
+        popPresenter?.sourceView = self.view
+        popPresenter?.sourceRect = self.view.bounds
+        DispatchQueue.main.async(execute: {
+            //    self.hud.hide(animated: true)
+            //[self.tableView reloadData];
+            UIApplication.shared.topMostViewController()?.present(optionsController, animated: true)
+        })
     }
     @objc func addScheduleBtnClick()
     {
@@ -103,8 +159,8 @@ class ScheduleViewController: UIViewController {
     @objc func editScheduleBtnClick()
     {
         
-//        let rescheduleVC = self.storyboard?.instantiateViewController(withIdentifier: "rescheduleVC") as! RescheduleViewController
-//        self.navigationController?.pushViewController(rescheduleVC, animated: true)
+        let rescheduleVC = self.storyboard?.instantiateViewController(withIdentifier: "rescheduleVC") as! RescheduleViewController
+        self.navigationController?.pushViewController(rescheduleVC, animated: true)
     }
     func searchFromArray(searchKey:String,searchString:String,array:NSMutableArray)
     {
@@ -174,7 +230,7 @@ extension ScheduleViewController:UITableViewDelegate,UITableViewDataSource
         addScheduleCell?.clinicAddressLbl.text = scheduleData?.clinicData?.clinicAddress ?? ""
         addScheduleCell?.clinicAddressLbl.addImage(imageName: "location.png", afterLabel: false)
         
-        addScheduleCell?.clinicImgView.layer.cornerRadius = addScheduleCell!.clinicImgView.frame.size.height / 2
+        addScheduleCell?.clinicImgView.layer.cornerRadius = (addScheduleCell!.clinicImgView.frame.size.height / 2)
         addScheduleCell?.clinicImgView.layer.borderWidth = 0.2
         
         addScheduleCell?.clinicImgView.clipsToBounds = true

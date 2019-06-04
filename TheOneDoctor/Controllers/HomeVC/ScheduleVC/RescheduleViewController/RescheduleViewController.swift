@@ -19,7 +19,7 @@ class RescheduleViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        self.title = "Edit Schedule"
         rescheduleTableView.tableFooterView = UIView()
         
 
@@ -34,7 +34,7 @@ extension RescheduleViewController:UITableViewDelegate,UITableViewDataSource
         return 1
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 2
+        return 5
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -47,7 +47,7 @@ extension RescheduleViewController:UITableViewDelegate,UITableViewDataSource
         return rescheduleCell!
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 200
+        return UITableView.automaticDimension
     }
     
 }

@@ -19,6 +19,9 @@ class AddScheduleDataModel:Mappable
     var patientHrsTime:String?
     var deleteStatus:Int?
     var type:String?
+    var id:Int?
+    var scheduleId:Int?
+    
     
     required init?(map: Map) {
         
@@ -32,7 +35,8 @@ class AddScheduleDataModel:Mappable
         patientHrsTime <- map["per_patient_time"]
         deleteStatus <- map["deleted_status"]
         type <- map["type"]
-        
+        id <- map["s_id"]
+        scheduleId <- map["schedule_id"]
     }
     
     init() {

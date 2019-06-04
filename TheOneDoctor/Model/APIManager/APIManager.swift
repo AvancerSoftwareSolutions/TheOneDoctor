@@ -9,7 +9,7 @@
 import Foundation
 import Alamofire
 import AlamofireObjectMapper
-
+  
 class APIManager
 {
     //MARK:- Base Url & Suffixes
@@ -25,6 +25,7 @@ class APIManager
     let createApiKeyURLSuffix = ""
     let sendOTPSuffix = "SendOTP"
     let loginSuffix = "Login"
+    let dashboardListSuffix = "IconList"
     let profileSuffix = "Details"
     let updateKeyURLSuffix = ""
     let addSpecialitySuffix = "Speciality"
@@ -32,11 +33,13 @@ class APIManager
     let updateProfileSuffix = "Update"
     let scheduleSuffix = "DashboardData"
     let addNormalScheduleSuffix = "Schedule"
+    let updateNormalScheduleSuffix = "ScheduleUpdate"
     let appointmentsListSuffix = "Appointment"
     let scheduleDateSuffix = "ScheduleDataByDate"
     let slotSessionSuffix = "SlotCreate"
     let addVIPScheduleSuffix = "VIPScheduleRequest"
     let rescheduleListSuffix = ""
+    
     
     func consolePrintValues(url:String,parameters:Dictionary<String, Any>)
     {
@@ -214,6 +217,54 @@ class APIManager
                 
         }
         
+    }
+    func dashboardListDetailsAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:DashboardModel?, _ error:Error?)-> Void)
+    {
+        let dashboardListAPIURL = baseURL + dashboardListSuffix
+        //        let headers: HTTPHeaders = [ "Authorization": Authorization]
+        consolePrintValues(url: dashboardListAPIURL, parameters: parameters)
+        
+        Alamofire.request(dashboardListAPIURL, method: .post, parameters: parameters, headers: nil)
+            .responseJSON(completionHandler: { (response) in
+                print(response as Any)
+            })
+            .responseObject { (response: DataResponse<DashboardModel>) in
+                let i =  response.response?.statusCode
+                
+                if i==402{
+                    let apiManager = APIManager()
+                    apiManager.createAPIKey{ (status, showError, response, error) in
+                        var createApiKey: CreateAPIKeyModel?
+                        if status == true {
+                            print("Sucess")
+                            
+                            createApiKey = response
+                            
+                            UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
+                            self.dashboardListDetailsAPI(parameters: parameters, completion: completion)
+                            
+                            
+                        }
+                        else {
+                            print("Failed")
+                            
+                        }
+                    }
+                }
+                else
+                {
+                    switch response.result {
+                        
+                    case .success:
+                        let responseData = response.result.value
+                        completion(true, false, responseData, nil)
+                        
+                    case .failure(let error):
+                        completion(false, true, nil, error)
+                    }
+                }
+                
+        }
     }
     func profileDetailsAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:ProfileModel?, _ error:Error?)-> Void)
     {
@@ -507,6 +558,55 @@ class APIManager
         }
     }
     
+    func updateNormalScheduleDetailsAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:UpdateScheduleModel?, _ error:Error?)-> Void)
+    {
+        let updateNormalScheduleAPIURL = baseURL + updateNormalScheduleSuffix
+        //        let headers: HTTPHeaders = [ "Authorization": Authorization]
+        consolePrintValues(url: updateNormalScheduleAPIURL, parameters: parameters)
+        
+        Alamofire.request(updateNormalScheduleAPIURL, method: .post, parameters: parameters, headers: nil)
+            .responseJSON(completionHandler: { (response) in
+                print(response as Any)
+            })
+            .responseObject { (response: DataResponse<UpdateScheduleModel>) in
+                let i =  response.response?.statusCode
+                
+                if i==402{
+                    let apiManager = APIManager()
+                    apiManager.createAPIKey{ (status, showError, response, error) in
+                        var createApiKey: CreateAPIKeyModel?
+                        if status == true {
+                            print("Sucess")
+                            
+                            createApiKey = response
+                            
+                            UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
+                            self.updateNormalScheduleDetailsAPI(parameters: parameters, completion: completion)
+                            
+                            
+                        }
+                        else {
+                            print("Failed")
+                            
+                        }
+                    }
+                }
+                else
+                {
+                    switch response.result {
+                        
+                    case .success:
+                        let responseData = response.result.value
+                        completion(true, false, responseData, nil)
+                        
+                    case .failure(let error):
+                        completion(false, true, nil, error)
+                    }
+                }
+                
+        }
+    }
+    
     func appointmentsListDetailsAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:AppointmentsModel?, _ error:Error?)-> Void)
     {
         let appointmentsListAPIURL = baseURL + appointmentsListSuffix
@@ -750,5 +850,7 @@ class APIManager
                 
         }
     }
+    
+    
 }
 

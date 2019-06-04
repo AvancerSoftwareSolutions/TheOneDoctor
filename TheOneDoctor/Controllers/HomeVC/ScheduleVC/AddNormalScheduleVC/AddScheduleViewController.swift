@@ -28,9 +28,12 @@ class AddScheduleViewController: UIViewController {
     var timeFormatter = DateFormatter()
     var patientHrsFormatter = DateFormatter()
     var patientMinFormatter = DateFormatter()
+    var cancelAppointScheduleArray:NSMutableArray = []
+    var cancelAppointListArray:NSMutableArray = []
     
     
     var addScheduleData:AddScheduleModel?
+    var updateScheduleData:UpdateScheduleModel?
     let apiManager = APIManager()
     
     var selectedIndexPath = IndexPath()
@@ -337,10 +340,11 @@ class AddScheduleViewController: UIViewController {
             
             if status == true {
                 self.addScheduleData = response
+                print(self.addScheduleData?.scheduleData?.toJSONString() as Any)
+                
                 if self.addScheduleData?.status?.code == "0" {
                     if type == 1
                     {
-//                        GenericMethods.showAlert(alertMessage: self.addScheduleData?.status?.message ?? "Unable to fetch data. Please try again after sometime.")
                         GenericMethods.showAlertwithPopNavigation(alertMessage: self.addScheduleData?.status?.message ?? "Success", vc: self)
                     }
                     else
@@ -361,6 +365,9 @@ class AddScheduleViewController: UIViewController {
                             dict.setValue(self.addScheduleData?.scheduleData?[i].deleteStatus, forKey: "deleted_status")
                             dict.setValue("00:00", forKey: "per_patient_time")
                             dict.setValue(self.addScheduleData?.scheduleData?[i].type, forKey: "type")
+                            dict.setValue(self.addScheduleData?.scheduleData?[i].scheduleId, forKey: "schedule_id")
+                            dict.setValue(self.addScheduleData?.scheduleData?[i].id, forKey: "s_id")
+                            
                             if self.addScheduleData?.scheduleData?[i].patientHrsTime != "00:00"
                             {
                                 patientHrsFromServer = self.addScheduleData?.scheduleData?[i].patientHrsTime ?? "00:00"
@@ -380,6 +387,17 @@ class AddScheduleViewController: UIViewController {
                     
                     
                 }
+                else if self.addScheduleData?.status?.code == "1" {
+                    if type == 1
+                    {
+
+                        GenericMethods.showYesOrNoAlertWithCompletionHandler(alertTitle: "The One", alertMessage: self.addScheduleData?.status?.message ?? "You have some appointments in the schedule. Do you want to change it?", completionHandlerForOk: { (alert) in
+                            
+                            print("json \(self.addScheduleData?.scheduleData?.toJSONString() as Any) \n \(self.addScheduleData?.scheduleData?.toJSONString() ?? "empty")")
+                            self.updateChangeSchedule()
+                        })
+                    }
+                }
                 else
                 {
                     GenericMethods.showAlert(alertMessage: self.addScheduleData?.status?.message ?? "Unable to fetch data. Please try again after sometime.")
@@ -390,9 +408,48 @@ class AddScheduleViewController: UIViewController {
                 
             }
             else {
-                GenericMethods.showAlertwithPopNavigation(alertMessage: error?.localizedDescription ?? "Something Went Wrong. Please try again.", vc: self)
+                
+                GenericMethods.showAlert(alertMessage: error?.localizedDescription ??  "Unable to fetch data. Please try again after sometime.")
                 
                 
+            }
+        }
+    }
+    
+    func updateChangeSchedule()
+    {
+        
+        var parameters = Dictionary<String, Any>()
+        parameters["doctor_id"] = userId
+        parameters["schedule"] = self.addScheduleData?.scheduleData?.toJSONString() ?? ""
+        parameters["appointment"] = self.addScheduleData?.appointment?.toJSONString()  ?? ""
+        
+        GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
+        
+        apiManager.updateNormalScheduleDetailsAPI(parameters: parameters) { (status, showError, response, error) in
+            
+            GenericMethods.hideLoaderMethod(view: self.view)
+            
+            if status == true {
+                self.updateScheduleData = response
+                
+                if self.updateScheduleData?.status?.code == "0"
+                {
+                    GenericMethods.showAlertwithPopNavigation(alertMessage: self.updateScheduleData?.status?.message ?? "Success", vc: self)
+                }
+                else
+                {
+                    GenericMethods.showAlert(alertMessage: self.updateScheduleData?.status?.message ?? "Unable to fetch data. Please try again after sometime.")
+                    
+                    
+                }
+                
+                
+            }
+            else {
+                
+                GenericMethods.showAlert(alertMessage: error?.localizedDescription ??  "Unable to fetch data. Please try again after sometime.")
+               
             }
         }
     }
@@ -429,8 +486,8 @@ extension AddScheduleViewController:UITableViewDelegate,UITableViewDataSource
         
         addNormalScheduleCell?.patientHrsBtnInstance.setTitle(GenericMethods.convertHrstoMinsFormat(dateStr: (self.updateDaysArray[indexPath.row] as? [AnyHashable:Any])? ["per_patient_time"] as? String ?? "00:00 AM"), for: .normal)
 //        addNormalScheduleCell?.patientHrsBtnInstance.addTarget(self, action: #selector(patientHrsBtnMethod(btn:)), for: .touchUpInside)
-        addNormalScheduleCell?.refreshBtnInstance.tag = indexPath.row
-        addNormalScheduleCell?.refreshBtnInstance.addTarget(self, action: #selector(refreshBtnMethod(btn:)), for: .touchUpInside)
+//        addNormalScheduleCell?.refreshBtnInstance.tag = indexPath.row
+//        addNormalScheduleCell?.refreshBtnInstance.addTarget(self, action: #selector(refreshBtnMethod(btn:)), for: .touchUpInside)
         addNormalScheduleCell?.weekDayLabel.text = (self.updateDaysArray[indexPath.row] as? [AnyHashable:Any])? ["available_days"] as? String ?? ""
         
         

@@ -29,7 +29,7 @@ class AddVIPScheduleViewController: UIViewController,sendDateDelegate {
     @IBOutlet weak var slotsCVCHgtConst: NSLayoutConstraint! // 100
     
     
-    var slotsCell:AppointmentFilterCollectionViewCell? = nil
+    var slotsCell:SlotsCollectionViewCell? = nil
     var scheduleDateData:ScheduleDateModel?
     var addVIPScheduleData:AddVIPScheduleModel?
     var sessionScheduleData:SessionScheduleModel?
@@ -40,6 +40,13 @@ class AddVIPScheduleViewController: UIViewController,sendDateDelegate {
     var timeSlotTime = ""
     var selectedDate = Date()
     var selectedType = ""
+    let postDataFormatter = DateFormatter()
+    
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        postDataFormatter.dateFormat = AppConstants.postDateFormat
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -60,7 +67,7 @@ class AddVIPScheduleViewController: UIViewController,sendDateDelegate {
         afterTimeTap.numberOfTapsRequired = 1
         afterSessionView.addGestureRecognizer(afterTimeTap)
         
-        self.slotsCollectionView.register(UINib(nibName: "AppointmentFilterCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "appointfilterCell")
+        self.slotsCollectionView.register(UINib(nibName: "SlotsCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "slotsListCell")
         slotsCVCHgtConst.constant = 0
         
 //        let hgt = ((self.appointmentsListData?.filterData?[0].clinicList?.count ?? 0) * 45) + ((self.appointmentsListData?.filterData?[0].clinicList?.count ?? 0) * 10)
@@ -71,19 +78,21 @@ class AddVIPScheduleViewController: UIViewController,sendDateDelegate {
     }
     @objc func beforeTimeClick()
     {
-        beforeSeesionView.backgroundColor = AppConstants.appGreenColor
-        afterSessionView.backgroundColor = AppConstants.appdarkGrayColor
+//        beforeSeesionView.backgroundColor = AppConstants.appGreenColor
+//        afterSessionView.backgroundColor = AppConstants.appdarkGrayColor
         sessionLoadingDetails(timeStr: beforeTimeLbl.text!, type: "before")
         
     }
     @objc func afterTimeClick()
     {
-        beforeSeesionView.backgroundColor = AppConstants.appdarkGrayColor
-        afterSessionView.backgroundColor = AppConstants.appGreenColor
+//        beforeSeesionView.backgroundColor = AppConstants.appdarkGrayColor
+//        afterSessionView.backgroundColor = AppConstants.appGreenColor
         sessionLoadingDetails(timeStr: afterTimeLbl.text!, type: "after")
         
     }
     override func viewDidLayoutSubviews() {
+        let height = slotsCollectionView.collectionViewLayout.collectionViewContentSize.height
+        slotsCVCHgtConst.constant = height;
         scrollViewInstance.contentSize = CGSize(width: scrollViewInstance.frame.width, height: submitBtnInstance.frame.origin.y+submitBtnInstance.frame.height+10)
     }
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -102,11 +111,13 @@ class AddVIPScheduleViewController: UIViewController,sendDateDelegate {
         }
         else
         {
+            self.sessionScheduleData?.sessionData = []
             var parameters = Dictionary<String, Any>()
             parameters["time"] = timeStr
             parameters["count"] = self.numberOfSlots
             parameters["type"] = type
             parameters["interval"] = self.scheduleDateData?.interval
+            parameters["date"] = postDataFormatter.string(from:selectedDate)
             
             GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
             
@@ -116,6 +127,7 @@ class AddVIPScheduleViewController: UIViewController,sendDateDelegate {
                 
                 if status == true {
                     self.sessionScheduleData = response
+                    
                     if self.sessionScheduleData?.status?.code == "0" {
                         //MARK: session data Success Details
                         
@@ -124,7 +136,8 @@ class AddVIPScheduleViewController: UIViewController,sendDateDelegate {
                             self.selectedType = "before"
                             self.timeSlotTime = self.scheduleDateData?.startTime ?? ""
                         }
-                        else{
+                        else
+                        {
                             self.selectedType = "after"
                             self.timeSlotTime = self.scheduleDateData?.endTime ?? ""
                         }
@@ -132,17 +145,6 @@ class AddVIPScheduleViewController: UIViewController,sendDateDelegate {
                         let count = self.sessionScheduleData?.sessionData?.count ?? 0
                         if count != 0
                         {
-                            let hgt2 = (count % 3)
-                            if hgt2 < 3
-                            {
-                                let hgt1 = (3 * 45) + (count * 10)
-                                self.slotsCVCHgtConst.constant = CGFloat(hgt1)
-                            }
-                            else
-                            {
-                                let hgt1 = (hgt2 * 45) + (count * 10)
-                                self.slotsCVCHgtConst.constant = CGFloat(hgt1)
-                            }
                             
                         }
                         else
@@ -182,8 +184,8 @@ class AddVIPScheduleViewController: UIViewController,sendDateDelegate {
         calendarVC.modalTransitionStyle = .crossDissolve
         calendarVC.modalPresentationStyle = .overCurrentContext
         calendarVC.delegate = self
-        calendarVC.minimumDate = Date()
-        calendarVC.maximumDate = Calendar.current.date(byAdding: .day, value: 28, to: Date())!
+        calendarVC.minimumDate = GenericMethods.currentDateTime()
+        calendarVC.maximumDate = Calendar.current.date(byAdding: .day, value: AppConstants.durationPeriod, to: GenericMethods.currentDateTime())!
         UIApplication.shared.topMostViewController()?.present(calendarVC, animated: true)
     }
     @IBAction func slotsBtnClick(_ sender: Any) {
@@ -204,6 +206,9 @@ class AddVIPScheduleViewController: UIViewController,sendDateDelegate {
                     self.slotsButtonInstance.setTitle("\(i)", for: .normal)
 
                     self.numberOfSlots = "\(i)"
+                    self.beforeSeesionView.backgroundColor = AppConstants.appdarkGrayColor
+                    self.afterSessionView.backgroundColor = AppConstants.appdarkGrayColor
+                    self.slotsCVCHgtConst.constant = 0
                 
                 })
             optionsController.addAction(action)
@@ -235,8 +240,7 @@ class AddVIPScheduleViewController: UIViewController,sendDateDelegate {
         }
         else
         {
-            let postDataFormatter = DateFormatter()
-            postDataFormatter.dateFormat = AppConstants.postDateFormat
+            
 //            let timeFormatter = DateFormatter()
 //            timeFormatter.dateFormat = "HH:mm"
             print(postDataFormatter.string(from: self.selectedDate))
@@ -311,6 +315,7 @@ class AddVIPScheduleViewController: UIViewController,sendDateDelegate {
         var parameters = Dictionary<String, Any>()
         parameters["doctor_id"] = UserDefaults.standard.value(forKey: "user_id") ?? 0 as Int
         parameters["day"] = dayStr
+        parameters["date"] = postDataFormatter.string(from:selectedDate)
         
         GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
         
@@ -333,6 +338,19 @@ class AddVIPScheduleViewController: UIViewController,sendDateDelegate {
                     self.selectDateBtnInstance.setTitle(btnDateFormatter.string(from: selectedDate), for: .normal)
                     btnDateFormatter.dateFormat = AppConstants.postDateFormat
                     
+                    self.beforeSeesionView.backgroundColor = AppConstants.appdarkGrayColor
+                    self.afterSessionView.backgroundColor = AppConstants.appdarkGrayColor
+                    self.slotsCVCHgtConst.constant = 0
+                    print("current time \(GenericMethods.currentDateTime()) selectedDate \(selectedDate)")
+//                    if selectedDate > GenericMethods.currentDateTime()
+//                    {
+//                        self.beforeSeesionView.isUserInteractionEnabled = true
+//                        self.afterSessionView.isUserInteractionEnabled = true
+//                    }
+//                    else
+//                    {
+//                        self.afterSessionView.isUserInteractionEnabled = true
+//                    }
                     if btnDateFormatter.string(from: selectedDate) == btnDateFormatter.string(from: GenericMethods.currentDateTime())
                     {
                         self.afterSessionView.isUserInteractionEnabled = true
@@ -397,20 +415,22 @@ extension AddVIPScheduleViewController:UICollectionViewDelegate,UICollectionView
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        slotsCell = collectionView.dequeueReusableCell(withReuseIdentifier: "appointfilterCell", for: indexPath) as? AppointmentFilterCollectionViewCell
-        slotsCell?.textBtn.titleLabel?.adjustsFontSizeToFitWidth = true
-        slotsCell?.textBtn.titleLabel?.font = UIFont.systemFont(ofSize: 10.0, weight: .regular)
-        slotsCell?.textBtn.setTitle(self.sessionScheduleData?.sessionData?[indexPath.row].ordinaryformat ?? "", for: .normal)
+        slotsCell = collectionView.dequeueReusableCell(withReuseIdentifier: "slotsListCell", for: indexPath) as? SlotsCollectionViewCell
+        
+        slotsCell?.bgView.layer.cornerRadius = 10.0
+        slotsCell?.bgView.layer.masksToBounds = true
+        slotsCell?.slotBtnInstance.isEnabled = false
+        
+        slotsCell?.slotBtnInstance.titleLabel?.adjustsFontSizeToFitWidth = true
+        slotsCell?.slotBtnInstance.titleLabel?.font = UIFont.systemFont(ofSize: 10.0, weight: .regular)
+        slotsCell?.slotBtnInstance.setTitle(self.sessionScheduleData?.sessionData?[indexPath.row].ordinaryformat ?? "", for: .normal)
         
         return slotsCell!
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-//        let cellSize:CGFloat = collectionView.frame.size.width - 18
-//        print("cellSize \(cellSize / 3)")
-        return CGSize(width: 100, height: 40)
+
+        return CGSize(width: 60, height: 20)
     }
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-//        return UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
-//    }
+
     
 }

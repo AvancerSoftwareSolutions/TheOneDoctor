@@ -169,8 +169,21 @@ extension AddScheduleTableViewCell:JTAppleCalendarViewDelegate,JTAppleCalendarVi
                     
                     cell.achievedCountLbl.isHidden = false
                     cell.achievedCountLbl.text = "\(valueDict1["achieved"] ?? 0)"
+                    var status = 0
+                    if (AppConstants.schedulefilteredStatus == 0) || (AppConstants.schedulefilteredStatus == 5)
+                    {
+                        status = valueDict1["status"]  as? Int ?? 0
+                        
+                    }
+                    else
+                    {
+                        if valueDict1["status"]  as? Int ?? 0 == AppConstants.schedulefilteredStatus
+                        {
+                            status = AppConstants.schedulefilteredStatus
+                        }
+                        
+                    }
                     
-                    let status:Int = valueDict1["status"]  as? Int ?? 0
                     switch status
                     {
                     case 0:

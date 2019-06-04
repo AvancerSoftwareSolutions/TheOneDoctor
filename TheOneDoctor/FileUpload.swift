@@ -294,9 +294,7 @@ class FileUpload: NSObject {
         
         let alert = UIAlertController(title: "Error", message: "It looks like your privacy settings are preventing us from accessing your gallery to pick Photos. You can fix this by doing the following:\n\n1. Touch the Settings button below to open the Settings of this app.\n\n2. Click Photos and Allow to Read and Write .\n\n3. Open this app and try again.", preferredStyle: .alert)
         let settingsAction = UIAlertAction(title: "Settings", style: .default, handler: { action in
-            defer {
-            }
-            do {
+            
                 //NSLog(@"tapped Settings");
                 //                let canOpenSettings: Bool = UIApplication.openSettingsURLString != nil
                 //                if canOpenSettings {
@@ -304,12 +302,7 @@ class FileUpload: NSObject {
                 
                 UIApplication.shared.open(url!, options: [:], completionHandler: nil)
                 //                }
-                
-                
-            }
-            catch let exception {
-                print(exception)
-            }
+            
         })
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         

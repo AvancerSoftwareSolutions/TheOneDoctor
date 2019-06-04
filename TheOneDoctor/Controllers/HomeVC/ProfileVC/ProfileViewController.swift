@@ -635,7 +635,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                         }
                         NSLog("Document directory is \(filePath)")
                         
-                        var fileURL = filePath.appendingPathComponent("Imageon\(GenericMethods.removeSpaceFromStr(str: "\(GenericMethods.currentDateTime()).jpeg"))")
+                        let fileURL = filePath.appendingPathComponent("Imageon\(GenericMethods.removeSpaceFromStr(str: "\(GenericMethods.currentDateTime()).jpeg"))")
 //                        let fileURL  = filePathURL.appendPathExtension("jpeg")
                         print(fileURL)
                         //writing
@@ -1280,13 +1280,7 @@ extension ProfileViewController:UICollectionViewDelegate,UICollectionViewDataSou
         let cellHeight:CGFloat = collectionView.frame.size.height - 10
         switch collectionView {
         case specialityCollectionView:
-//
-//            if let cell = collectionView.cellForItem(at: indexPath as IndexPath) as? DoctorSpecialityCollectionViewCell {
-//                let lblWidth = cell.specialityLbl.intrinsicContentSize.width
-//                print("lblWidth \(lblWidth)")
-//                return CGSize(width: lblWidth + 44, height: 45)
-//            }
-            
+
             let size = ((self.specialityArray[indexPath.item] as? [AnyHashable:Any])? ["name"] as? NSString)!.size(withAttributes: nil)
             print("size \(size.width)")
             return CGSize(width: (size.width + 44) , height: cellHeight)

@@ -22,7 +22,7 @@ class LoginUserDataModel:Mappable
 
     func mapping(map: Map) {
         userId <- map ["user_id"]
-        userImg <- map ["picture"]
+        userImg <- map ["profile"]
         gender <- map ["sex"]
     }
 
