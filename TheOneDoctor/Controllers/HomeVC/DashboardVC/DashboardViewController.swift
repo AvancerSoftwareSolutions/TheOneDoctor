@@ -8,6 +8,7 @@
 
 import UIKit
 import Alamofire
+import Photos
 
 class DashboardViewController: UIViewController,UIGestureRecognizerDelegate {
     
@@ -27,6 +28,8 @@ class DashboardViewController: UIViewController,UIGestureRecognizerDelegate {
     let apiManager = APIManager()
     
 
+    var fetchResults: [PHFetchResult<PHAssetCollection>] = []
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -69,15 +72,137 @@ class DashboardViewController: UIViewController,UIGestureRecognizerDelegate {
             ["image":"Watch.png",
              "detail":"Link The ONE Watch"]
         ]
-        let hours24 = GenericMethods.convert24hrto12hrFormat(dateStr: "20:00")
-        print("hours24 \(hours24)")
-        let mins24 = GenericMethods.convertHrstoMinsFormat(dateStr: "00:30")
-        
-        print("mins24 \(mins24)")
+//        fetchCustomAlbumPhotos()
+//        getAlbumList()
+        fetchVideoFromLibrary()
         
         // Do any additional setup after loading the view.
     }
+    func getAlbumList()
+    {
+        let fetchOptions = PHFetchOptions()
+        let albumResult = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: fetchOptions)
+        
+        fetchResults = [albumResult]
+//        let album = fetchResults.first?.firstObject
+        fetchOptions.sortDescriptors = [
+            NSSortDescriptor(key: "creationDate", ascending: false)
+        ]
+        fetchOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
+        for i in 0..<fetchResults.count
+        {
+            let coll = fetchResults[0][i]
+            print("\(String(describing: coll.localizedTitle))\n")
+            
+            
+            
+            let fetchResult = PHAsset.fetchAssets(in: coll, options: fetchOptions)
+            
+            
+            print("count \(fetchResult.count)")
+            for i in 0..<fetchResult.count
+            {
+                FileUpload.getURL(of: fetchResult[i]) { (url) in
+                    print("image url \(String(describing: url))")
+                }
+            }
+            
+            
+        }
+//        for res in fetchResults
+//        {
+//            print("\(res.localizedTitle)\n")
+//        }
+//        print("asset \(String(describing: album?.localizedTitle))")
+        
+        
+        
+        
+        
+//        let photosManager = PHCachingImageManager.default()
+//        let ass = PHAsset.fetchAssets(in: <#T##PHAssetCollection#>, options: <#T##PHFetchOptions?#>)
+//        photosManager.
+//        photosManager.requestImage(for: asset, targetSize: imageSize, contentMode: imageContentMode, options: nil) { (result, _) in
+//            cell.imageView.image = result
+//        }
+    }
+    func fetchCustomAlbumPhotos()
+    {
+        let albumName = "All Photos"
+        var assetCollection = PHAssetCollection()
+        var albumFound = Bool()
+        var photoAssets = PHFetchResult<AnyObject>()
+        let fetchOptions = PHFetchOptions()
+        
+        fetchOptions.predicate = NSPredicate(format: "title = %@", albumName)
+        let collection:PHFetchResult = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: fetchOptions)
+        
+        if let firstObject = collection.firstObject{
+            //found the album
+            assetCollection = firstObject
+            albumFound = true
+        }
+        else { albumFound = false }
+        _ = collection.count
+        photoAssets = PHAsset.fetchAssets(in: assetCollection, options: nil) as! PHFetchResult<AnyObject>
+        let imageManager = PHCachingImageManager()
+        photoAssets.enumerateObjects{(object: AnyObject!,
+            count: Int,
+            stop: UnsafeMutablePointer<ObjCBool>) in
+            
+            if object is PHAsset{
+                let asset = object as! PHAsset
+                print("Inside  If object is PHAsset, This is number 1")
+                
+                let imageSize = CGSize(width: asset.pixelWidth,
+                                       height: asset.pixelHeight)
+                
+                /* For faster performance, and maybe degraded image */
+                let options = PHImageRequestOptions()
+                options.deliveryMode = .fastFormat
+                options.isSynchronous = true
+                
+                imageManager.requestImage(for: asset,
+                                          targetSize: imageSize,
+                                          contentMode: .aspectFill,
+                                          options: options,
+                                          resultHandler: {
+                                            (image, info) -> Void in
+                                            print(info as Any)
+//                                            self.photo = image!
+//                                            /* The image is now available to us */
+//                                            self.addImgToArray(uploadImage: self.photo!)
+                                            print("enum for image, This is number 2")
+                                            
+                })
+                
+            }
+        }
+    }
     
+    func fetchVideoFromLibrary() {
+        let fetchOptions: PHFetchOptions = PHFetchOptions()
+        fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+        
+        let fetchResult = PHAsset.fetchAssets(with: .video, options: fetchOptions)
+        fetchResult.enumerateObjects { (object, index, stop) -> Void in
+            let options = PHImageRequestOptions()
+            options.isSynchronous = true
+            options.deliveryMode = .highQualityFormat
+
+            PHImageManager.default().requestAVAsset(forVideo: object , options: .none) { (avAsset, avAudioMix, dict) -> Void in
+                print(avAsset as Any)
+                
+                if let urlAsset = avAsset as? AVURLAsset {
+                    let localVideoUrl = urlAsset.url
+                    print("localVideoUrl \(localVideoUrl)")
+                }
+                
+                print("dict is \(dict as Any)")
+            }
+        }
+    }
+
     @objc func logoutMethod()
     {
         GenericMethods.showYesOrNoAlertWithCompletionHandler(alertTitle: "Are you sure want to Logout ?", alertMessage: "") { (UIAlertAction) in
@@ -99,6 +224,7 @@ class DashboardViewController: UIViewController,UIGestureRecognizerDelegate {
         imgView.layer.masksToBounds = true
     }
     override func viewWillAppear(_ animated: Bool) {
+        
         GenericMethods.setProfileImage(imageView: profilePicImgView,borderColor:UIColor.lightGray)
         navigationController?.navigationBar.isHidden = true
         loadingdashBoardDetailsAPI()
@@ -210,6 +336,11 @@ extension DashboardViewController:UICollectionViewDelegate,UICollectionViewDataS
             
             let queueVC = self.storyboard?.instantiateViewController(withIdentifier: "queueVC") as! QueueViewController
             self.navigationController?.pushViewController(queueVC, animated: true)
+            
+        case 3:
+            
+            let mediaCVC = self.storyboard?.instantiateViewController(withIdentifier: "mediaCVC") as! MediaCollectionViewController
+            self.navigationController?.pushViewController(mediaCVC, animated: true)
             
         default:
             break

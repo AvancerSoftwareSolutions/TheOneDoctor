@@ -30,23 +30,28 @@ class AppointmentsViewController: UIViewController,sendAppointmentsFilterValuesD
     var date = ""
     let dateFormatter = DateFormatter()
     let createdDateFormatter = DateFormatter()
+    let postDataFormatter = DateFormatter()
     
     var maximumDate = Date()
-    var selectedDate = Date()
+    var selectedDate = GenericMethods.currentDateTime()
     
     var ageStr = ""
     var appointmentStr = ""
     var clinicStr = ""
+    var currentRow = 0
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         
+        postDataFormatter.dateFormat = AppConstants.postDateFormat
         dateFormatter.dateFormat = AppConstants.dayMonthYearFormat
         createdDateFormatter.dateFormat = AppConstants.defaultDateFormat
         
     }
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.maximumDate = Calendar.current.date(byAdding: .day, value: AppConstants.durationPeriod, to: GenericMethods.currentDateTime())!
         
         monthDayLbl.text = dateFormatter.string(from: GenericMethods.currentDateTime())
         previousMonthBtnInst.isHidden = true
@@ -58,12 +63,14 @@ class AppointmentsViewController: UIViewController,sendAppointmentsFilterValuesD
         
         appointmentsTableView.tableFooterView = UIView()
         
+        let refreshBtn = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(refreshClick))
+        
         let svgHoldingView = UIView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
         GenericMethods.setLeftViewWithSVG(svgView: svgHoldingView, with: "filter", color: UIColor.white)
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(filterBtnClick))
         tapGesture.numberOfTapsRequired = 1
         svgHoldingView.addGestureRecognizer(tapGesture)
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(customView: svgHoldingView)
+        self.navigationItem.rightBarButtonItems = [UIBarButtonItem.init(customView: svgHoldingView),refreshBtn]
         
         loadingAppointmentsDetailsAPI(date: createdDateFormatter.string(from: GenericMethods.currentDateTime()), postDate: GenericMethods.currentDateTime())
         
@@ -73,6 +80,32 @@ class AppointmentsViewController: UIViewController,sendAppointmentsFilterValuesD
         
         // Do any additional setup after loading the view.
     }
+    @objc func refreshClick()
+    {
+        loadingAppointmentsDetailsAPI(date: createdDateFormatter.string(from: self.selectedDate), postDate: self.selectedDate)
+    }
+    func scrollToBottom(){
+        DispatchQueue.main.async {
+            print("currentRow \(self.currentRow)")
+            let indexPath = IndexPath(row: self.currentRow, section: 0)
+            self.appointmentsTableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+        }
+    }
+    override func viewDidLayoutSubviews() {
+        print("viewDidLayoutSubviews")
+        guard let count = self.appointmentsListData?.appointmentsData?.count
+        else
+        {
+            return
+        }
+        print(count)
+        if count > 0
+        {
+            scrollToBottom()
+        }
+        
+    }
+    
     @objc func openCalendarView()
     {
         let calendarVC = self.storyboard!.instantiateViewController(withIdentifier: "calendarVC") as! CalendarViewController
@@ -81,9 +114,9 @@ class AppointmentsViewController: UIViewController,sendAppointmentsFilterValuesD
         calendarVC.modalTransitionStyle = .crossDissolve
         calendarVC.modalPresentationStyle = .overCurrentContext
         calendarVC.delegate = self
-        calendarVC.minimumDate = Date()
-        calendarVC.maximumDate = Calendar.current.date(byAdding: .day, value: AppConstants.durationPeriod, to: Date())!
-        calendarVC.setDate = GenericMethods.currentDateTime()
+        calendarVC.minimumDate = GenericMethods.currentDateTime()
+        calendarVC.maximumDate = Calendar.current.date(byAdding: .day, value: AppConstants.durationPeriod, to: GenericMethods.currentDateTime())!
+        calendarVC.setDate = self.selectedDate
         UIApplication.shared.topMostViewController()?.present(calendarVC, animated: true)
 
         
@@ -142,8 +175,7 @@ class AppointmentsViewController: UIViewController,sendAppointmentsFilterValuesD
     
     func loadingAppointmentsDetailsAPI(date:String,postDate:Date)
     {
-        let postDataFormatter = DateFormatter()
-        postDataFormatter.dateFormat = AppConstants.postDateFormat
+        
         print(GenericMethods.dateFormatting(createdDateStr: date, dateFormat: AppConstants.postDateFormat))
         
         // "type":"ALL","clinic_id":1,"age":"0-10"
@@ -162,27 +194,38 @@ class AppointmentsViewController: UIViewController,sendAppointmentsFilterValuesD
             
             if status == true {
                 self.appointmentsListData = response
+                
                 func setValuesMethod()
                 {
                     self.selectedDate = postDate
-                    if self.selectedDate == Date()
+                    
+                    if self.postDataFormatter.string(from: self.selectedDate) == self.postDataFormatter.string(from: GenericMethods.currentDateTime())
                     {
                         self.previousMonthBtnInst.isHidden = true
                     }
-                    else if self.selectedDate == self.maximumDate
+                    else if self.postDataFormatter.string(from: self.selectedDate) == self.postDataFormatter.string(from: self.maximumDate)
                     {
                         self.nextMonthBtnInst.isHidden = true
                     }
                     else
                     {
-                        self.previousMonthBtnInst.isHidden = true
+                        self.previousMonthBtnInst.isHidden = false
+                        self.nextMonthBtnInst.isHidden = false
                     }
                     self.monthDayLbl.text = self.dateFormatter.string(from: self.selectedDate)
                     self.appointmentsTableView.reloadData()
+//                    self.scrollToBottom()
                 }
                 if self.appointmentsListData?.status?.code == "0"{
                     //MARK: Appointments Success Details
                     setValuesMethod()
+//                    if self.appointmentsListData?.appointmentsData?.count ?? 0 > 0
+//                    {
+//                        for i in 0..<self.appointmentsListData?.appointmentsData?.count ?? 0
+//                        {
+//
+//                        }
+//                    }
                     
                 }
                 else if self.appointmentsListData?.status?.code == "1"
@@ -195,7 +238,6 @@ class AppointmentsViewController: UIViewController,sendAppointmentsFilterValuesD
                 {
                 GenericMethods.showAlertwithPopNavigation(alertMessage: self.appointmentsListData?.status?.message ?? "Unable to fetch data. Please try again after sometime.", vc: self)
 
-                    //                    GenericMethods.showAlert(alertMessage: self.profileData?.status?.message ?? "Unable to fetch data. Please try again after sometime.")
                 }
                 
                 
@@ -276,11 +318,26 @@ extension AppointmentsViewController:UITableViewDelegate,UITableViewDataSource
             appointmentsCell?.userTypeLbl.text = "  V"
         case "Referral":
             appointmentsCell?.userTypeLbl.text = "  R"
+        case "WalkIn":
+            appointmentsCell?.userTypeLbl.text = "  W"
         default:
             break
         }
         
-        
+        let status = appointmentsListData?.appointmentsData?[indexPath.row].status ?? 0
+        print("status \(appointmentsListData?.appointmentsData?[0].status ?? 10)")
+        if status == 4
+        {
+            appointmentsCell?.bgView.layer.borderColor = UIColor.green.cgColor
+            appointmentsCell?.bgView.layer.borderWidth = 1.0
+            currentRow = indexPath.row
+        }
+        else
+        {
+            appointmentsCell?.bgView.layer.borderColor = UIColor.white.cgColor
+            appointmentsCell?.bgView.layer.borderWidth = 1.0
+        }
+
         // Configure the cell...
         
         return appointmentsCell!

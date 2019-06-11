@@ -12,15 +12,19 @@ import ObjectMapper
 class RescheduleDataModel:Mappable
 {
     
-    var status:StatusDataModel?
-    
+    var time:String?
+    var from:String?
+    var status:Int?
+    var type:String?
     required init?(map: Map) {
         
     }
     
     func mapping(map: Map) {
-        status <- map["status"]
-        
+        time <- map["TIME"]
+        from <- map["From"]
+        status <- map["Status"]
+        type <- map["Type"]
     }
     
     init() {

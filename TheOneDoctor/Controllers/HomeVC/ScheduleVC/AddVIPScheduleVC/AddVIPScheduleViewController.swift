@@ -55,7 +55,7 @@ class AddVIPScheduleViewController: UIViewController,sendDateDelegate {
         selectDateBtnInstance.layer.borderColor = AppConstants.appdarkGrayColor.cgColor
         selectDateBtnInstance.layer.borderWidth = 1.0
         
-        slotsSelectView.layer.addBorder(edge: .bottom, color: AppConstants.appdarkGrayColor, thickness: 1.0)
+        
         
         selectDateBtnInstance.setTitle("Select Date", for: .normal)
         
@@ -75,6 +75,9 @@ class AddVIPScheduleViewController: UIViewController,sendDateDelegate {
         
 
         // Do any additional setup after loading the view.
+    }
+    override func viewDidAppear(_ animated: Bool) {
+        slotsSelectView.layer.addBorder(edge: .bottom, color: AppConstants.appdarkGrayColor, thickness: 1.0)
     }
     @objc func beforeTimeClick()
     {
@@ -218,12 +221,11 @@ class AddVIPScheduleViewController: UIViewController,sendDateDelegate {
                 })
             optionsController.addAction(action)
         }
-        let senderView = sender as? UIButton
         optionsController.modalPresentationStyle = .popover
         
         let popPresenter: UIPopoverPresentationController? = optionsController.popoverPresentationController
-        popPresenter?.sourceView = senderView
-        popPresenter?.sourceRect = senderView?.bounds ?? CGRect.zero
+        popPresenter?.sourceView = slotsSelectView
+        popPresenter?.sourceRect = slotsSelectView?.bounds ?? CGRect.zero
         DispatchQueue.main.async(execute: {
             //    self.hud.hide(animated: true)
             //[self.tableView reloadData];
@@ -350,11 +352,10 @@ class AddVIPScheduleViewController: UIViewController,sendDateDelegate {
                     
                     if btnDateFormatter.string(from: selectedDate) == btnDateFormatter.string(from: GenericMethods.currentDateTime())
                     {
-                        let startTimeStr = GenericMethods.convert12hrto24hrFormat(dateStr: self.scheduleDateData?.startTime ?? "00:00 AM")
-                        let currentDateStr = GenericMethods.currentDateTimeString()
                         
-                        let startDate = GenericMethods.stringToDate(dateString: startTimeStr)
-                        let currentDate = GenericMethods.stringToDate(dateString: currentDateStr)
+                        
+                        let startDate = GenericMethods.convert12hrStringToDate(dateString: self.scheduleDateData?.startTime ?? "00:00 AM")
+                        let currentDate = GenericMethods.stringToDate(dateString: GenericMethods.currentDateTimeString())
                         
                         if startDate > currentDate
                         {

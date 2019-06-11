@@ -12,7 +12,7 @@ import ObjectMapper
 class QueueAppointmentModel:Mappable
 {
     
-    var queueData:Array<DashboardDataModel>?
+    var queueData:Array<QueueDataModel>?
     var totalPatientCount:Int?
     var attendedCount:Int?
     

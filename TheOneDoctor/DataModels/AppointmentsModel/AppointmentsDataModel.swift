@@ -18,7 +18,7 @@ class AppointmentsDataModel:Mappable
     var date:String?
     var type:String?
     var fromTime:String?
-    var status:String?
+    var status:Int?
     var appointmentId:String?
     
     required init?(map: Map) {

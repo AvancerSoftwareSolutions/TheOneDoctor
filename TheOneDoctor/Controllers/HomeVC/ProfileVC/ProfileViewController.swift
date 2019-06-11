@@ -766,9 +766,11 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
          otherwise app will crash on iPad */
         switch UIDevice.current.userInterfaceIdiom {
         case .pad:
+//            alert.popoverPresentationController?.sourceView = self.profilePicBtnInstance
+//            alert.popoverPresentationController?.sourceRect = self.profilePicBtnInstance.bounds
             alert.popoverPresentationController?.sourceView = self.view
-            alert.popoverPresentationController?.sourceRect = self.view.bounds
-            alert.popoverPresentationController?.permittedArrowDirections = .up
+            alert.popoverPresentationController?.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
+            alert.popoverPresentationController?.permittedArrowDirections = []
             
         default:
             break
@@ -837,9 +839,12 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
              otherwise app will crash on iPad */
             switch UIDevice.current.userInterfaceIdiom {
             case .pad:
+//                alert.popoverPresentationController?.sourceView = self.addPicUploadBtnInstance
+//                alert.popoverPresentationController?.sourceRect = self.addPicUploadBtnInstance.bounds
+//                alert.popoverPresentationController?.permittedArrowDirections = .up
                 alert.popoverPresentationController?.sourceView = self.view
-                alert.popoverPresentationController?.sourceRect = self.view.bounds
-                alert.popoverPresentationController?.permittedArrowDirections = .up
+                alert.popoverPresentationController?.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
+                alert.popoverPresentationController?.permittedArrowDirections = []
                 
             default:
                 break

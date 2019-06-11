@@ -9,6 +9,10 @@
 import UIKit
 import JTAppleCalendar
 
+protocol addScheduleTableViewCellDelegate {
+    func selectedDateMethod(scheduleDate:Date)
+}
+
 class AddScheduleTableViewCell: UITableViewCell {
     
     @IBOutlet weak var calendarView: JTAppleCalendarView!
@@ -28,6 +32,7 @@ class AddScheduleTableViewCell: UITableViewCell {
     let dateformatter = DateFormatter()
     let comparisonDateFormatter = DateFormatter()
     var isCalendarShow:Bool = false
+    var delegate:addScheduleTableViewCellDelegate?
     
     var isFilterStr = ""
 
@@ -97,30 +102,13 @@ class AddScheduleTableViewCell: UITableViewCell {
         if comparisonDateFormatter.string(from: date) == comparisonDateFormatter.string(from: GenericMethods.currentDateTime())
         {
             currentDateLbl.text = dateformatter.string(from: GenericMethods.currentDateTime())
-            print("current date time \(GenericMethods.currentDateTime())")
+//            print("current date time \(GenericMethods.currentDateTime())")
         }
         else
         {
-            currentDateLbl.text = dateformatter.string(from: date)
-            print("current date \(dateformatter.string(from: date))")
-        }
-        
-//        if dateformatter.string(from: date) == dateformatter.string(from: GenericMethods.currentDateTime())
-//        {
-//            currentDateLbl.text = dateformatter.string(from: GenericMethods.currentDateTime())
-//            print("current date time \(GenericMethods.currentDateTime())")
-//
-//        }
-//        else
-//        {
-//            currentDateLbl.text = dateformatter.string(from: date)
-//                    print("current date \(dateformatter.string(from: date))")
-//
-//        }
-        
-        
-        
+        currentDateLbl.text = dateformatter.string(from: date)
         calendarView.reloadData()
+        }
         
     }
     func searchFromArray(searchKey:String,searchString:String,array:NSMutableArray) -> Array<Any>
@@ -138,6 +126,8 @@ class AddScheduleTableViewCell: UITableViewCell {
 extension AddScheduleTableViewCell:JTAppleCalendarViewDelegate,JTAppleCalendarViewDataSource
 {
     func calendar(_ calendar: JTAppleCalendarView, shouldSelectDate date: Date, cell: JTAppleCell?, cellState: CellState) -> Bool {
+        print("shouldSelectDate")
+        
         if cellState.dateBelongsTo != .thisMonth {
             return false
         }
@@ -219,7 +209,7 @@ extension AddScheduleTableViewCell:JTAppleCalendarViewDelegate,JTAppleCalendarVi
 
         let endDate = Calendar.current.date(byAdding: .day, value: 28, to: GenericMethods.currentDateTime())
         
-        print("current \(GenericMethods.currentDateTime())")
+//        print("current \(GenericMethods.currentDateTime())")
         let param = ConfigurationParameters(startDate: GenericMethods.currentDateTime(), endDate: endDate!)
 //        let param = ConfigurationParameters(startDate: GenericMethods.currentDateTime(), endDate: endDate, numberOfRows: 6, calendar: Calendar.current, generateInDates: .forFirstMonthOnly, generateOutDates: .off, firstDayOfWeek: .sunday, hasStrictBoundaries: true)
         
@@ -236,45 +226,60 @@ extension AddScheduleTableViewCell:JTAppleCalendarViewDelegate,JTAppleCalendarVi
         
     }
     func calendar(_ calendar: JTAppleCalendarView, didSelectDate date: Date, cell: JTAppleCell?, cellState: CellState) {
-        
-        dateformatter.dateFormat = AppConstants.monthYearFormat
-        dateformatter.locale = Calendar.current.locale
-        dateformatter.timeZone = Calendar.current.timeZone
-        print("selected date \(dateformatter.string(from: date))")
-        print("current selected date \(dateformatter.string(from: date))")
-        
-        if dateformatter.string(from: date) != dateformatter.string(from: GenericMethods.currentDateTime())
-        {
-            previousMothBtnInstance.isHidden = false
-            nextMonthBtnInstance.isHidden = true
+        if cellState.selectionType == SelectionType.userInitiated {
+            print("userInitial")
+            
+            print("current selected date \(dateformatter.string(from: date))")
+            let selectedDateFormatter = DateFormatter()
+            selectedDateFormatter.dateFormat = AppConstants.defaultDateFormat
+            selectedDateFormatter.timeZone = TimeZone.current
+            let datestr = selectedDateFormatter.string(from: date as Date)
+            selectedDateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+
+            guard let currentDate = selectedDateFormatter.date(from: datestr)
+                else
+            {
+                return
+            }
+            
+            let between = currentDate.isBetween(GenericMethods.currentDateTime(), and: Calendar.current.date(byAdding: .day, value: AppConstants.durationPeriod, to: GenericMethods.currentDateTime())!)
+            if between
+            {
+                self.delegate?.selectedDateMethod(scheduleDate: currentDate)
+            }
+            
+
         }
-        else
-        {
-            nextMonthBtnInstance.isHidden = false
-            previousMothBtnInstance.isHidden = true
+        else if cellState.selectionType == SelectionType.programatic {
+            print("programmatic")
+            dateformatter.dateFormat = AppConstants.monthYearFormat
+            dateformatter.locale = Calendar.current.locale
+            dateformatter.timeZone = Calendar.current.timeZone
+            
+            if dateformatter.string(from: date) != dateformatter.string(from: GenericMethods.currentDateTime())
+            {
+                previousMothBtnInstance.isHidden = false
+                nextMonthBtnInstance.isHidden = true
+            }
+            else
+            {
+                nextMonthBtnInstance.isHidden = false
+                previousMothBtnInstance.isHidden = true
+            }
         }
+        
+        
 
         self.handleSelectedCell(cell: cell, cellState: cellState)
     }
     func calendar(_ calendar: JTAppleCalendarView, didDeselectDate date: Date, cell: JTAppleCell?, cellState: CellState) {
+        print("didDeselectDate")
         self.handleSelectedCell(cell: cell, cellState: cellState)
     }
+    
     
     func calendar(_ calendar: JTAppleCalendarView, didScrollToDateSegmentWith visibleDates: DateSegmentInfo) {
         self.setupViewOfCalendar(from: visibleDates)
     }
-    
-    func calendar(_ calendar: JTAppleCalendarView, willScrollToDateSegmentWith visibleDates: DateSegmentInfo)
-    {
-        guard let date = visibleDates.monthDates.first?.date else {
-            return
-        }
-        print("willscroll date \(date)")
-        if date == Calendar.current.date(byAdding: .month, value: 2, to: Date())
-        {
-            
-        }
-        
-    }
-    
+
 }

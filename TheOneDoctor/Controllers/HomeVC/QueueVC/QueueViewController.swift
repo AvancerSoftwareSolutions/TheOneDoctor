@@ -29,19 +29,28 @@ class QueueViewController: UIViewController {
         
         self.title = "Queue"
         
+        let refreshBtn = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(refreshClick))
+        
+        self.navigationItem.rightBarButtonItem = refreshBtn
+        
         self.queueCollectionView.register(UINib(nibName: "SlotsCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "slotsListCell")
         self.loadingQueueDetailsAPI()
 
         // Do any additional setup after loading the view.
     }
-    override func viewWillAppear(_ animated: Bool) {
-        stackViewHgtConst.constant = totalPatientView.bounds.height
+    
+    override func viewDidAppear(_ animated: Bool) {
+        stackViewHgtConst.constant = totalPatientView.bounds.width
         totalPatientView.layer.cornerRadius = totalPatientView.bounds.height / 2
         totalPatientView.layer.masksToBounds = true
         pendingPatientView.layer.cornerRadius = pendingPatientView.bounds.height / 2
         pendingPatientView.layer.masksToBounds = true
         self.shadowView(view: self.totalPatientView)
         self.shadowView(view:self.pendingPatientView)
+    }
+    @objc func refreshClick()
+    {
+        self.loadingQueueDetailsAPI()
     }
     func shadowView(view:UIView)
     {
@@ -54,7 +63,7 @@ class QueueViewController: UIViewController {
         view.layer.shadowOffset = CGSize(width: 0, height: 2)
     }
     
-    // MARK: - Dashboard API
+    // MARK: - Queue API
     func loadingQueueDetailsAPI()
     {
         var parameters = Dictionary<String, Any>()
@@ -118,7 +127,39 @@ extension QueueViewController:UICollectionViewDelegate,UICollectionViewDataSourc
         slotsListCell?.bgView.layer.borderColor = UIColor.white.cgColor
         slotsListCell?.slotBtnInstance.setTitleColor(UIColor.clear, for: .normal)
         slotsListCell?.slotBtnInstance.setTitle("", for: .normal)
-        slotsListCell?.slotBtnInstance.setImage(UIImage(named: "green-man.png"), for: .normal)
+//        slotsListCell?.slotBtnInstance.setImage(UIImage(named: "green-man.png"), for: .normal)
+        
+        if queueListData?.appointmentData?.queueData?[indexPath.row].otpStatus ?? 0 == 0
+        {
+            // Not yet register otp
+            if queueListData?.appointmentData?.queueData?[indexPath.row].sex == "male"
+            {
+                //
+                slotsListCell?.slotBtnInstance.setImage(UIImage(named: "man_NOT.png"), for: .normal)
+            }
+            else
+            {
+                slotsListCell?.slotBtnInstance.setImage(UIImage(named: "Wom_NOT.png"), for: .normal)
+            }
+        }
+        else
+        {
+            // otp registered
+            if queueListData?.appointmentData?.queueData?[indexPath.row].sex == "male"
+            {
+                //
+                slotsListCell?.slotBtnInstance.setImage(UIImage(named: "man_OTP.png"), for: .normal)
+            }
+            else
+            {
+                slotsListCell?.slotBtnInstance.setImage(UIImage(named: "Wom_OTP.png"), for: .normal)
+            }
+        }
+        
+        
+        
+        
+//        let queueListData?.appointmentData?.queueData?[indexPath.row].otpStatus
         
         
        

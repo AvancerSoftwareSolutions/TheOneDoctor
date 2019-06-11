@@ -17,11 +17,11 @@ class CalendarViewController: UIViewController {
     @IBOutlet weak var popupView: UIView!
     @IBOutlet weak var datePicker: UIDatePicker!
     var delegate : sendDateDelegate?
-    let date = Date()
+//    let date = Date()
     var dateFormatter = DateFormatter()
     var monthYearFormatter = DateFormatter()
     var selectedDate = Date()
-    var monthYearStr:String = ""
+//    var monthYearStr:String = ""
     var dateStr:String = ""
     var fromView:String = ""
     var minimumDate = Date()
@@ -51,9 +51,10 @@ class CalendarViewController: UIViewController {
         datePicker.timeZone = TimeZone.current
         datePicker.timeZone = TimeZone(secondsFromGMT: 0)
         datePicker.addTarget(self, action: #selector(pickerChanged(_:)), for: .valueChanged)
-        selectedDate = date
-        monthYearStr = "\(monthYearFormatter.string(from: date))"
+        
+//        monthYearStr = "\(monthYearFormatter.string(from: date))"
         datePicker.setDate(setDate, animated: true)
+        selectedDate = datePicker.date
         
 //        if fromView == "register"
 //        {
@@ -72,7 +73,7 @@ class CalendarViewController: UIViewController {
         dateFormatter.dateFormat = AppConstants.datePickerFormat
         print(Date().localizedDescription)
         if let date = (sender as? UIDatePicker)?.date {
-            monthYearStr = "\(monthYearFormatter.string(from: date))"
+//            monthYearStr = "\(monthYearFormatter.string(from: date))"
             
             let datestr = dateFormatter.string(from: date as Date)
             
@@ -84,10 +85,12 @@ class CalendarViewController: UIViewController {
             
             selectedDate = selectDate
             print("selectDate \(selectDate)")
+            
+           
 
         }
         
-        print(" date description: \(selectedDate) & \(monthYearStr)")
+        print(" date description: \(selectedDate)")
     }
     @IBAction func cancelBtnClick(_ sender: Any) {
         dismiss(animated: true, completion: nil)

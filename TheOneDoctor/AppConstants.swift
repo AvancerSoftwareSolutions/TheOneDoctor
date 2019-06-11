@@ -47,6 +47,9 @@ struct AppConstants
     static let appdarkGrayColor:UIColor = #colorLiteral(red: 0.2588235294, green: 0.2549019608, blue: 0.262745098, alpha: 1) //424143 - darkGray
     static let appyellowColor:UIColor = #colorLiteral(red: 1, green: 0.8256910443, blue: 0, alpha: 1) // FFCB04 // R-225 B-4 G-203
     
+    static let normalSlotColor:UIColor = #colorLiteral(red: 0.3803921569, green: 0.7568627451, blue: 0.5843137255, alpha: 1) // 61C195
+    static let vipSlotColor:UIColor = #colorLiteral(red: 0.4156862745, green: 0.6, blue: 0.9607843137, alpha: 1) // 6A99F5
+    
     static let khudColour:UIColor =  UIColor(red: 100/255.0 , green: 166/255.0, blue: 35/255.0, alpha: 1)
     static var changeViewClick:Bool = false
     
@@ -72,6 +75,7 @@ struct AppConstants
     static let defaultDateFormat = "yyyy-MM-dd HH:mm:ss"
     static let monthYearFormat = "MM-yyyy"
     static let time12HoursInMeridianFormat = "h:mm a"
+    static let time12HoursFormat = "hh:mm a"
     static let timeHoursFormat = "h"
     static let timeMinFormat = "mm"
     static let time24HoursFormat = "HH:mm"
@@ -80,6 +84,8 @@ struct AppConstants
     static let datePickerFormat = "dd-MM-yyyy HH:mm:ss Z"
     
     static let durationPeriod = 28
+    
+    
     
     
     

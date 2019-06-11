@@ -36,7 +36,7 @@ class SpecialityListViewController: UIViewController {
         tableView.tableFooterView = UIView()
         popupView.layer.cornerRadius = 10.0
         popupView.layer.masksToBounds = true
-        tableView.layer.addBorder(edge: UIRectEdge.top, color: UIColor.darkGray, thickness: 1.0)
+        
         doneBtnInst.layer.cornerRadius = 5.0
         doneBtnInst.layer.masksToBounds = true
         if type == 0
@@ -52,7 +52,9 @@ class SpecialityListViewController: UIViewController {
 
         // Do any additional setup after loading the view.
     }
-    
+    override func viewDidAppear(_ animated: Bool) {
+        tableView.layer.addBorder(edge: UIRectEdge.top, color: UIColor.darkGray, thickness: 1.0)
+    }
 
     @objc func addSpecialityBtnCLick(sender:UIButton)
     {

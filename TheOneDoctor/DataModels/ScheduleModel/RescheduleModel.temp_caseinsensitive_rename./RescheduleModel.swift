@@ -13,7 +13,8 @@ class RescheduleModel:Mappable
 {
     
     var status:StatusDataModel?
-    var rescheduleListData:Array<RescheduleDataModel>?
+    var rescheduleData:Array<RescheduleDataModel>?
+    var delayedSlotStatus:Int?
     
     required init?(map: Map) {
         
@@ -21,7 +22,8 @@ class RescheduleModel:Mappable
     
     func mapping(map: Map) {
         status <- map["status"]
-        
+        rescheduleData <- map["ScheduleList"]
+        delayedSlotStatus <- map["delaystatus"]
     }
     
     init() {

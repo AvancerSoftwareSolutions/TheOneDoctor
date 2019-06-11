@@ -36,10 +36,7 @@ class OTPVerificationViewController: UIViewController {
         
         GenericMethods.setButtonAttributes(button: verifyBtnInstance, with: "VERIFY")
         
-        tf1.layer.addBorder(edge: UIRectEdge.bottom, color: UIColor.black, thickness: 1.0)
-        tf2.layer.addBorder(edge: UIRectEdge.bottom, color: UIColor.black, thickness: 1.0)
-        tf3.layer.addBorder(edge: UIRectEdge.bottom, color: UIColor.black, thickness: 1.0)
-        tf4.layer.addBorder(edge: UIRectEdge.bottom, color: UIColor.black, thickness: 1.0)
+        
         
         let numberToolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: 320, height: 50))
         numberToolbar.barStyle = .default
@@ -57,6 +54,12 @@ class OTPVerificationViewController: UIViewController {
         tf2.text = "\(digits[1])"
         tf3.text = "\(digits[2])"
         tf4.text = "\(digits[3])"
+    }
+    override func viewDidAppear(_ animated: Bool) {
+        tf1.layer.addBorder(edge: UIRectEdge.bottom, color: UIColor.black, thickness: 1.0)
+        tf2.layer.addBorder(edge: UIRectEdge.bottom, color: UIColor.black, thickness: 1.0)
+        tf3.layer.addBorder(edge: UIRectEdge.bottom, color: UIColor.black, thickness: 1.0)
+        tf4.layer.addBorder(edge: UIRectEdge.bottom, color: UIColor.black, thickness: 1.0)
     }
     @objc func doneWithNumberPad()
     {

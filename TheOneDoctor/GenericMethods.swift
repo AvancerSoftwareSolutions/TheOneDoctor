@@ -17,6 +17,10 @@ extension Date {
     var localizedDescription: String {
         return description(with: .current)
     }
+    func isBetween(_ date1: Date, and date2: Date) -> Bool {
+        return (min(date1, date2) ... max(date1, date2)).contains(self)
+    }
+    
 }
 extension UILabel
 {
@@ -480,6 +484,7 @@ class GenericMethods: NSObject {
         return datestr
         
     }
+    
     class func currentDateTime() -> Date
     {
         let date = NSDate()
@@ -488,15 +493,41 @@ class GenericMethods: NSObject {
         dateFormatter.timeZone = TimeZone.current
         let datestr = dateFormatter.string(from: date as Date)
 //        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-        print("datestr\(datestr)")
+        print("currentdatestr \(datestr)")
         //        print("dateDate\(dateFormatter.date(from: datestr)!)")
         guard let currentDate = dateFormatter.date(from: datestr)
             else
         {
             return Date()
         }
-        print("currentDate\(currentDate)")
+        print("currentDate \(currentDate)")
         return currentDate
+    }
+    class func convertStringToDate(dateString:String)-> Date
+    {
+        print("dateString \(dateString)")
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat =  AppConstants.defaultDateFormat
+        //        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        dateFormatter.locale = Locale.current
+        
+        //        let item = "7:00 PM"
+        let date = dateFormatter.date(from: dateString)
+        print("Start: \(String(describing: date))") // Start: Optional(2000-01-01 19:00:00 +0000)
+        return date!
+    }
+    class func convert12hrStringToDate(dateString:String)-> Date
+    {
+        print("dateString \(dateString)")
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat =  AppConstants.time12HoursFormat
+//        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        dateFormatter.locale = Locale.current
+        
+        //        let item = "7:00 PM"
+        let date = dateFormatter.date(from: dateString)
+        print("Start: \(String(describing: date))") // Start: Optional(2000-01-01 19:00:00 +0000)
+        return date!
     }
     class func stringToDate(dateString:String)-> Date
     {
@@ -576,7 +607,34 @@ class GenericMethods: NSObject {
         return outputStr
 
     }
-    
+    class func getHrsFromDate(dateStr:String,type:String)->Int
+    {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = AppConstants.time24HoursFormat
+
+        guard let date = dateFormatter.date(from: dateStr) else
+        {
+            return 0
+        }
+        
+        switch type
+        {
+        case "hour":
+            dateFormatter.dateFormat = AppConstants.timeHoursFormat
+            let hour = dateFormatter.string(from: date)
+            if hour == "12"
+            {
+                return 0
+            }
+            return Int(hour)!
+        case "min":
+            dateFormatter.dateFormat = AppConstants.timeMinFormat
+            let min = dateFormatter.string(from: date)
+            return Int(min)!
+        default:
+            return 0
+        }
+    }
     //MARK Date to 12 hrs
     class func convertDateto12hrFormat(dateStr:Date) -> String
     {

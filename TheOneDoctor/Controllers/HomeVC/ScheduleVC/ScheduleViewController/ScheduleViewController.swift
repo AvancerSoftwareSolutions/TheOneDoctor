@@ -10,7 +10,7 @@ import UIKit
 import JTAppleCalendar
 import Alamofire
 
-class ScheduleViewController: UIViewController {
+class ScheduleViewController: UIViewController,addScheduleTableViewCellDelegate {
     
     //MARK:- IBOutlets
     @IBOutlet weak var fullBookedLbl: UILabel!
@@ -27,6 +27,8 @@ class ScheduleViewController: UIViewController {
     var addScheduleCell:AddScheduleTableViewCell? = nil
     let apiManager = APIManager()
     var scheduleData:ScheduleModel?
+    var addBtn = UIBarButtonItem()
+    var editBtn = UIBarButtonItem()
     
     
     var resultDateDict:NSMutableDictionary = [:]
@@ -46,8 +48,8 @@ class ScheduleViewController: UIViewController {
         bookingYetStartLbl.layer.borderColor = UIColor.lightGray.cgColor
         bookingYetStartLbl.layer.borderWidth = 0.2
 
-        let addBtn = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addScheduleBtnClick))
-        let editBtn = UIBarButtonItem(image: UIImage(named: "EditProfPic.png"), style: .plain, target: self, action: #selector(editScheduleBtnClick))
+        addBtn = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addScheduleBtnClick))
+        editBtn = UIBarButtonItem(image: UIImage(named: "EditProfPic.png"), style: .plain, target: self, action: #selector(editScheduleBtnClick))
         
         filterView = UIView(frame: CGRect(x: 28, y: 0, width: 10, height: 10))
         filterView.backgroundColor = .red
@@ -149,9 +151,7 @@ class ScheduleViewController: UIViewController {
          otherwise app will crash on iPad */
         switch UIDevice.current.userInterfaceIdiom {
         case .pad:
-            alert.popoverPresentationController?.sourceView = self.view
-            alert.popoverPresentationController?.sourceRect = self.view.bounds
-            alert.popoverPresentationController?.permittedArrowDirections = .up
+            alert.popoverPresentationController?.barButtonItem = self.addBtn
             
         default:
             break
@@ -208,6 +208,13 @@ class ScheduleViewController: UIViewController {
             }
         }
     }
+    func selectedDateMethod(scheduleDate:Date)
+    {
+        print("selectedDateMethod\(scheduleDate)")
+        let rescheduleVC = self.storyboard?.instantiateViewController(withIdentifier: "rescheduleVC") as! RescheduleViewController
+        rescheduleVC.userSelectedDate = scheduleDate
+        self.navigationController?.pushViewController(rescheduleVC, animated: true)
+    }
 
     
 
@@ -228,6 +235,8 @@ extension ScheduleViewController:UITableViewDelegate,UITableViewDataSource
         {
             addScheduleCell = AddScheduleTableViewCell(style: .default, reuseIdentifier: "addScheduleCell")
         }
+        
+        addScheduleCell?.delegate = self
         addScheduleCell?.clinicName.text = scheduleData?.clinicData?.clinicName ?? ""
         addScheduleCell?.clinicAddressLbl.text = scheduleData?.clinicData?.clinicAddress ?? ""
         addScheduleCell?.clinicAddressLbl.addImage(imageName: "location.png", afterLabel: false)
