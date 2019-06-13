@@ -228,6 +228,7 @@ class RescheduleViewController: UIViewController,sendDateDelegate,refreshLoading
     // MARK: - Reschedule List API
     func loadingRescheduleDetailsAPI(dayStr:String,selectedDate: Date)
     {
+        self.view.endEditing(true)
         var parameters = Dictionary<String, Any>()
         parameters["doctor_id"] = UserDefaults.standard.value(forKey: "user_id") ?? 0 as Int
         parameters["day"] = dayStr
@@ -261,7 +262,8 @@ class RescheduleViewController: UIViewController,sendDateDelegate,refreshLoading
                     
                     self.collectionViewHgtConst.constant = 100
                     self.slotsUnavailableLbl.isHidden = false
-                    self.makeAvailableHgtConst.constant = 40
+//                    self.makeAvailableHgtConst.constant = 40
+                    self.makeAvailableHgtConst.constant = 0
                     self.slotsUnavailableHgtConst.constant = 60
                     self.slotsUnavailableLbl.text = "Slots Cancelled"
 //                    GenericMethods.showAlert(alertMessage: self.rescheduleListData?.status?.message ?? "You are unavailable on this day")
@@ -313,6 +315,7 @@ class RescheduleViewController: UIViewController,sendDateDelegate,refreshLoading
             }
         }
         
+        self.view.endEditing(true)
         var parameters = Dictionary<String, Any>()
         parameters["doctor_id"] = UserDefaults.standard.value(forKey: "user_id") ?? 0 as Int
         parameters["day"] = dayStr
@@ -398,6 +401,55 @@ class RescheduleViewController: UIViewController,sendDateDelegate,refreshLoading
             
         }
     }
+    func makeAvailableMethod(dayStr:String,selectedDate:Date)
+    {
+        self.view.endEditing(true)
+        var parameters = Dictionary<String, Any>()
+        parameters["doctor_id"] = UserDefaults.standard.value(forKey: "user_id") ?? 0 as Int
+        parameters["day"] = dayStr
+        parameters["date"] = postDataFormatter.string(from:selectedDate)
+        
+        //        print("parm \(parameters)")
+        
+        GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
+        
+        apiManager.makeAvailableDetailsAPI(parameters: parameters) { (status, showError, response, error) in
+            
+            GenericMethods.hideLoaderMethod(view: self.view)
+            
+            if status == true {
+                self.rescheduleListData = response
+                
+                self.reloadAllViews()
+                if self.rescheduleListData?.status?.code == "0" {
+                    //MARK: Reschedule Success Details
+                    
+                    GenericMethods.showAlertWithCompletionHandler(alertMessage: self.rescheduleListData?.status?.message ?? "Success", completionHandlerForOk: { (alertAction) in
+                        self.reloadAllViews()
+                        self.loadingRescheduleDetailsAPI(dayStr: dayStr, selectedDate: selectedDate)
+                    })
+                    
+                }
+                else
+                {
+                    
+                    GenericMethods.showAlert(alertMessage: self.rescheduleListData?.status?.message ?? "Unable to fetch data. Please try again after sometime.")
+                    
+                    
+                }
+                
+                
+            }
+            else {
+                
+                GenericMethods.showAlert(alertMessage: error?.localizedDescription ?? "Something Went Wrong. Please try again.")
+                
+                
+                
+            }
+        }
+    }
+    
     
     @objc func addCancelSlotsBtnClick(sender:UIButton)
     {
@@ -538,6 +590,8 @@ class RescheduleViewController: UIViewController,sendDateDelegate,refreshLoading
     @IBAction func makeAvailableBtnClick(_ sender: Any)
     {
         GenericMethods.showYesOrNoAlertWithCompletionHandler(alertTitle: "Are you sure, you are available?", alertMessage: "") { (alertAction) in
+            
+            self.makeAvailableMethod(dayStr: self.dayFormatter.string(from: self.userSelectedDate), selectedDate: self.userSelectedDate)
             
         }
     }

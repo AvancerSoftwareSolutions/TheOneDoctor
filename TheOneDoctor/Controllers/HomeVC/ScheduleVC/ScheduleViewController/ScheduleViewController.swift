@@ -99,23 +99,24 @@ class ScheduleViewController: UIViewController,addScheduleTableViewCellDelegate 
         alertContentView?.layer.cornerRadius = 5
         optionsController.addAction(UIAlertAction(title: "Fully Booked", style: .default, handler: { (alertAction) in
             self.filterView.isHidden = false
-            AppConstants.schedulefilteredStatus = 1
+            self.showStatusInScheduleView(status: 1)
         }))
         optionsController.addAction(UIAlertAction(title: "Booking Inprogress", style: .default, handler: { (alertAction) in
             self.filterView.isHidden = false
-            AppConstants.schedulefilteredStatus = 2
+            self.showStatusInScheduleView(status: 2)
         }))
         optionsController.addAction(UIAlertAction(title: "No booking", style: .default, handler: { (alertAction) in
             self.filterView.isHidden = false
-            AppConstants.schedulefilteredStatus = 3
+            self.showStatusInScheduleView(status: 3)
         }))
         optionsController.addAction(UIAlertAction(title: "Slot not allocated", style: .default, handler: { (alertAction) in
             self.filterView.isHidden = false
-            AppConstants.schedulefilteredStatus = 4
+            self.showStatusInScheduleView(status: 4)
+            
         }))
         optionsController.addAction(UIAlertAction(title: "Reset", style: .default, handler: { (alertAction) in
             self.filterView.isHidden = true
-            AppConstants.schedulefilteredStatus = 5
+            self.showStatusInScheduleView(status: 5)
         }))
         
 //        let senderView = sender
@@ -129,6 +130,13 @@ class ScheduleViewController: UIViewController,addScheduleTableViewCellDelegate 
             //[self.tableView reloadData];
             UIApplication.shared.topMostViewController()?.present(optionsController, animated: true)
         })
+    }
+    func showStatusInScheduleView(status:Int)
+    {
+        AppConstants.schedulefilteredStatus = status
+        self.addScheduleCell?.calendarView.reloadData()
+        self.scheduleTableView.reloadData()
+        
     }
     @objc func addScheduleBtnClick()
     {

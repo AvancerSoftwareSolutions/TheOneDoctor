@@ -118,6 +118,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     func ConnectToFCM() {
         Messaging.messaging().shouldEstablishDirectChannel = true
+        
         InstanceID.instanceID().instanceID { (result, error) in
             if let error = error {
                 print("Error fetching remote instange ID: \(error)")

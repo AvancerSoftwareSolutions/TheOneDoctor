@@ -12,6 +12,7 @@ import Photos
 import Alamofire
 import MobileCoreServices
 import BSImagePicker
+import AVKit
 
 class FileUpload: NSObject {
     
@@ -206,7 +207,6 @@ class FileUpload: NSObject {
         return []
     }
     
-    
     class func getURL(of asset: PHAsset, completionHandler : @escaping ((_ responseURL : URL?) -> Void)) {
         
         if asset.mediaType == .image {
@@ -221,14 +221,19 @@ class FileUpload: NSObject {
                 }
                 completionHandler(input.fullSizeImageURL)
             })
-        } else if asset.mediaType == .video {
+        }
+        else if asset.mediaType == .video {
             let options: PHVideoRequestOptions = PHVideoRequestOptions()
+            options.deliveryMode = .highQualityFormat
             options.version = .original
+            options.isNetworkAccessAllowed = true
+            
             PHImageManager.default().requestAVAsset(forVideo: asset, options: options, resultHandler: { (asset, audioMix, info) in
                 if let urlAsset = asset as? AVURLAsset {
                     let localVideoUrl = urlAsset.url
                     completionHandler(localVideoUrl)
                 } else {
+                    print("Asset url fetching failed")
                     completionHandler(nil)
                 }
             })
@@ -363,6 +368,43 @@ class FileUpload: NSObject {
         imagePicker.videoQuality = UIImagePickerController.QualityType.typeHigh
         vc.present(imagePicker, animated: true, completion: nil)
         
+    }
+    
+    class func assetplayVideo (view:UIViewController, asset:PHAsset) {
+        
+        guard (asset.mediaType == PHAssetMediaType.video)
+            
+            else {
+                print("Not a valid video media type")
+                return
+        }
+        
+        PHCachingImageManager().requestAVAsset(forVideo: asset, options: nil, resultHandler: {(asset: AVAsset?, audioMix: AVAudioMix?, info: [NSObject : AnyObject]?) in
+            
+            let asset = asset as! AVURLAsset
+            DispatchQueue.main.async {
+                
+                let player = AVPlayer(url: asset.url)
+                let playerViewController = AVPlayerViewController()
+                playerViewController.player = player
+                view.present(playerViewController, animated: true) {
+                    playerViewController.player!.play()
+                }
+            }
+            
+            } as! (AVAsset?, AVAudioMix?, [AnyHashable : Any]?) -> Void)
+    }
+    class func localFileplayVideo (view: UIViewController, appLocalUrl: URL) {
+        
+        DispatchQueue.main.async {
+            
+            let player = AVPlayer(url: appLocalUrl)
+            let playerViewController = AVPlayerViewController()
+            playerViewController.player = player
+            view.present(playerViewController, animated: true) {
+                playerViewController.player!.play()
+            }
+        }
     }
 
 }

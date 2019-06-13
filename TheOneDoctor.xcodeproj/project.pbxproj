@@ -99,6 +99,9 @@
 		1FC65AEC228D39EF00F889C9 /* AppointmentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FC65AEB228D39EF00F889C9 /* AppointmentsViewController.swift */; };
 		1FC65AEE228D450300F889C9 /* filter.svg in Resources */ = {isa = PBXBuildFile; fileRef = 1FC65AED228D450200F889C9 /* filter.svg */; };
 		1FC65AF1228D5F8400F889C9 /* ProfileSpecialityDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FC65AF0228D5F8400F889C9 /* ProfileSpecialityDataModel.swift */; };
+		1FCF1A8622AF7A9B007F6014 /* CustomTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FCF1A8522AF7A9B007F6014 /* CustomTitleView.swift */; };
+		1FCF1A8822AF7AAC007F6014 /* CustomTitleView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1FCF1A8722AF7AAC007F6014 /* CustomTitleView.xib */; };
+		1FCF1A8A22AF890F007F6014 /* MediaCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FCF1A8922AF890F007F6014 /* MediaCollectionViewCell.swift */; };
 		1FE013C62298F13000CA4EFC /* location.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FE013C52298F13000CA4EFC /* location.png */; };
 		1FE013C82298F64200CA4EFC /* CalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE013C72298F64100CA4EFC /* CalendarViewController.swift */; };
 		1FE013CA2299131A00CA4EFC /* SectionHeaderCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE013C92299131A00CA4EFC /* SectionHeaderCollectionReusableView.swift */; };
@@ -115,6 +118,8 @@
 		1FE013EB229ABEDB00CA4EFC /* RescheduleModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE013EA229ABEDB00CA4EFC /* RescheduleModel.swift */; };
 		1FE013ED229ABEED00CA4EFC /* RescheduleDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE013EC229ABEED00CA4EFC /* RescheduleDataModel.swift */; };
 		1FE013EF229AC48800CA4EFC /* ChangeScheduleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE013EE229AC48800CA4EFC /* ChangeScheduleViewController.swift */; };
+		1FEF4C8922B0C49B00726D94 /* imgSelect.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FEF4C8822B0C49B00726D94 /* imgSelect.png */; };
+		1FEF4C8B22B0C7C500726D94 /* mediaSelect.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FEF4C8A22B0C7C400726D94 /* mediaSelect.png */; };
 		1FF88A222295122A00A5C28A /* CalendarDateCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FF88A202295122A00A5C28A /* CalendarDateCollectionViewCell.swift */; };
 		1FF88A232295122A00A5C28A /* CalendarDateCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1FF88A212295122A00A5C28A /* CalendarDateCollectionViewCell.xib */; };
 		1FF8E5482282A58C0060D7FC /* Schedule.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FF8E5422282A5890060D7FC /* Schedule.png */; };
@@ -233,6 +238,9 @@
 		1FC65AEB228D39EF00F889C9 /* AppointmentsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentsViewController.swift; sourceTree = "<group>"; };
 		1FC65AED228D450200F889C9 /* filter.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = filter.svg; sourceTree = "<group>"; };
 		1FC65AF0228D5F8400F889C9 /* ProfileSpecialityDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSpecialityDataModel.swift; sourceTree = "<group>"; };
+		1FCF1A8522AF7A9B007F6014 /* CustomTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTitleView.swift; sourceTree = "<group>"; };
+		1FCF1A8722AF7AAC007F6014 /* CustomTitleView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CustomTitleView.xib; sourceTree = "<group>"; };
+		1FCF1A8922AF890F007F6014 /* MediaCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaCollectionViewCell.swift; sourceTree = "<group>"; };
 		1FE013C52298F13000CA4EFC /* location.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = location.png; sourceTree = "<group>"; };
 		1FE013C72298F64100CA4EFC /* CalendarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarViewController.swift; sourceTree = "<group>"; };
 		1FE013C92299131A00CA4EFC /* SectionHeaderCollectionReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeaderCollectionReusableView.swift; sourceTree = "<group>"; };
@@ -249,6 +257,8 @@
 		1FE013EA229ABEDB00CA4EFC /* RescheduleModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RescheduleModel.swift; sourceTree = "<group>"; };
 		1FE013EC229ABEED00CA4EFC /* RescheduleDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RescheduleDataModel.swift; sourceTree = "<group>"; };
 		1FE013EE229AC48800CA4EFC /* ChangeScheduleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeScheduleViewController.swift; sourceTree = "<group>"; };
+		1FEF4C8822B0C49B00726D94 /* imgSelect.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = imgSelect.png; sourceTree = "<group>"; };
+		1FEF4C8A22B0C7C400726D94 /* mediaSelect.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mediaSelect.png; sourceTree = "<group>"; };
 		1FF88A202295122A00A5C28A /* CalendarDateCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarDateCollectionViewCell.swift; sourceTree = "<group>"; };
 		1FF88A212295122A00A5C28A /* CalendarDateCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CalendarDateCollectionViewCell.xib; sourceTree = "<group>"; };
 		1FF8E5422282A5890060D7FC /* Schedule.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Schedule.png; sourceTree = "<group>"; };
@@ -346,6 +356,7 @@
 		1F12424E2280149600B13213 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				1FCF1A8422AF7A73007F6014 /* CustomTitleView */,
 				1F044E27229E86CF009CFBF5 /* SlotsCollectionViewCell */,
 				1FE013E0229AA18100CA4EFC /* SlotsTableViewCell */,
 				1FBE36C92294481D002E32BA /* CalendarCVC */,
@@ -364,6 +375,7 @@
 			isa = PBXGroup;
 			children = (
 				1FAAABB722AE7CE8004E2A52 /* MediaCollectionViewController.swift */,
+				1FCF1A8922AF890F007F6014 /* MediaCollectionViewCell.swift */,
 				1F1242392280118600B13213 /* AppDelegate.swift */,
 				1FE013C72298F64100CA4EFC /* CalendarViewController.swift */,
 				1F1242562280159800B13213 /* LoginVC */,
@@ -471,7 +483,9 @@
 				1FE013C52298F13000CA4EFC /* location.png */,
 				1FC341892296AA1000634EAD /* editing.png */,
 				1FC341802296621C00634EAD /* errorImg.png */,
+				1FEF4C8822B0C49B00726D94 /* imgSelect.png */,
 				1FC341872296A91200634EAD /* Settings.png */,
+				1FEF4C8A22B0C7C400726D94 /* mediaSelect.png */,
 				1FC3417F2296621B00634EAD /* loaderImg.png */,
 				1FA27EA522829AB500759E6A /* emptyProfile.png */,
 				1F1BFD81228C438E0005D927 /* ProfileBGImg.png */,
@@ -743,6 +757,15 @@
 			path = DashboardVC;
 			sourceTree = "<group>";
 		};
+		1FCF1A8422AF7A73007F6014 /* CustomTitleView */ = {
+			isa = PBXGroup;
+			children = (
+				1FCF1A8522AF7A9B007F6014 /* CustomTitleView.swift */,
+				1FCF1A8722AF7AAC007F6014 /* CustomTitleView.xib */,
+			);
+			path = CustomTitleView;
+			sourceTree = "<group>";
+		};
 		1FE013DF229AA13F00CA4EFC /* ScheduleViewController */ = {
 			isa = PBXGroup;
 			children = (
@@ -893,6 +916,7 @@
 				1FA27EA622829AB600759E6A /* emptyProfile.png in Resources */,
 				1FF8E5492282A58C0060D7FC /* Appoint.png in Resources */,
 				1FB0F0BA22A7F4A3005D5504 /* man_OTP.png in Resources */,
+				1FEF4C8922B0C49B00726D94 /* imgSelect.png in Resources */,
 				1FF8E55D2282F9060060D7FC /* DoctorPicturesCollectionViewCell.xib in Resources */,
 				1FC341822296621C00634EAD /* errorImg.png in Resources */,
 				1FF8E54C2282A58C0060D7FC /* Revenue.png in Resources */,
@@ -902,10 +926,12 @@
 				1F4C669A228434D700453B2E /* EditProfPic.png in Resources */,
 				1F1BFD82228C438F0005D927 /* ProfileBGImg.png in Resources */,
 				1FE013D0229916F600CA4EFC /* AppointmentFilterCollectionViewCell.xib in Resources */,
+				1FCF1A8822AF7AAC007F6014 /* CustomTitleView.xib in Resources */,
 				1FF8E5502282AAF50060D7FC /* Menprofile.png in Resources */,
 				1FF88A232295122A00A5C28A /* CalendarDateCollectionViewCell.xib in Resources */,
 				1FC3418A2296AA1100634EAD /* editing.png in Resources */,
 				1FF8E54A2282A58C0060D7FC /* Watch.png in Resources */,
+				1FEF4C8B22B0C7C500726D94 /* mediaSelect.png in Resources */,
 				1FF8E54D2282A58C0060D7FC /* Queue.png in Resources */,
 				1F1242442280118800B13213 /* Assets.xcassets in Resources */,
 				1F351D46229F9E5100681691 /* red_wom.png in Resources */,
@@ -1037,6 +1063,7 @@
 				1FE013CF229916F600CA4EFC /* AppointmentFilterCollectionViewCell.swift in Sources */,
 				1F55DB8B229832EE00B92E6B /* AppointmentsDataModel.swift in Sources */,
 				1FB8F3A92281B283006AF087 /* DashboardCollectionViewCell.swift in Sources */,
+				1FCF1A8A22AF890F007F6014 /* MediaCollectionViewCell.swift in Sources */,
 				1F12427F2280551500B13213 /* SendOTPModel.swift in Sources */,
 				1FBE36C222942BB1002E32BA /* AddScheduleViewController.swift in Sources */,
 				1FF8E5582282E3300060D7FC /* DoctorSpecialityCollectionViewCell.swift in Sources */,
@@ -1046,6 +1073,7 @@
 				1FC65AEC228D39EF00F889C9 /* AppointmentsViewController.swift in Sources */,
 				1F1242532280158300B13213 /* LoginViewController.swift in Sources */,
 				1F0D8798228EEAE90011050E /* CancelSpecialityModel.swift in Sources */,
+				1FCF1A8622AF7A9B007F6014 /* CustomTitleView.swift in Sources */,
 				1F351D5E229F9F7E00681691 /* QueueViewController.swift in Sources */,
 				1FB8F3A722818AF0006AF087 /* ProfileDataModel.swift in Sources */,
 				1FB8F3A1228167F9006AF087 /* StatusDataModel.swift in Sources */,

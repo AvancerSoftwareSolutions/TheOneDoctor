@@ -42,6 +42,7 @@ class APIManager
     let rescheduleListSuffix = "RescheduleList"
     let rescheduleSuffix = "Reschedule"
     let delayScheduleSuffix = "delayslot"
+    let makeAvailableSuffix = "Makeavailable"
     
     
     func consolePrintValues(url:String,parameters:Dictionary<String, Any>)
@@ -973,6 +974,54 @@ class APIManager
                             
                             UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
                             self.delaySlotsDetailsAPI(parameters: parameters, completion: completion)
+                            
+                            
+                        }
+                        else {
+                            print("Failed")
+                            
+                        }
+                    }
+                }
+                else
+                {
+                    switch response.result {
+                        
+                    case .success:
+                        let responseData = response.result.value
+                        completion(true, false, responseData, nil)
+                        
+                    case .failure(let error):
+                        completion(false, true, nil, error)
+                    }
+                }
+                
+        }
+    }
+    func makeAvailableDetailsAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:RescheduleModel?, _ error:Error?)-> Void)
+    {
+        let makeAvailableAPIURL = baseURL + makeAvailableSuffix
+        //        let headers: HTTPHeaders = [ "Authorization": Authorization]
+        consolePrintValues(url: makeAvailableAPIURL, parameters: parameters)
+        
+        Alamofire.request(makeAvailableAPIURL, method: .post, parameters: parameters, headers: nil)
+            .responseJSON(completionHandler: { (response) in
+                print(response as Any)
+            })
+            .responseObject { (response: DataResponse<RescheduleModel>) in
+                let i =  response.response?.statusCode
+                
+                if i==402{
+                    let apiManager = APIManager()
+                    apiManager.createAPIKey{ (status, showError, response, error) in
+                        var createApiKey: CreateAPIKeyModel?
+                        if status == true {
+                            print("Sucess")
+                            
+                            createApiKey = response
+                            
+                            UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
+                            self.makeAvailableDetailsAPI(parameters: parameters, completion: completion)
                             
                             
                         }

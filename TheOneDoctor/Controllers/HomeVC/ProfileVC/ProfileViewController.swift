@@ -15,7 +15,7 @@ import MobileCoreServices
 import BSImagePicker
 import SDWebImage
 
-class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UIImagePickerControllerDelegate, UINavigationControllerDelegate,UIDocumentInteractionControllerDelegate,sendSpecialityListValuesDelegate,sendDeletePicDelegate {
+class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UIImagePickerControllerDelegate, UINavigationControllerDelegate,UIDocumentInteractionControllerDelegate,sendSpecialityListValuesDelegate,sendDeletePicDelegate,sendMediaAssetsDelegate {
     
     
     
@@ -636,7 +636,6 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                         NSLog("Document directory is \(filePath)")
                         
                         let fileURL = filePath.appendingPathComponent("Imageon\(GenericMethods.removeSpaceFromStr(str: "\(GenericMethods.currentDateTime()).jpeg"))")
-//                        let fileURL  = filePathURL.appendPathExtension("jpeg")
                         print(fileURL)
                         //writing
                         do {
@@ -791,6 +790,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
     }
     @IBAction func docAddiPicUploadBtnClick(_ sender: Any) {
         let maxCount = Int(self.profileData?.profileData?.maxcount ?? "") ?? 0
+        print(uploadingMediaArray.count)
         if uploadingMediaArray.count == maxCount
         {
             GenericMethods.showYesOrNoAlertWithCompletionHandler(alertTitle: "The ONE", alertMessage: "You already have maximum additional pictures. Do you want to delete existing to add more pictures?") { (alertAction) in
@@ -810,24 +810,32 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                 //            self.imagePicker.delegate = self
                 //            FileUpload.openGallary(imagePicker: self.imagePicker, vc: self, assets: self.selectedAssets)
                 
-                let vc = BSImagePickerViewController()
-                vc.maxNumberOfSelections = maxCount - self.uploadingMediaArray.count
-                self.bs_presentImagePickerController(vc, animated: true, select: { (asset:PHAsset) in
-                    
-                }, deselect: { (asset:PHAsset) in
-                    
-                }, cancel: { (assets:[PHAsset]) in
-                    
-                }, finish: { (outputassets:[PHAsset]) in
-                    self.selectedAssets = []
-                    for i in 0..<outputassets.count
-                    {
-                        self.selectedAssets.append(outputassets[i])
-                    }
-                    print("selectedAssets \(self.selectedAssets)")
-                    self.gettingValuesFromPHAsset(assetsArr: self.selectedAssets)
-                    
-                }, completion: nil)
+                let mediaCVC = self.storyboard?.instantiateViewController(withIdentifier: "mediaCVC") as! MediaCollectionViewController
+                mediaCVC.maxNumberOfSelections =  maxCount - self.uploadingMediaArray.count
+                mediaCVC.delegate = self
+                let navigateVC = UINavigationController(rootViewController: mediaCVC)
+                navigateVC.navigationBar.barTintColor = AppConstants.appGreenColor
+                navigateVC.navigationBar.tintColor = UIColor.white
+                self.present(navigateVC, animated: true, completion: nil)
+                
+//                let vc = BSImagePickerViewController()
+//                vc.maxNumberOfSelections = maxCount - self.uploadingMediaArray.count
+//                self.bs_presentImagePickerController(vc, animated: true, select: { (asset:PHAsset) in
+//
+//                }, deselect: { (asset:PHAsset) in
+//
+//                }, cancel: { (assets:[PHAsset]) in
+//
+//                }, finish: { (outputassets:[PHAsset]) in
+//                    self.selectedAssets = []
+//                    for i in 0..<outputassets.count
+//                    {
+//                        self.selectedAssets.append(outputassets[i])
+//                    }
+//                    print("selectedAssets \(self.selectedAssets)")
+//                    self.gettingValuesFromPHAsset(assetsArr: self.selectedAssets)
+//
+//                }, completion: nil)
                 
             }))
             
@@ -889,7 +897,16 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
         self.uploadingMediaArray = NSMutableArray(array: uploadArray)
         self.doctorPicturesCollectionView.reloadData()
     }
-    
+    func sendMediaAssests(assets:[PHAsset])
+    {
+        self.selectedAssets = []
+        for i in 0..<assets.count
+        {
+            self.selectedAssets.append(assets[i])
+        }
+        print("selectedAssets \(self.selectedAssets)")
+        self.gettingValuesFromPHAsset(assetsArr: self.selectedAssets)
+    }
     func gettingValuesFromPHAsset(assetsArr:[PHAsset])
     {
         fileDataArr = []
@@ -897,7 +914,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
         mimeTypeArr = []
         
         for i in 0..<assetsArr.count {
-            
+            print("assets index \(assetsArr[i])")
             FileUpload.getURL(of: assetsArr[i]) { (url) in
                 print("mediaURL \(String(describing: url))")
                 
@@ -911,7 +928,10 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                         self.mimeTypeArr.append(FileUpload.mimeTypeForPath(path: mediaURL.path))
                         if self.fileDataArr.count == (assetsArr.count)
                         {
-                            self.addDocFilesUpload()
+                            DispatchQueue.main.async {
+                                self.addDocFilesUpload()
+                            }
+                            
                         }
                     }
                     catch
@@ -930,24 +950,27 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                         print("progress: \(progress)")
                     }
                     
-                    PHImageManager.default().requestImage(for: assetsArr[i], targetSize: self.view.frame.size, contentMode: PHImageContentMode.aspectFill, options: options, resultHandler: {
-                        (image, info) in
-                        guard let getImage = image,let dictInfo = info else
-                        {
-                            GenericMethods.showAlert(alertMessage: "Something went wrong. Try again.")
-                            return
-                        }
-                        print("dict: \(String(describing: dictInfo))")
-                        print("image size: \(String(describing: getImage.size))")
-                        print("picurl \(String(describing: dictInfo["PHImageFileURLKey"]))")
-                        guard let imgUrl = dictInfo["PHImageFileURLKey"] as? URL else
-                        {
-                            return
-                        }
-                        sendAssetDataToServer(mediaURL: imgUrl)
+                    DispatchQueue.main.async {
                         
-                        
-                    })
+                        PHImageManager.default().requestImage(for: assetsArr[i], targetSize: self.view.frame.size, contentMode: PHImageContentMode.aspectFill, options: options, resultHandler: {
+                            (image, info) in
+                            guard let getImage = image,let dictInfo = info else
+                            {
+                                GenericMethods.showAlert(alertMessage: "Something went wrong. Try again.")
+                                return
+                            }
+                            print("dict: \(String(describing: dictInfo))")
+                            print("image size: \(String(describing: getImage.size))")
+                            print("picurl \(String(describing: dictInfo["PHImageFileURLKey"]))")
+                            guard let imgUrl = dictInfo["PHImageFileURLKey"] as? URL else
+                            {
+                                return
+                            }
+                            sendAssetDataToServer(mediaURL: imgUrl)
+                            
+                            
+                        })
+                    }
                     return
                 }
                 sendAssetDataToServer(mediaURL: mediaURL)

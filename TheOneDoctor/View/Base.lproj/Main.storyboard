@@ -1569,20 +1569,78 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="Dm7-yc-Uxb">
+                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="5" minimumInteritemSpacing="5" id="Dm7-yc-Uxb">
                             <size key="itemSize" width="88" height="85"/>
                             <size key="headerReferenceSize" width="0.0" height="0.0"/>
                             <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                            <inset key="sectionInset" minX="5" minY="5" maxX="5" maxY="5"/>
+                            <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                         </collectionViewFlowLayout>
                         <cells>
-                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="mediaCell" id="hnb-fX-hVa">
-                                <rect key="frame" x="5" y="5" width="88" height="85"/>
+                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="mediaCell" id="hnb-fX-hVa" customClass="MediaCollectionViewCell" customModule="TheOneDoctor" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="88" height="85"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO">
                                     <rect key="frame" x="0.0" y="0.0" width="88" height="85"/>
                                     <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="qJY-aa-bC6">
+                                            <rect key="frame" x="0.0" y="0.0" width="88" height="85"/>
+                                        </imageView>
+                                        <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.85000002384185791" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="PlayImg" translatesAutoresizingMaskIntoConstraints="NO" id="BcT-5z-Pid">
+                                            <rect key="frame" x="0.0" y="0.0" width="88" height="85"/>
+                                            <color key="tintColor" red="0.20392156862745098" green="0.47058823529411764" blue="0.96470588235294119" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                        </imageView>
+                                        <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="41A-4P-jY8">
+                                            <rect key="frame" x="0.0" y="0.0" width="88" height="85"/>
+                                            <subviews>
+                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ksi-iR-OcF">
+                                                    <rect key="frame" x="0.0" y="0.0" width="88" height="85"/>
+                                                    <color key="backgroundColor" cocoaTouchSystemColor="lightTextColor"/>
+                                                </view>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="mediaSelect.png" translatesAutoresizingMaskIntoConstraints="NO" id="lZl-ly-h7g">
+                                                    <rect key="frame" x="63" y="60" width="20" height="20"/>
+                                                    <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="20" id="APV-zy-Xth"/>
+                                                        <constraint firstAttribute="height" constant="20" id="SUf-Z3-Izj"/>
+                                                    </constraints>
+                                                </imageView>
+                                            </subviews>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <constraints>
+                                                <constraint firstItem="ksi-iR-OcF" firstAttribute="top" secondItem="41A-4P-jY8" secondAttribute="top" id="P8w-1T-H7H"/>
+                                                <constraint firstItem="ksi-iR-OcF" firstAttribute="leading" secondItem="41A-4P-jY8" secondAttribute="leading" id="Qbo-EB-1E2"/>
+                                                <constraint firstAttribute="bottom" secondItem="ksi-iR-OcF" secondAttribute="bottom" id="Vea-52-HcX"/>
+                                                <constraint firstAttribute="trailing" secondItem="lZl-ly-h7g" secondAttribute="trailing" constant="5" id="cwT-m1-ce0"/>
+                                                <constraint firstAttribute="bottom" secondItem="lZl-ly-h7g" secondAttribute="bottom" constant="5" id="dxj-g4-s4n"/>
+                                                <constraint firstAttribute="trailing" secondItem="ksi-iR-OcF" secondAttribute="trailing" id="z9n-G0-DxY"/>
+                                            </constraints>
+                                        </view>
+                                    </subviews>
                                 </view>
+                                <constraints>
+                                    <constraint firstItem="qJY-aa-bC6" firstAttribute="leading" secondItem="hnb-fX-hVa" secondAttribute="leading" id="4Kh-wL-Zkx"/>
+                                    <constraint firstItem="41A-4P-jY8" firstAttribute="top" secondItem="hnb-fX-hVa" secondAttribute="top" id="6C0-eq-eVW"/>
+                                    <constraint firstAttribute="trailing" secondItem="41A-4P-jY8" secondAttribute="trailing" id="H11-PU-kdh"/>
+                                    <constraint firstItem="41A-4P-jY8" firstAttribute="leading" secondItem="hnb-fX-hVa" secondAttribute="leading" id="J34-PO-srW"/>
+                                    <constraint firstItem="41A-4P-jY8" firstAttribute="centerY" secondItem="hnb-fX-hVa" secondAttribute="centerY" id="O1x-k0-mNB"/>
+                                    <constraint firstItem="BcT-5z-Pid" firstAttribute="bottom" secondItem="qJY-aa-bC6" secondAttribute="bottom" id="Siv-9A-WJr"/>
+                                    <constraint firstItem="BcT-5z-Pid" firstAttribute="centerY" secondItem="qJY-aa-bC6" secondAttribute="centerY" id="UUV-vF-eBA"/>
+                                    <constraint firstItem="qJY-aa-bC6" firstAttribute="top" secondItem="hnb-fX-hVa" secondAttribute="top" id="ZZE-hv-xor"/>
+                                    <constraint firstAttribute="bottom" secondItem="41A-4P-jY8" secondAttribute="bottom" id="bj3-qz-phA"/>
+                                    <constraint firstItem="BcT-5z-Pid" firstAttribute="top" secondItem="qJY-aa-bC6" secondAttribute="top" id="f7j-ZD-hWo"/>
+                                    <constraint firstAttribute="trailing" secondItem="qJY-aa-bC6" secondAttribute="trailing" id="fIl-hQ-9Od"/>
+                                    <constraint firstItem="BcT-5z-Pid" firstAttribute="leading" secondItem="qJY-aa-bC6" secondAttribute="leading" id="gam-o7-8jo"/>
+                                    <constraint firstItem="41A-4P-jY8" firstAttribute="centerX" secondItem="hnb-fX-hVa" secondAttribute="centerX" id="iuR-6W-XsG"/>
+                                    <constraint firstAttribute="bottom" secondItem="qJY-aa-bC6" secondAttribute="bottom" id="lbX-8S-yW9"/>
+                                    <constraint firstItem="BcT-5z-Pid" firstAttribute="trailing" secondItem="qJY-aa-bC6" secondAttribute="trailing" id="rgG-cc-0PL"/>
+                                    <constraint firstItem="BcT-5z-Pid" firstAttribute="centerX" secondItem="qJY-aa-bC6" secondAttribute="centerX" id="vDH-bq-yaT"/>
+                                </constraints>
+                                <connections>
+                                    <outlet property="mediaImgView" destination="qJY-aa-bC6" id="a4v-w4-rdY"/>
+                                    <outlet property="playImg" destination="BcT-5z-Pid" id="hnG-Dm-yBY"/>
+                                    <outlet property="selectCellView" destination="41A-4P-jY8" id="jHe-ZZ-2pj"/>
+                                </connections>
                             </collectionViewCell>
                         </cells>
                         <connections>
@@ -3408,6 +3466,7 @@
         <image name="homeBg01.png" width="2000" height="2436"/>
         <image name="leftArrow" width="30" height="30"/>
         <image name="logo.png" width="299" height="230"/>
+        <image name="mediaSelect.png" width="15" height="15"/>
         <image name="rightArrow" width="30" height="30"/>
         <namedColor name="AppDarkGray">
             <color red="0.25882352941176473" green="0.25490196078431371" blue="0.2627450980392157" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

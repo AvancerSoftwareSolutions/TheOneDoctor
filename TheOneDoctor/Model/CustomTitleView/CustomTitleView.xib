@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CustomTitleView" customModule="TheOneDoctor" customModuleProvider="target">
+            <connections>
+                <outlet property="contentView" destination="iN0-l3-epB" id="Weg-JE-LuY"/>
+                <outlet property="dropDownBtnInst" destination="MRa-7N-3Hl" id="tzZ-eb-Hoa"/>
+                <outlet property="titleLabel" destination="csO-aC-Skb" id="a8k-yu-LWD"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="300" height="70"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="csO-aC-Skb">
+                    <rect key="frame" x="0.0" y="0.0" width="250" height="70"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="19"/>
+                    <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <button opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MRa-7N-3Hl">
+                    <rect key="frame" x="250" y="0.0" width="50" height="70"/>
+                    <state key="normal" image="DropDown"/>
+                </button>
+            </subviews>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="csO-aC-Skb" secondAttribute="bottom" id="5gp-n4-rN4"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="csO-aC-Skb" secondAttribute="trailing" constant="50" id="9DH-gM-wfp"/>
+                <constraint firstItem="csO-aC-Skb" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="D0Q-ZE-M6H"/>
+                <constraint firstAttribute="bottom" secondItem="MRa-7N-3Hl" secondAttribute="bottom" id="N4I-RH-q4L"/>
+                <constraint firstItem="MRa-7N-3Hl" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="NmF-tf-vOU"/>
+                <constraint firstItem="csO-aC-Skb" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="mPm-Zo-wp6"/>
+                <constraint firstItem="MRa-7N-3Hl" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="t0p-FD-s0Q"/>
+                <constraint firstItem="MRa-7N-3Hl" firstAttribute="leading" secondItem="csO-aC-Skb" secondAttribute="trailing" id="vvW-tX-sJ2"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <point key="canvasLocation" x="44.927536231884062" y="-20.089285714285712"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="DropDown" width="20" height="20"/>
+    </resources>
+</document>

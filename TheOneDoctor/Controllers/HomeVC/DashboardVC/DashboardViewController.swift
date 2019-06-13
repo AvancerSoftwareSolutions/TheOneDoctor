@@ -74,7 +74,7 @@ class DashboardViewController: UIViewController,UIGestureRecognizerDelegate {
         ]
 //        fetchCustomAlbumPhotos()
 //        getAlbumList()
-        fetchVideoFromLibrary()
+        
         
         // Do any additional setup after loading the view.
     }
@@ -186,16 +186,63 @@ class DashboardViewController: UIViewController,UIGestureRecognizerDelegate {
         
         let fetchResult = PHAsset.fetchAssets(with: .video, options: fetchOptions)
         fetchResult.enumerateObjects { (object, index, stop) -> Void in
-            let options = PHImageRequestOptions()
-            options.isSynchronous = true
+            let options = PHVideoRequestOptions()
             options.deliveryMode = .highQualityFormat
+            options.version = .original
+            options.isNetworkAccessAllowed = true
 
-            PHImageManager.default().requestAVAsset(forVideo: object , options: .none) { (avAsset, avAudioMix, dict) -> Void in
-                print(avAsset as Any)
+            PHImageManager.default().requestAVAsset(forVideo: object , options: options) { (avAsset, avAudioMix, dict) -> Void in
+                print("avAsset \(avAsset as Any)")
+                var fileURL = URL(string: "")
                 
                 if let urlAsset = avAsset as? AVURLAsset {
                     let localVideoUrl = urlAsset.url
                     print("localVideoUrl \(localVideoUrl)")
+                }
+                else
+                {
+                    
+                    
+                    let fileManager = FileManager.default
+                    if let tDocumentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
+                        let filePath =  tDocumentDirectory.appendingPathComponent(AppConstants.storageFolderName)
+                        if !fileManager.fileExists(atPath: filePath.path) {
+                            do {
+                                try fileManager.createDirectory(atPath: filePath.path, withIntermediateDirectories: true, attributes: nil)
+                            } catch {
+                                NSLog("Couldn't create document directory")
+                            }
+                        }
+                        else
+                        {
+                            print("Already exists")
+                        }
+                        NSLog("Document directory is \(filePath)")
+                        
+                        fileURL = filePath.appendingPathComponent("Videoon\(GenericMethods.removeSpaceFromStr(str: "\(GenericMethods.currentDateTime()).mp4"))")
+                        print(fileURL as Any )
+                        //writing
+                        
+                    }
+                    PHImageManager.default().requestExportSession(forVideo: object, options: options, exportPreset: AVAssetExportPresetHighestQuality, resultHandler: { (exportSession, dict) in
+                        print("exportSession \(String(describing: exportSession))\n dict \(String(describing: dict))")
+                        if exportSession == nil {
+                            print("COULD NOT CREATE EXPORT SESSION")
+                            return
+                        }
+                        
+                        exportSession!.outputURL = fileURL
+                        exportSession!.outputFileType = AVFileType.mp4 //file type encode goes here, you can change it for other types
+                        
+                        print("GOT EXPORT SESSION")
+                        exportSession!.exportAsynchronously() {
+                            print("EXPORT DONE")
+                        }
+                        
+                        print("progress: \(exportSession!.progress)")
+                        print("error: \(String(describing: exportSession!.error))")
+                        print("status: \(exportSession!.status.rawValue)")
+                    })
                 }
                 
                 print("dict is \(dict as Any)")
@@ -337,10 +384,12 @@ extension DashboardViewController:UICollectionViewDelegate,UICollectionViewDataS
             let queueVC = self.storyboard?.instantiateViewController(withIdentifier: "queueVC") as! QueueViewController
             self.navigationController?.pushViewController(queueVC, animated: true)
             
-        case 3:
+//        case 3:
             
-            let mediaCVC = self.storyboard?.instantiateViewController(withIdentifier: "mediaCVC") as! MediaCollectionViewController
-            self.navigationController?.pushViewController(mediaCVC, animated: true)
+//            fetchVideoFromLibrary()
+            
+//            let mediaCVC = self.storyboard?.instantiateViewController(withIdentifier: "mediaCVC") as! MediaCollectionViewController
+//            self.navigationController?.pushViewController(mediaCVC, animated: true)
             
         default:
             break
