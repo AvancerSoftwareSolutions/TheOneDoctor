@@ -14,7 +14,8 @@ class ChangeScheduleViewController: UIViewController {
 
     //MARK: IBOutlets
     @IBOutlet weak var popupView: UIView!
-    @IBOutlet weak var closeBtnInst: UIButton!
+    @IBOutlet weak var closeImgView: UIImageView!
+    
     
     @IBOutlet weak var scrollViewInstance: UIScrollView!
     @IBOutlet weak var delayedSlotsView: UIView!
@@ -35,7 +36,13 @@ class ChangeScheduleViewController: UIViewController {
         
         popupView.layer.cornerRadius = 10.0
         popupView.layer.masksToBounds = true
+        closeImgView.layer.cornerRadius = 15.0
+        closeImgView.layer.masksToBounds = true
+        closeImgView.layer.borderWidth = 0.3
+        closeImgView.layer.borderColor = #colorLiteral(red: 0.9098039216, green: 0.9098039216, blue: 0.9098039216, alpha: 1)
         
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(closeMethod))
+        self.closeImgView.addGestureRecognizer(tapGesture)
         
         GenericMethods.roundedCornerTextView(textView:reasonTextView)
         GenericMethods.setButtonAttributes(button: submitBtnInstance, with: "Submit")
@@ -53,6 +60,10 @@ class ChangeScheduleViewController: UIViewController {
     }
     override func viewDidAppear(_ animated: Bool) {
         delayedSlotsView.layer.addBorder(edge: .bottom, color: AppConstants.appdarkGrayColor, thickness: 1.0)
+    }
+    @objc func closeMethod()
+    {
+        self.dismiss(animated: true, completion: nil)
     }
     @objc func doneWithNumberPad()
     {
@@ -82,12 +93,10 @@ class ChangeScheduleViewController: UIViewController {
         scrollViewInstance.contentOffset = CGPoint(x: 0, y: scrollViewInstance.contentOffset.y)
     }
     
-    @IBAction func closeBtnClick(_ sender: Any) {
-        self.dismiss(animated: true, completion: nil)
-    }
+    
     @IBAction func delayedSlotsBtnClick(_ sender: Any) {
         let optionsController = UIAlertController(title: "Select No. of slots", message: nil, preferredStyle: .actionSheet)
-        optionsController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        optionsController.addAction(UIAlertAction(title: "Dismiss", style: .destructive, handler: nil))
         
         optionsController.view.tintColor = AppConstants.khudColour
         

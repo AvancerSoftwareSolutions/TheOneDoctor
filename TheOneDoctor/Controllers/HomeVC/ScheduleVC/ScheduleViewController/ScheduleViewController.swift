@@ -19,6 +19,7 @@ class ScheduleViewController: UIViewController,addScheduleTableViewCellDelegate 
     @IBOutlet weak var noSlotLbl: UILabel!
     
     @IBOutlet weak var scheduleTableView: UITableView!
+    @IBOutlet weak var slotsCancelledLbl: UILabel!
     
     //MARK:- Variables
     var filterView = UIView()
@@ -44,12 +45,17 @@ class ScheduleViewController: UIViewController,addScheduleTableViewCellDelegate 
         roundLabel(lbl: bookingInProgressLbl, color: UIColor.yellow)
         roundLabel(lbl: bookingYetStartLbl, color: UIColor.green)
         roundLabel(lbl: noSlotLbl, color: UIColor.orange)
+        roundLabel(lbl: slotsCancelledLbl, color: UIColor.white)
+        
+        slotsCancelledLbl.layer.borderColor = UIColor.red.cgColor
+        slotsCancelledLbl.layer.borderWidth = 0.7
+        
         
         bookingYetStartLbl.layer.borderColor = UIColor.lightGray.cgColor
         bookingYetStartLbl.layer.borderWidth = 0.2
 
         addBtn = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addScheduleBtnClick))
-        editBtn = UIBarButtonItem(image: UIImage(named: "EditProfPic.png"), style: .plain, target: self, action: #selector(editScheduleBtnClick))
+        editBtn = UIBarButtonItem(image: UIImage(named: "edit.png"), style: .plain, target: self, action: #selector(editScheduleBtnClick))
         
         filterView = UIView(frame: CGRect(x: 28, y: 0, width: 10, height: 10))
         filterView.backgroundColor = .red
@@ -72,11 +78,19 @@ class ScheduleViewController: UIViewController,addScheduleTableViewCellDelegate 
         // Do any additional setup after loading the view.
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        loadingScheduleDetailsAPI()
-    }
+    
     override func viewWillDisappear(_ animated: Bool) {
         self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+    }
+    override func viewDidAppear(_ animated: Bool) {
+        loadingScheduleDetailsAPI()
+    }
+    override func viewDidLayoutSubviews() {
+        DispatchQueue.main.async {
+            
+            let indexPath = IndexPath(row: 0, section: 0)
+            self.scheduleTableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+        }
     }
     func roundLabel(lbl:UILabel,color:UIColor)
     {
@@ -86,10 +100,9 @@ class ScheduleViewController: UIViewController,addScheduleTableViewCellDelegate 
     }
     @objc func filterBtnClick(sender:UITapGestureRecognizer)
     {
-//        filterView.isHidden = true
         let optionsController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        optionsController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        optionsController.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: nil))
         
         optionsController.view.tintColor = AppConstants.khudColour
         
@@ -126,17 +139,17 @@ class ScheduleViewController: UIViewController,addScheduleTableViewCellDelegate 
         popPresenter?.sourceView = self.view
         popPresenter?.sourceRect = self.view.bounds
         DispatchQueue.main.async(execute: {
-            //    self.hud.hide(animated: true)
-            //[self.tableView reloadData];
+            
             UIApplication.shared.topMostViewController()?.present(optionsController, animated: true)
         })
     }
     func showStatusInScheduleView(status:Int)
     {
         AppConstants.schedulefilteredStatus = status
-        self.addScheduleCell?.calendarView.reloadData()
         self.scheduleTableView.reloadData()
-        
+        self.addScheduleCell?.calendarView.reloadData()
+        self.scheduleTableView.layoutIfNeeded()
+        self.scheduleTableView.setContentOffset(CGPoint.zero, animated: false)
     }
     @objc func addScheduleBtnClick()
     {
@@ -172,15 +185,7 @@ class ScheduleViewController: UIViewController,addScheduleTableViewCellDelegate 
         let rescheduleVC = self.storyboard?.instantiateViewController(withIdentifier: "rescheduleVC") as! RescheduleViewController
         self.navigationController?.pushViewController(rescheduleVC, animated: true)
     }
-    func searchFromArray(searchKey:String,searchString:String,array:NSMutableArray)
-    {
-        let predicate = NSPredicate(format: "\(searchKey) CONTAINS[C] %@", "\(searchString)" )
-        let orPredi: NSPredicate? = NSCompoundPredicate(orPredicateWithSubpredicates: [predicate])
-        
-        let arr = array.filtered(using: orPredi!)
-//        print ("arr = \(arr)")
-        //        imageStr = (array[0]as? [AnyHashable:Any])? ["FlagPng"] as? String ?? ""
-    }
+    
     //MARK:- Loading Schedule
     func loadingScheduleDetailsAPI()
     {
@@ -199,8 +204,6 @@ class ScheduleViewController: UIViewController,addScheduleTableViewCellDelegate 
                     AppConstants.resultDateArray = []
                     AppConstants.resultDateArray = NSMutableArray(array: self.scheduleData?.dateDict ?? [""])
                     print("first array \(AppConstants.resultDateArray[0])")
-                    
-                    self.searchFromArray(searchKey: "date", searchString: "2019-05-25", array: AppConstants.resultDateArray)
                     
                     self.scheduleTableView.reloadData()
                     self.addScheduleCell?.calendarView.reloadData()
@@ -255,7 +258,8 @@ extension ScheduleViewController:UITableViewDelegate,UITableViewDataSource
         addScheduleCell?.clinicImgView.clipsToBounds = true
         addScheduleCell?.clinicImgView.layer.masksToBounds = true
         addScheduleCell?.clinicImgView.layer.borderColor = UIColor.white.cgColor
-        
+        addScheduleCell?.clinicImgView.sd_setShowActivityIndicatorView(true)
+        addScheduleCell?.clinicImgView.sd_setIndicatorStyle(.gray)
         addScheduleCell?.clinicImgView.contentMode = .scaleAspectFit
         addScheduleCell?.clinicImgView.image = nil
         addScheduleCell?.clinicImgView.sd_setImage(with: URL(string: scheduleData?.clinicData?.clinicPicture ?? ""), placeholderImage: AppConstants.imgPlaceholder,options: SDWebImageOptions(rawValue: 0), completed: { (image, error, cacheType, imageURL) in

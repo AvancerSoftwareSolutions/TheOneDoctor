@@ -23,14 +23,13 @@ class DeletePicturesViewController: UIViewController {
     let apiManager = APIManager()
     var delegate:sendDeletePicDelegate?
     
+    
     @IBOutlet weak var collectionView: UICollectionView!
-    @IBOutlet weak var submitBtnInstance: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        submitBtnInstance.layer.cornerRadius = 5.0
-        submitBtnInstance.layer.masksToBounds = true
+        
         self.title = "Additional Pictures"
         let closeBtn = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(closeBtnMethod))
         self.navigationItem.rightBarButtonItem = closeBtn
@@ -45,19 +44,59 @@ class DeletePicturesViewController: UIViewController {
     @objc func deleteImg(btn:UIButton)
     {
         print("selected delete \(self.picturesArray[btn.tag] as? String ?? " ")")
-        self.picturesArray.remove(self.picturesArray[btn.tag] as? String ?? " ")
-        self.uploadPicturesArray.remove(self.uploadPicturesArray[btn.tag] as? String ?? " ")
+
         
-        self.collectionView.reloadData()
+        print("uploading \(self.uploadPicturesArray[btn.tag] as? String ?? " ")")
         
+        GenericMethods.showYesOrNoAlertWithCompletionHandler(alertTitle: "", alertMessage: "Do you want to delete this item?") { (alertAction) in
+            
+            var parameters = Dictionary<String, Any>()
+            parameters["doctor_id"] = UserDefaults.standard.value(forKey: "user_id") ?? 0 as Int
+            parameters["file"] = self.uploadPicturesArray[btn.tag] as? String ?? " "
+            
+            GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
+            
+            self.apiManager.deletePicDetailsAPI(parameters: parameters) { (status, showError, response, error) in
+                
+                GenericMethods.hideLoaderMethod(view: self.view)
+                
+                if status == true {
+                    self.deletePicData = response
+                    if self.deletePicData?.status?.code == "0" {
+                        //MARK: Profile Success Details
+                        
+                        GenericMethods.showAlert(alertMessage: self.deletePicData?.status?.message ?? "Updated Successfully")
+                        self.picturesArray.remove(self.picturesArray[btn.tag] as? String ?? " ")
+                        self.uploadPicturesArray.remove(self.uploadPicturesArray[btn.tag] as? String ?? " ")
+                        
+                        self.collectionView.reloadData()
+                    }
+                    else
+                    {
+                        
+                        GenericMethods.showAlert(alertMessage: self.deletePicData?.status?.message ?? "Unable to fetch data. Please try again after sometime.")
+                    }
+                    
+                    
+                }
+                else {
+                    
+                    GenericMethods.showAlert(alertMessage: self.deletePicData?.status?.message ?? "Unable to fetch data. Please try again after sometime.")
+                }
+            }
+
+        }
+       
+        
+    }
+    // MARK: - Delete Picture API
+    func deletePicDetailsAPI(pictureUrl:String)
+    {
+
     }
     
     // MARK: - IBActions
-    
-    @IBAction func submitBtnClick(_ sender: Any) {
-        self.delegate?.sendDeletePicValues(picArray: self.picturesArray, uploadArray: self.uploadPicturesArray)
-        self.dismiss(animated: true, completion: nil)
-    }
+
     
     /*
     // MARK: - Navigation

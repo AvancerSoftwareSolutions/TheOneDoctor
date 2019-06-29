@@ -193,12 +193,14 @@ class AddVIPScheduleViewController: UIViewController,sendDateDelegate {
         calendarVC.delegate = self
         calendarVC.minimumDate = GenericMethods.currentDateTime()
         calendarVC.setDate = selectedDate
-        calendarVC.maximumDate = Calendar.current.date(byAdding: .day, value: AppConstants.durationPeriod, to: GenericMethods.currentDateTime())!
+        calendarVC.maximumDate = GenericMethods.dayLimitCalendar()
+        
+        
         UIApplication.shared.topMostViewController()?.present(calendarVC, animated: true)
     }
     @IBAction func slotsBtnClick(_ sender: Any) {
         let optionsController = UIAlertController(title: "Select No. of slots", message: nil, preferredStyle: .actionSheet)
-        optionsController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        optionsController.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: nil))
         
         optionsController.view.tintColor = AppConstants.khudColour
         

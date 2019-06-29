@@ -12,8 +12,8 @@ import AVFoundation
 import ACFloatingTextfield_Swift
 import Photos
 import MobileCoreServices
-import BSImagePicker
 import SDWebImage
+import Alamofire
 
 class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UIImagePickerControllerDelegate, UINavigationControllerDelegate,UIDocumentInteractionControllerDelegate,sendSpecialityListValuesDelegate,sendDeletePicDelegate,sendMediaAssetsDelegate {
     
@@ -60,6 +60,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
     var cancelSpecialityData:CancelSpecialityModel?
     var sendOTPData:SendOTPModel?
     var profileUpdateData:ProfileUpdateModel?
+    var alamoFireManager : SessionManager?
     
     var imagePicker = UIImagePickerController()
     var doctorMediaArray:NSMutableArray = []
@@ -131,7 +132,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
         subSpecialityCollectionView.register(UINib(nibName: "DoctorSpecialityCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "docSpecialityCell")
         doctorPicturesCollectionView.register(UINib(nibName: "DoctorPicturesCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "docPicturesCell")
         
-        GenericMethods.setProfileImage(imageView: profileImgView,borderColor:UIColor.white)
+        GenericMethods.setProfileImage(imageView: profileImgView,borderColor:UIColor.white, imageString: UserDefaults.standard.value(forKey: "user_image") as? String ?? "")
         GenericMethods.setLeftViewWithSVG(svgView: mobileIconView, with: "phone", color: AppConstants.appGreenColor)
         
         roundButton(button: profilePicBtnInstance)
@@ -159,11 +160,14 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWasShown), name: UIResponder.keyboardDidShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
 
-        loadingProfileDetailsAPI()
+        
         
         // Do any additional setup after loading the view.
     }
-    
+    override func viewWillAppear(_ animated: Bool)
+    {
+        loadingProfileDetailsAPI()
+    }
     func roundButton(button:UIButton)
     {
         button.layer.cornerRadius = button.frame.size.height / 2
@@ -282,7 +286,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
 
 //                    self.reloadHeaderView()
                     
-                    GenericMethods.setProfileImage(imageView: self.profileImgView,borderColor:UIColor.white)
+                    GenericMethods.setProfileImage(imageView: self.profileImgView,borderColor:UIColor.white, imageString: UserDefaults.standard.value(forKey: "user_image") as? String ?? "")
 
                     
                     guard let arr1 = self.profileData?.profileData?.additionalPictureList,let arr2 = self.profileData?.profileData?.additionalVideoList
@@ -393,7 +397,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                     {
                         if self.addSpecialityData?.specialityData?.count ?? 0 == 0
                         {
-                            GenericMethods.showAlertMethod(alertMessage: "Empty List")
+                            GenericMethods.showAlertMethod(alertMessage: "No other speciality available")
                             return
                         }
                     }
@@ -401,7 +405,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                     {
                         if self.addSpecialityData?.subSpecialityData?.count ?? 0 == 0
                         {
-                            GenericMethods.showAlertMethod(alertMessage: "Empty List")
+                            GenericMethods.showAlertMethod(alertMessage: "No other sub speciality available")
                             return
                         }
                     }
@@ -912,7 +916,10 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
         fileDataArr = []
         fileNameArr = []
         mimeTypeArr = []
-        
+        UIApplication.shared.beginIgnoringInteractionEvents()
+        let loadingProfileNotification = MBProgressHUD.showAdded(to: self.view, animated: true)
+        loadingProfileNotification.mode = MBProgressHUDMode.determinate
+        loadingProfileNotification.label.text = "Fetching"
         for i in 0..<assetsArr.count {
             print("assets index \(assetsArr[i])")
             FileUpload.getURL(of: assetsArr[i]) { (url) in
@@ -928,14 +935,20 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                         self.mimeTypeArr.append(FileUpload.mimeTypeForPath(path: mediaURL.path))
                         if self.fileDataArr.count == (assetsArr.count)
                         {
+                            GenericMethods.hideLoaderMethod(view: self.view)
                             DispatchQueue.main.async {
                                 self.addDocFilesUpload()
                             }
                             
                         }
+                        else
+                        {
+                            GenericMethods.hideLoaderMethod(view: self.view)
+                        }
                     }
                     catch
                     {
+                        GenericMethods.hideLoaderMethod(view: self.view)
                         print("Cannot convert photo data")
                     }
                 }
@@ -956,6 +969,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                             (image, info) in
                             guard let getImage = image,let dictInfo = info else
                             {
+                                GenericMethods.hideLoaderMethod(view: self.view)
                                 GenericMethods.showAlert(alertMessage: "Something went wrong. Try again.")
                                 return
                             }
@@ -964,8 +978,53 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                             print("picurl \(String(describing: dictInfo["PHImageFileURLKey"]))")
                             guard let imgUrl = dictInfo["PHImageFileURLKey"] as? URL else
                             {
+                                let fileManager = FileManager.default
+                                if let tDocumentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
+                                    let filePath =  tDocumentDirectory.appendingPathComponent(AppConstants.storageFolderName)
+                                    if !fileManager.fileExists(atPath: filePath.path) {
+                                        do {
+                                            try fileManager.createDirectory(atPath: filePath.path, withIntermediateDirectories: true, attributes: nil)
+                                        } catch {
+                                            NSLog("Couldn't create document directory")
+                                            GenericMethods.hideLoaderMethod(view: self.view)
+                                        }
+                                    }
+                                    else
+                                    {
+                                        print("Already exists")
+                                    }
+                                    NSLog("Document directory is \(filePath)")
+                                    
+                                    let fileURL = filePath.appendingPathComponent("Imageon\(GenericMethods.removeSpaceFromStr(str: "\(GenericMethods.currentDateTime()).png"))")
+                                    print(fileURL)
+                                    guard let imgData = getImage.pngData()
+                                        else
+                                    {
+                                        GenericMethods.hideLoaderMethod(view: self.view)
+                                        GenericMethods.showAlert(alertMessage: "Error in retrieving image. Please try again")
+                                        
+                                        return
+                                    }
+                                    //writing
+                                    do {
+                                        try imgData.write(to: fileURL, options:[])
+                                        
+                                        print(fileURL.path)
+                                        print("mimieType \(FileUpload.mimeTypeForPath(path: fileURL.path))")
+                                        sendAssetDataToServer(mediaURL: fileURL)
+                                        
+                                        
+                                    }
+                                    catch {
+                                        print("failed to write data")
+                                        
+                                        GenericMethods.hideLoaderMethod(view: self.view)
+                                        GenericMethods.showAlert(alertMessage: "Error in retrieving image. Please try again")
+                                    }
+                                }
                                 return
                             }
+                            
                             sendAssetDataToServer(mediaURL: imgUrl)
                             
                             
@@ -983,7 +1042,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
     func updateProfPicUpload(fileData:Data,filename:String,mimeType:String,keyname:String)
     {
         //MARK:- Profile picture upload
-//        GenericMethods.showLoaderMethod(shownView: self.view, message: "Uploading")
+
         UIApplication.shared.beginIgnoringInteractionEvents()
         let loadingProfileNotification = MBProgressHUD.showAdded(to: self.view, animated: true)
         loadingProfileNotification.mode = MBProgressHUDMode.annularDeterminate
@@ -1001,7 +1060,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
             if (status as AnyObject).object(forKey: "code") as? String == "0"
             {
                 UserDefaults.standard.set(responseObject.object(forKey: "picturepath") as? String ?? "", forKey: "user_image")
-                GenericMethods.setProfileImage(imageView: self.profileImgView,borderColor:UIColor.white)
+                GenericMethods.setProfileImage(imageView: self.profileImgView,borderColor:UIColor.white, imageString: UserDefaults.standard.value(forKey: "user_image") as? String ?? "")
                 self.picture = responseObject.object(forKey: "profile") as? String ?? ""
                 
                 GenericMethods.showAlertMethod(alertMessage: "\((status as AnyObject).object(forKey: "message") as? String ?? "Success")")
@@ -1033,45 +1092,111 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
         
         print("fileDataArr \(fileDataArr)\n fileNameArr \(fileNameArr)\n mimeTypeArr \(mimeTypeArr)\n")
         
-        WebAPIHelper.addDoctorPicFileUpload(shownProgress:loadingNotification,fileData: fileDataArr, filename: fileNameArr, mimeType: mimeTypeArr, methodName: "multipleupload", vc: self, success: { (response) in
-            print("response \(response as Any)")
-            GenericMethods.hideLoaderMethod(view: self.view)
-            
-            let responseObject: AnyObject = (response as AnyObject?)!
-            guard let status = responseObject.object(forKey: "status") else
+        let body:Parameters = ["doctor_id" : "\(UserDefaults.standard.value(forKey: "user_id") ?? 0 as Int)"]
+        
+        
+        let configuration = URLSessionConfiguration.default
+        configuration.timeoutIntervalForRequest = AppConstants.uploadFileTimeOutSeconds
+        configuration.timeoutIntervalForResource = AppConstants.uploadFileTimeOutSeconds
+        alamoFireManager = Alamofire.SessionManager(configuration: configuration)
+        
+        
+        alamoFireManager?.upload(multipartFormData: { (multipartFormData: MultipartFormData) in
+            for i in 0..<self.fileDataArr.count
             {
-                GenericMethods.showAlert(alertMessage: "Something Went Wrong! Please try again")
-                return
+                multipartFormData.append(self.fileDataArr[i], withName: "file[\(i)]", fileName: self.fileNameArr[i], mimeType: self.mimeTypeArr[i])
             }
-            if (status as AnyObject).object(forKey: "code") as? String == "0"
-            {
-                let picPathArray:[String] = response?.object(forKey: "picturepath") as! [String]
+            for (key, value) in body {
+                print("value is \(value)")
+                multipartFormData.append("\(value)".data(using: String.Encoding.utf8)!, withName: key)
+            }
+        }, to: "\(apiManager.fileUploadBaseURL)multipleupload", encodingCompletion: { (encodingResult) in
+            
+            
+            GenericMethods.hideLoading()
+            
+            print("encodingResult \(encodingResult)")
+            switch encodingResult {
                 
-                for i in 0..<picPathArray.count
-                {
-                    self.doctorMediaArray.add(picPathArray[i])
+            case .success(let upload, _, _):
+                print(upload.response as Any)
+                print("response Data is \(upload.responseData as Any)")
+                upload.uploadProgress { progress in
+                    
+                    
+                    loadingNotification.progress = Float(progress.fractionCompleted)
                 }
-                
-                let uploadingDataArray:[String] = response?.object(forKey: "data") as! [String]
-                
-                for i in 0..<uploadingDataArray.count
-                {
-                    self.uploadingMediaArray.add(uploadingDataArray[i])
+                upload.responseJSON { response in
+                    
+                                            print("response is \(response.response as Any)")
+                    //                        print(response.request as Any)
+                                            print(response.result)
+                    
+                    switch response.result {
+                        
+                    case .success(let json):
+                        print("json \(json)")
+                        GenericMethods.hideLoaderMethod(view: self.view)
+                        
+                            
+                            let responseObject: AnyObject = (json as AnyObject?)!
+                            guard let status = responseObject.object(forKey: "status") else
+                            {
+                                GenericMethods.showAlert(alertMessage: "Something Went Wrong! Please try again")
+                                return
+                            }
+                            if (status as AnyObject).object(forKey: "code") as? String == "0"
+                            {
+                                
+                                GenericMethods.showAlertMethod(alertMessage: (status as AnyObject).object(forKey: "message") as? String ?? "Uploaded sucessfully")
+                                 self.loadingProfileDetailsAPI()
+                            }
+                            else
+                            {
+                                GenericMethods.showAlert(alertMessage: "Something Went Wrong! Please try again")
+                            }
+                        
+                        
+                    case .failure(let error):
+                        GenericMethods.hideLoaderMethod(view: self.view)
+                        
+                        print("failure error is \(error)")
+                        
+                        GenericMethods.showAlertWithTitle(alertTitle: AppConstants.AppName, alertMessage: "\(error.localizedDescription)")
+                    }
                 }
-                FileUpload.removeFileDataToLocal()
-                self.doctorPicturesCollectionView.reloadData()
-                GenericMethods.showAlert(alertMessage: "Uploaded sucessfully")
+            case .failure(let encodingError):
+                GenericMethods.hideLoaderMethod(view: self.view)
+                print("encodingError:\(encodingError)")
             }
-            else
-            {
-                GenericMethods.showAlert(alertMessage: "Something Went Wrong! Please try again")
-            }
-            
-            
-            
-        }, Failure: { (error) in
-            print(error.localizedDescription)
         })
+        
+        
+//        WebAPIHelper.addDoctorPicFileUpload(shownProgress:loadingNotification, parameters: body,fileData: fileDataArr, filename: fileNameArr, mimeType: mimeTypeArr, methodName: "\(apiManager.fileUploadBaseURL)multipleupload", vc: self, success: { (response) in
+//            print("response \(response as Any)")
+//            GenericMethods.hideLoaderMethod(view: self.view)
+//
+//            let responseObject: AnyObject = (response as AnyObject?)!
+//            guard let status = responseObject.object(forKey: "status") else
+//            {
+//                GenericMethods.showAlert(alertMessage: "Something Went Wrong! Please try again")
+//                return
+//            }
+//            if (status as AnyObject).object(forKey: "code") as? String == "0"
+//            {
+//
+//                GenericMethods.showAlert(alertMessage: (status as AnyObject).object(forKey: "message") as? String ?? "Uploaded sucessfully")
+//            }
+//            else
+//            {
+//                GenericMethods.showAlert(alertMessage: "Something Went Wrong! Please try again")
+//            }
+//
+//
+//
+//        }, Failure: { (error) in
+//            print(error.localizedDescription)
+//        })
     }
     func otpSuccessMethod()
     {
@@ -1177,16 +1302,16 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
             }
             
             print("imgarr \(imgArr) \n videoArr \(videoArr)")
-            
+
             var parameters = Dictionary<String, Any>()
             parameters["user_id"] = UserDefaults.standard.value(forKey: "user_id") as? Int ?? 0
             parameters["mobile"] = mobileTF.text
             parameters["email"] = emailTF.text
             parameters["short_biography"] = biographyTextView.text
-            parameters["picture"] = self.picture
-            
-            parameters["additionalpicture"] = imgArr
-            parameters["additionalvideo"] = videoArr
+//            parameters["picture"] = self.picture
+//
+//            parameters["additionalpicture"] = imgArr
+//            parameters["additionalvideo"] = videoArr
             parameters["speciality"] = specArrString
             parameters["subspeciality"] = subspecArrString
             
@@ -1204,8 +1329,6 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                         //MARK: Update Success Details
                         
                         GenericMethods.showAlertwithPopNavigation(alertMessage: self.profileUpdateData?.status?.message ?? "", vc: self)
-                        
-                        
                         
                     }
                     else
@@ -1343,25 +1466,31 @@ extension ProfileViewController:UICollectionViewDelegate,UICollectionViewDataSou
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == doctorPicturesCollectionView
         {
-            if let cell = collectionView.cellForItem(at: indexPath) as? DoctorPicturesCollectionViewCell {
-                if cell.playImgView.isHidden == false
-                {
-                    let videoURL = URL(string: self.doctorMediaArray[indexPath.item] as? String ?? "")
-                    let player = AVPlayer(url: videoURL!)
-                    let playerViewController = AVPlayerViewController()
-                    playerViewController.player = player
-                    self.present(playerViewController, animated: true) {
-                        playerViewController.player!.play()
-                    }
-                }
-                else
-                {
-                    let openFileVC = self.storyboard!.instantiateViewController(withIdentifier: "openFileVC") as? OpenFileViewController
-                    openFileVC?.titleStr = ""
-                    openFileVC?.openURLStr = self.doctorMediaArray[indexPath.item] as? String ?? ""
-                    self.navigationController?.pushViewController(openFileVC!, animated: true)
-                }
-            }
+            let previewMediaVC = self.storyboard?.instantiateViewController(withIdentifier: "previewMediaVC") as! PreviewMediaViewController
+            previewMediaVC.mediaArray = self.doctorMediaArray
+            previewMediaVC.isDeleteEnabled = true
+            self.navigationController?.present(previewMediaVC, animated: true, completion: nil)
+//            if let cell = collectionView.cellForItem(at: indexPath) as? DoctorPicturesCollectionViewCell {
+            
+                
+//                if cell.playImgView.isHidden == false
+//                {
+//                    let videoURL = URL(string: self.doctorMediaArray[indexPath.item] as? String ?? "")
+//                    let player = AVPlayer(url: videoURL!)
+//                    let playerViewController = AVPlayerViewController()
+//                    playerViewController.player = player
+//                    self.present(playerViewController, animated: true) {
+//                        playerViewController.player!.play()
+//                    }
+//                }
+//                else
+//                {
+//                    let openFileVC = self.storyboard!.instantiateViewController(withIdentifier: "openFileVC") as? OpenFileViewController
+//                    openFileVC?.titleStr = ""
+//                    openFileVC?.openURLStr = self.doctorMediaArray[indexPath.item] as? String ?? ""
+//                    self.navigationController?.pushViewController(openFileVC!, animated: true)
+//                }
+//            }
             
         }
         //        let financeTVC = self.storyboard!.instantiateViewController(withIdentifier: "financeTVC") as? FinanceTableViewController

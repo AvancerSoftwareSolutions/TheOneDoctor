@@ -44,7 +44,7 @@ class AppointmentFilterViewController: UIViewController {
         
         GenericMethods.setButtonAttributes(button: submitBntInstance, with: "Submit")
         
-        let closeBtn = UIBarButtonItem(image: UIImage(named: "Close"), style: .plain, target: self, action: #selector(dismissVC))
+        let closeBtn = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(dismissVC))
         
         self.ageCollectionView.register(UINib(nibName: "AppointmentFilterCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "appointfilterCell")
         
@@ -53,7 +53,7 @@ class AppointmentFilterViewController: UIViewController {
         self.clinicListTableView.register(UINib(nibName: "SlotsTableViewCell", bundle: nil), forCellReuseIdentifier: "slotsCell")
         
         let refreshBtn = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(resetFilterMethod))
-        self.navigationItem.rightBarButtonItems = [refreshBtn,closeBtn]
+        self.navigationItem.rightBarButtonItems = [closeBtn,refreshBtn]
         
         clinicListTableView.tableFooterView = UIView()
         let hgt = ((self.appointmentsListData?.filterData?[0].clinicList?.count ?? 0) * 45) + ((self.appointmentsListData?.filterData?[0].clinicList?.count ?? 0) * 10)

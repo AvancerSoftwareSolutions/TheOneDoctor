@@ -18,11 +18,11 @@
 	<string>1.0.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
 	<key>FirebaseMessagingAutoInitEnabled</key>
 	<false/>
 	<key>FirebaseScreenReportingEnabled</key>
-	<false/>
-	<key>FirebaseAppDelegateProxyEnabled</key>
 	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
@@ -60,6 +60,10 @@
 	<array>
 		<string>armv7</string>
 	</array>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleLightContent</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<true/>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

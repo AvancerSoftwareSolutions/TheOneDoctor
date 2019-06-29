@@ -15,6 +15,7 @@ class QueueModel:Mappable
     var status:StatusDataModel?
     var appointmentData:QueueAppointmentModel?
     
+    
     required init?(map: Map) {
         
     }

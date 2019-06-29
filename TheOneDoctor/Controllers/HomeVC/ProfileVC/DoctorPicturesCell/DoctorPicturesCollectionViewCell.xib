@@ -22,17 +22,24 @@
                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="MZZ-hU-St1">
                         <rect key="frame" x="0.0" y="0.0" width="100" height="100"/>
                     </imageView>
-                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.84999999999999998" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="PlayImg" translatesAutoresizingMaskIntoConstraints="NO" id="61W-fZ-y0c">
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.84999999999999998" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="PlayImg" translatesAutoresizingMaskIntoConstraints="NO" id="61W-fZ-y0c">
                         <rect key="frame" x="0.0" y="0.0" width="100" height="100"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     </imageView>
                 </subviews>
             </view>
             <constraints>
+                <constraint firstItem="61W-fZ-y0c" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="5ge-hi-yR0"/>
                 <constraint firstItem="MZZ-hU-St1" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="DW8-Fb-WGe"/>
+                <constraint firstItem="MZZ-hU-St1" firstAttribute="centerX" secondItem="gTV-IL-0wX" secondAttribute="centerX" id="G0e-Kw-i7M"/>
+                <constraint firstAttribute="bottom" secondItem="61W-fZ-y0c" secondAttribute="bottom" id="USs-HH-0vi"/>
+                <constraint firstAttribute="trailing" secondItem="61W-fZ-y0c" secondAttribute="trailing" id="WFw-pJ-tzc"/>
+                <constraint firstItem="61W-fZ-y0c" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="brU-Ct-fYG"/>
                 <constraint firstAttribute="bottom" secondItem="MZZ-hU-St1" secondAttribute="bottom" id="cMQ-g1-FV0"/>
                 <constraint firstAttribute="trailing" secondItem="MZZ-hU-St1" secondAttribute="trailing" id="gHb-gA-N3B"/>
+                <constraint firstItem="61W-fZ-y0c" firstAttribute="centerY" secondItem="gTV-IL-0wX" secondAttribute="centerY" id="kAS-FY-bGm"/>
                 <constraint firstItem="MZZ-hU-St1" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="puS-J0-53O"/>
+                <constraint firstItem="61W-fZ-y0c" firstAttribute="centerX" secondItem="gTV-IL-0wX" secondAttribute="centerX" id="ttg-SF-NfD"/>
+                <constraint firstItem="MZZ-hU-St1" firstAttribute="centerY" secondItem="gTV-IL-0wX" secondAttribute="centerY" id="u5y-bX-5WH"/>
             </constraints>
             <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
             <size key="customSize" width="116" height="93"/>

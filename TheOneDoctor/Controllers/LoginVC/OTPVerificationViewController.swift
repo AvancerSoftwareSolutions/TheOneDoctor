@@ -181,6 +181,8 @@ class OTPVerificationViewController: UIViewController {
                         UserDefaults.standard.set(self.loginData?.userData?.userId, forKey: "user_id")
                         UserDefaults.standard.set(self.loginData?.userData?.userImg, forKey: "user_image")
                         UserDefaults.standard.set(self.loginData?.userData?.gender, forKey: "gender")
+                        UserDefaults.standard.set(self.loginData?.userData?.firstName, forKey: "firstName")
+                        UserDefaults.standard.set(self.loginData?.userData?.lastName, forKey: "lastName")
                         
                         let alert = UIAlertController(title: nil, message: self.loginData?.status?.message ?? "", preferredStyle: .alert)
                         UIApplication.shared.topMostViewController()?.present(alert, animated: true)

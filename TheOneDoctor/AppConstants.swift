@@ -30,7 +30,7 @@ struct AppConstants
     static let storageFolderName : String = "TheONE"
     static let imageFileName: String = "image"
     static let videoFileName: String = "video"
-    static let docImgListplaceHolderImg = UIImage(named: "LoaderImage")
+    static let docImgListplaceHolderImg = UIImage(named: "")
     static let errorLoadingImg = UIImage(named: "ErrorImage")
     static let imgPlaceholder = UIImage(named: "emptyProfile.png")
     static var resultDateDict:NSMutableDictionary = [:]
@@ -69,22 +69,27 @@ struct AppConstants
     
     //MARK:- DateFormats
     
-    static let monthDayFormat = "MMM yyyy"
+    static let monthYearTextFormat = "MMM yyyy"
     static let postDateFormat = "yyyy-MM-dd"
     static let dayMonthYearFormat = "E, MMM d"
     static let defaultDateFormat = "yyyy-MM-dd HH:mm:ss"
+    static let currentDateFormat = "yyyy-MM-dd HH:mm:ss Z"
     static let monthYearFormat = "MM-yyyy"
     static let time12HoursInMeridianFormat = "h:mm a"
     static let time12HoursFormat = "hh:mm a"
     static let timeHoursFormat = "h"
     static let timeMinFormat = "mm"
+    static let timeSecFormat = "ss"
     static let time24HoursFormat = "HH:mm"
     static let titleDateFormat = "d, MMM yyyy"
     static let dayFormat = "EEEE"
+    static let yearFormat = "yyyy"
+    static let monthFormat = "MMM"
     static let datePickerFormat = "dd-MM-yyyy HH:mm:ss Z"
     
     static let durationPeriod = 28
-    
+    static let advtDurationPeriod = 90
+    static let uploadFileTimeOutSeconds:Double = 180.0
     
     
     

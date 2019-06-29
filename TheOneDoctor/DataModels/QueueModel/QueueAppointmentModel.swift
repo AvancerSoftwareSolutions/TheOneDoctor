@@ -15,7 +15,7 @@ class QueueAppointmentModel:Mappable
     var queueData:Array<QueueDataModel>?
     var totalPatientCount:Int?
     var attendedCount:Int?
-    
+    var filter:Array<String>?
     
     required init?(map: Map) {
         
@@ -25,6 +25,7 @@ class QueueAppointmentModel:Mappable
         queueData <- map["QueueData"]
         totalPatientCount <- map["TotalPatientCount"]
         attendedCount <- map["AttentedCount"]
+        filter <- map["FilterData"]
     }
     
     init() {

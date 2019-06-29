@@ -17,6 +17,8 @@ class QueueDataModel:Mappable
     var patientId:String?
     var patientName:String?
     var appointmentId:String?
+    var type:String?
+    var referral:Int?
     
     
     required init?(map: Map) {
@@ -29,6 +31,8 @@ class QueueDataModel:Mappable
         patientId <- map["patient_id"]
         patientName <- map["patient_name"]
         appointmentId <- map["appointment_id"]
+        type <- map["Type"]
+        referral <- map["Referral"]
     }
     
     init() {

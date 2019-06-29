@@ -30,8 +30,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        
-        
+        print("first date \(GenericMethods.dayLimitCalendar())")
         
          guard let statusBarView = UIApplication.shared.value(forKeyPath: "statusBarWindow.statusBar") as? UIView else {
          return false
@@ -136,6 +135,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
         
+    }
+    func current()
+    {
+        print("xx \(GenericMethods.currentDateTime())")
+    }
+    func autoRefreshMethod()
+    {
+        if ((UIApplication.shared.topMostViewController() as? QueueViewController) != nil)
+        {
+            
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "refreshQueue"), object: nil)
+
+        }
+        else if ((UIApplication.shared.topMostViewController() as? AppointmentsViewController) != nil)
+        {
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "refreshAppointments"), object: nil)
+        }
     }
 
     // MARK: - Core Data stack
@@ -299,13 +315,13 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             jsonConversion(key1)
         }
         
-        let content = UNMutableNotificationContent()
-        content.title = "Title"
-        content.body = "Body"
-        content.sound = UNNotificationSound.default
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
-        let request = UNNotificationRequest(identifier: "TestIdentifier", content: content, trigger: trigger)
-        UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
+//        let content = UNMutableNotificationContent()
+//        content.title = "Title"
+//        content.body = "Body"
+//        content.sound = UNNotificationSound.default
+//        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+//        let request = UNNotificationRequest(identifier: "TestIdentifier", content: content, trigger: trigger)
+//        UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
     }
     
     // showing push notification
@@ -390,14 +406,22 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         if let Address = alertacceptDict?["Address"] {
             print("Address is \("\(Address)")")
         }
+        if let type = alertacceptDict?["type"] as? String {
+            print("type is \("\(type)")")
+            switch type
+            {
+            case "100":
+                autoRefreshMethod()
+            default:
+                break
+            }
+            
+        }
     }
     func application(received remoteMessage: MessagingRemoteMessage) {
         print("Received Remote Message: 3\nCheck In:\n")
         debugPrint(remoteMessage.appData)
         print("Received Remote Message: 3\nCheck Out:\n")
-        
-        
-        
     }
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         print("willPresent")

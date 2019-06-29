@@ -14,6 +14,8 @@ class LoginUserDataModel:Mappable
     var userId:Int?
     var userImg:String?
     var gender:String?
+    var firstName:String?
+    var lastName:String?
 
     required init?(map: Map) {
         
@@ -24,6 +26,8 @@ class LoginUserDataModel:Mappable
         userId <- map ["user_id"]
         userImg <- map ["profile"]
         gender <- map ["sex"]
+        firstName <- map ["firstname"]
+        lastName <- map ["lastname"]
     }
 
 }

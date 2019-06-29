@@ -8,12 +8,13 @@
 
 import UIKit
 import Alamofire
-import Photos
 
-class DashboardViewController: UIViewController,UIGestureRecognizerDelegate {
+class DashboardViewController: UIViewController,UIGestureRecognizerDelegate,sendViewNavigationMethod {
+    
+    
     
     //MARK:- IBOutlets
-    @IBOutlet weak var profilePicImgView: UIImageView!
+    
     @IBOutlet weak var notificationImgView: UIImageView!
     
     @IBOutlet weak var settingsImgView: UIImageView!
@@ -24,244 +25,86 @@ class DashboardViewController: UIViewController,UIGestureRecognizerDelegate {
     
     var dashboardCell:DashboardCollectionViewCell? = nil
     var dashBoardListData:DashboardModel?
-    var textArray:NSMutableArray = []
     let apiManager = APIManager()
-    
-
-    var fetchResults: [PHFetchResult<PHAssetCollection>] = []
-    
+    var panGesture = UIPanGestureRecognizer()
+    var refreshControl = UIRefreshControl()
+    var isRefreshEnabled = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         roundImgView(imgView: settingsImgView)
-        
-        
-        let cornerRadius = profilePicImgView.bounds.height / 2
-        
-        profileContainerView.clipsToBounds = false
-        profileContainerView.layer.cornerRadius = cornerRadius
-        profileContainerView.layer.shadowColor = UIColor.darkGray.cgColor
-        profileContainerView.layer.shadowOpacity = 1
-        profileContainerView.layer.shadowOffset = CGSize.zero
-        profileContainerView.layer.shadowRadius = 2
-        profileContainerView.layer.shadowPath = UIBezierPath(roundedRect: profileContainerView.bounds, cornerRadius: cornerRadius).cgPath
 
-        
-        let profileTapGesture = UITapGestureRecognizer(target: self, action: #selector(profilePageNavigationMethod))
+        let profileTapGesture = UITapGestureRecognizer(target: self, action: #selector(menuPageNavigationMethod))
         profileTapGesture.numberOfTapsRequired = 1
-        self.profilePicImgView.addGestureRecognizer(profileTapGesture)
-        self.profilePicImgView.isUserInteractionEnabled = true
+        self.profileContainerView.addGestureRecognizer(profileTapGesture)
+        self.profileContainerView.isUserInteractionEnabled = true
         
-        let settingsTapGesture = UITapGestureRecognizer(target: self, action: #selector(logoutMethod))
+        let settingsTapGesture = UITapGestureRecognizer(target: self, action: #selector(settingsNavigateMethod))
         settingsTapGesture.numberOfTapsRequired = 1
         self.settingsImgView.addGestureRecognizer(settingsTapGesture)
         self.settingsImgView.isUserInteractionEnabled = true
         
-        textArray = [
-            ["image":"Appoint.png",
-             "detail":"Appointments"],
-            ["image":"Schedule.png",
-             "detail":"Schedule"],
-            ["image":"Queue.png",
-             "detail":"Queue"],
-            ["image":"Revenue.png",
-             "detail":"Revenue"],
-            ["image":"Upload.png",
-             "detail":"Upload"],
-            ["image":"Watch.png",
-             "detail":"Link The ONE Watch"]
-        ]
-//        fetchCustomAlbumPhotos()
-//        getAlbumList()
+        GenericMethods.setLeftViewWithSVG(svgView: profileContainerView, with: "hamburger", color: AppConstants.appdarkGrayColor)
+        
+
+        
+        let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(menuPageNavigationMethod))
+        swipeRight.direction = UISwipeGestureRecognizer.Direction.right
+        self.view.addGestureRecognizer(swipeRight)
+        
+//        let swipeBottom = UISwipeGestureRecognizer(target: self, action: #selector(refreshFunction))
+//        swipeBottom.direction = UISwipeGestureRecognizer.Direction.down
+//        self.view.addGestureRecognizer(swipeBottom)
+        
+        collectionView.refreshControl = refreshControl
+        refreshControl.addTarget(self, action: #selector(refreshFunction), for: .valueChanged)
+        refreshControl.tintColor = UIColor.black
+        let attributes = [NSAttributedString.Key.foregroundColor: UIColor.black]
+        refreshControl.attributedTitle = NSAttributedString(string: "Refreshing", attributes: attributes)
         
         
         // Do any additional setup after loading the view.
     }
-    func getAlbumList()
+    
+    @objc func refreshFunction()
     {
-        let fetchOptions = PHFetchOptions()
-        let albumResult = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: fetchOptions)
-        
-        fetchResults = [albumResult]
-//        let album = fetchResults.first?.firstObject
-        fetchOptions.sortDescriptors = [
-            NSSortDescriptor(key: "creationDate", ascending: false)
-        ]
-        fetchOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
-        for i in 0..<fetchResults.count
-        {
-            let coll = fetchResults[0][i]
-            print("\(String(describing: coll.localizedTitle))\n")
-            
-            
-            
-            let fetchResult = PHAsset.fetchAssets(in: coll, options: fetchOptions)
-            
-            
-            print("count \(fetchResult.count)")
-            for i in 0..<fetchResult.count
+//        collectionView.refreshControl = refreshControl
+//        refreshControl.addTarget(self, action: #selector(refreshFunction), for: .valueChanged)
+//        refreshControl.tintColor = UIColor.black
+//        let attributes = [NSAttributedString.Key.foregroundColor: UIColor.black]
+//        refreshControl.attributedTitle = NSAttributedString(string: "Refreshing", attributes: attributes)
+        isRefreshEnabled = true
+        loadingdashBoardDetailsAPI()
+    }
+    
+
+    @objc func settingsNavigateMethod()
+    {
+        let settingsVC = self.storyboard?.instantiateViewController(withIdentifier: "settingsVC") as! SettingsViewController
+        self.navigationController?.pushViewController(settingsVC, animated: true)
+    }
+    @objc func leftMenuPan(recognizer:UIPanGestureRecognizer)
+    {
+        if recognizer.state == UIGestureRecognizer.State.ended {
+            if panGesture.isLeft(theViewYouArePassing: self.view)
             {
-                FileUpload.getURL(of: fetchResult[i]) { (url) in
-                    print("image url \(String(describing: url))")
-                }
-            }
-            
-            
-        }
-//        for res in fetchResults
-//        {
-//            print("\(res.localizedTitle)\n")
-//        }
-//        print("asset \(String(describing: album?.localizedTitle))")
-        
-        
-        
-        
-        
-//        let photosManager = PHCachingImageManager.default()
-//        let ass = PHAsset.fetchAssets(in: <#T##PHAssetCollection#>, options: <#T##PHFetchOptions?#>)
-//        photosManager.
-//        photosManager.requestImage(for: asset, targetSize: imageSize, contentMode: imageContentMode, options: nil) { (result, _) in
-//            cell.imageView.image = result
-//        }
-    }
-    func fetchCustomAlbumPhotos()
-    {
-        let albumName = "All Photos"
-        var assetCollection = PHAssetCollection()
-        var albumFound = Bool()
-        var photoAssets = PHFetchResult<AnyObject>()
-        let fetchOptions = PHFetchOptions()
-        
-        fetchOptions.predicate = NSPredicate(format: "title = %@", albumName)
-        let collection:PHFetchResult = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: fetchOptions)
-        
-        if let firstObject = collection.firstObject{
-            //found the album
-            assetCollection = firstObject
-            albumFound = true
-        }
-        else { albumFound = false }
-        _ = collection.count
-        photoAssets = PHAsset.fetchAssets(in: assetCollection, options: nil) as! PHFetchResult<AnyObject>
-        let imageManager = PHCachingImageManager()
-        photoAssets.enumerateObjects{(object: AnyObject!,
-            count: Int,
-            stop: UnsafeMutablePointer<ObjCBool>) in
-            
-            if object is PHAsset{
-                let asset = object as! PHAsset
-                print("Inside  If object is PHAsset, This is number 1")
-                
-                let imageSize = CGSize(width: asset.pixelWidth,
-                                       height: asset.pixelHeight)
-                
-                /* For faster performance, and maybe degraded image */
-                let options = PHImageRequestOptions()
-                options.deliveryMode = .fastFormat
-                options.isSynchronous = true
-                
-                imageManager.requestImage(for: asset,
-                                          targetSize: imageSize,
-                                          contentMode: .aspectFill,
-                                          options: options,
-                                          resultHandler: {
-                                            (image, info) -> Void in
-                                            print(info as Any)
-//                                            self.photo = image!
-//                                            /* The image is now available to us */
-//                                            self.addImgToArray(uploadImage: self.photo!)
-                                            print("enum for image, This is number 2")
-                                            
-                })
-                
+                menuBtnClick()
             }
         }
     }
-    
-    func fetchVideoFromLibrary() {
-        let fetchOptions: PHFetchOptions = PHFetchOptions()
-        fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-        
-        let fetchResult = PHAsset.fetchAssets(with: .video, options: fetchOptions)
-        fetchResult.enumerateObjects { (object, index, stop) -> Void in
-            let options = PHVideoRequestOptions()
-            options.deliveryMode = .highQualityFormat
-            options.version = .original
-            options.isNetworkAccessAllowed = true
-
-            PHImageManager.default().requestAVAsset(forVideo: object , options: options) { (avAsset, avAudioMix, dict) -> Void in
-                print("avAsset \(avAsset as Any)")
-                var fileURL = URL(string: "")
-                
-                if let urlAsset = avAsset as? AVURLAsset {
-                    let localVideoUrl = urlAsset.url
-                    print("localVideoUrl \(localVideoUrl)")
-                }
-                else
-                {
-                    
-                    
-                    let fileManager = FileManager.default
-                    if let tDocumentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
-                        let filePath =  tDocumentDirectory.appendingPathComponent(AppConstants.storageFolderName)
-                        if !fileManager.fileExists(atPath: filePath.path) {
-                            do {
-                                try fileManager.createDirectory(atPath: filePath.path, withIntermediateDirectories: true, attributes: nil)
-                            } catch {
-                                NSLog("Couldn't create document directory")
-                            }
-                        }
-                        else
-                        {
-                            print("Already exists")
-                        }
-                        NSLog("Document directory is \(filePath)")
-                        
-                        fileURL = filePath.appendingPathComponent("Videoon\(GenericMethods.removeSpaceFromStr(str: "\(GenericMethods.currentDateTime()).mp4"))")
-                        print(fileURL as Any )
-                        //writing
-                        
-                    }
-                    PHImageManager.default().requestExportSession(forVideo: object, options: options, exportPreset: AVAssetExportPresetHighestQuality, resultHandler: { (exportSession, dict) in
-                        print("exportSession \(String(describing: exportSession))\n dict \(String(describing: dict))")
-                        if exportSession == nil {
-                            print("COULD NOT CREATE EXPORT SESSION")
-                            return
-                        }
-                        
-                        exportSession!.outputURL = fileURL
-                        exportSession!.outputFileType = AVFileType.mp4 //file type encode goes here, you can change it for other types
-                        
-                        print("GOT EXPORT SESSION")
-                        exportSession!.exportAsynchronously() {
-                            print("EXPORT DONE")
-                        }
-                        
-                        print("progress: \(exportSession!.progress)")
-                        print("error: \(String(describing: exportSession!.error))")
-                        print("status: \(exportSession!.status.rawValue)")
-                    })
-                }
-                
-                print("dict is \(dict as Any)")
-            }
-        }
-    }
-
-    @objc func logoutMethod()
+    @objc func menuPageNavigationMethod()
     {
-        GenericMethods.showYesOrNoAlertWithCompletionHandler(alertTitle: "Are you sure want to Logout ?", alertMessage: "") { (UIAlertAction) in
-            GenericMethods.resetDefaults()
-            GenericMethods.navigateToLogin()
-        }
+        menuBtnClick()
     }
-    @objc func profilePageNavigationMethod()
+    func menuBtnClick()
     {
-    
-        let profileVC = self.storyboard?.instantiateViewController(withIdentifier: "profileVC") as! ProfileViewController
-        self.navigationController?.pushViewController(profileVC, animated: true)
+        let leftMenuVC = self.storyboard?.instantiateViewController(withIdentifier: "leftMenuVC") as! LeftMenuViewController
+        leftMenuVC.delegate = self
+        self.navigationController!.definesPresentationContext = true
+        leftMenuVC.modalTransitionStyle = .crossDissolve
+        leftMenuVC.modalPresentationStyle = .overCurrentContext
+        self.navigationController?.present(leftMenuVC, animated: true, completion: nil)
     }
     func roundImgView(imgView:UIImageView)
     {
@@ -272,22 +115,27 @@ class DashboardViewController: UIViewController,UIGestureRecognizerDelegate {
     }
     override func viewWillAppear(_ animated: Bool) {
         
-        GenericMethods.setProfileImage(imageView: profilePicImgView,borderColor:UIColor.lightGray)
+        
         navigationController?.navigationBar.isHidden = true
-        loadingdashBoardDetailsAPI()
+        
     }
     override func viewWillDisappear(_ animated: Bool) {
         navigationController?.navigationBar.isHidden = false
         self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
     }
+    override func viewDidAppear(_ animated: Bool) {
+        loadingdashBoardDetailsAPI()
+    }
     
     // MARK: - Dashboard API
-    func loadingdashBoardDetailsAPI()
+    @objc func loadingdashBoardDetailsAPI()
     {
         var parameters = Dictionary<String, Any>()
         parameters["user_id"] = UserDefaults.standard.value(forKey: "user_id") ?? 0 as Int
-        
-        GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
+        if !self.isRefreshEnabled
+        {
+           GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
+        }
         
         apiManager.dashboardListDetailsAPI(parameters: parameters) { (status, showError, response, error) in
             
@@ -297,13 +145,41 @@ class DashboardViewController: UIViewController,UIGestureRecognizerDelegate {
                 self.dashBoardListData = response
                 if self.dashBoardListData?.status?.code == "0" {
                     //MARK: Dashboard Success Details
+                    if self.isRefreshEnabled
+                    {
+                        DispatchQueue.main.async(execute: {
+                            
+                            // when done, update the model and the UI here
+                            
+                            self.refreshControl.attributedTitle = NSAttributedString(string: "Pull to Refresh") // reset the message
+                            self.refreshControl.endRefreshing()
+                            self.isRefreshEnabled = false
+                            self.collectionView.reloadData()
+                        })
+                    }
+                    else
+                    {
+                        self.collectionView.reloadData()
+                    }
                     
-                    self.collectionView.reloadData()
                     
                 }
                 else
                 {
+                    
                     GenericMethods.showAlertwithPopNavigation(alertMessage: self.dashBoardListData?.status?.message ?? "Unable to fetch data. Please try again after sometime.", vc: self)
+                    if self.isRefreshEnabled
+                    {
+                        DispatchQueue.main.async(execute: {
+                            
+                            // when done, update the model and the UI here
+                            
+                            self.refreshControl.attributedTitle = NSAttributedString(string: "Pull to Refresh") // reset the message
+                            self.refreshControl.endRefreshing()
+                            self.isRefreshEnabled = false
+                            
+                        })
+                    }
                     //                    GenericMethods.showAlert(alertMessage: self.profileData?.status?.message ?? "Unable to fetch data. Please try again after sometime.")
                 }
                 
@@ -311,11 +187,28 @@ class DashboardViewController: UIViewController,UIGestureRecognizerDelegate {
             }
             else {
                 GenericMethods.showAlertwithPopNavigation(alertMessage: error?.localizedDescription ?? "Something Went Wrong. Please try again.", vc: self)
-                
+                if self.isRefreshEnabled
+                {
+                    DispatchQueue.main.async(execute: {
+                        
+                        // when done, update the model and the UI here
+                        
+                        self.refreshControl.attributedTitle = NSAttributedString(string: "Pull to Refresh") // reset the message
+                        self.refreshControl.isHidden = true
+                        self.refreshControl.endRefreshing()
+                        
+                        self.isRefreshEnabled = false
+                        
+                    })
+                }
                 
                 
             }
         }
+    }
+    
+    func sendViewsToNavigate(vc: UIViewController) {
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     /*
@@ -354,10 +247,6 @@ extension DashboardViewController:UICollectionViewDelegate,UICollectionViewDataS
         
         GenericMethods.createThumbnailOfVideoFromRemoteUrl(url: dashBoardListData?.dashboardData?[indexPath.item].icon ?? "",imgView: dashboardCell!.imgView,playImgView: UIImageView())
         
-        
-//        dashboardCell?.descriptionLbl.text = (textArray[indexPath.row] as? [AnyHashable:Any])? ["detail"] as? String
-//        dashboardCell?.imgView.image = UIImage(named: (textArray[indexPath.row] as? [AnyHashable:Any])? ["image"] as? String ?? "")
-        
         return dashboardCell!
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -384,12 +273,12 @@ extension DashboardViewController:UICollectionViewDelegate,UICollectionViewDataS
             let queueVC = self.storyboard?.instantiateViewController(withIdentifier: "queueVC") as! QueueViewController
             self.navigationController?.pushViewController(queueVC, animated: true)
             
-//        case 3:
+        case 3:
             
-//            fetchVideoFromLibrary()
             
-//            let mediaCVC = self.storyboard?.instantiateViewController(withIdentifier: "mediaCVC") as! MediaCollectionViewController
-//            self.navigationController?.pushViewController(mediaCVC, animated: true)
+            
+            let earningsVC = self.storyboard?.instantiateViewController(withIdentifier: "earningsVC") as! RevenuesViewController
+            self.navigationController?.pushViewController(earningsVC, animated: true)
             
         default:
             break

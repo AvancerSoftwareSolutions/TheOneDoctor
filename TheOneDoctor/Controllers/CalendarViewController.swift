@@ -31,14 +31,13 @@ class CalendarViewController: UIViewController {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         
-        monthYearFormatter = DateFormatter()
+        monthYearFormatter.dateFormat = AppConstants.monthYearTextFormat
         monthYearFormatter.timeZone = TimeZone.current
         monthYearFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-        monthYearFormatter.dateFormat = AppConstants.monthDayFormat
-        dateFormatter = DateFormatter()
-        dateFormatter.timeZone = TimeZone.current
-        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        
         dateFormatter.dateFormat = AppConstants.postDateFormat
+        monthYearFormatter.timeZone = TimeZone.current
+        monthYearFormatter.timeZone = TimeZone(secondsFromGMT: 0)
         
     }
     override func viewDidLoad() {
@@ -55,6 +54,8 @@ class CalendarViewController: UIViewController {
 //        monthYearStr = "\(monthYearFormatter.string(from: date))"
         datePicker.setDate(setDate, animated: true)
         selectedDate = datePicker.date
+        
+        
         
 //        if fromView == "register"
 //        {

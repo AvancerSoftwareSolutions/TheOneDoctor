@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="scheduleSectionCell" id="KGk-i7-Jjw" customClass="ScheduleSectionTableViewCell" customModule="TheOneDoctor" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Total No. of Attendants" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LAv-EY-Lx8">
+                        <rect key="frame" x="16" y="9.5" width="288" height="25"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="25" id="yyo-aL-fEc"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" weight="medium" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="18" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="t0h-KB-fsK">
+                        <rect key="frame" x="270.5" y="9.5" width="19.5" height="25"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="25" id="kwM-7f-UTZ"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
+                        <color key="textColor" red="0.89411764709999997" green="0.73725490199999999" blue="0.1176470588" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="trailing" secondItem="t0h-KB-fsK" secondAttribute="trailing" constant="30" id="0YR-ry-bfx"/>
+                    <constraint firstItem="t0h-KB-fsK" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="1UM-0j-0ho"/>
+                    <constraint firstAttribute="trailing" secondItem="LAv-EY-Lx8" secondAttribute="trailing" constant="16" id="CmZ-tG-qq1"/>
+                    <constraint firstItem="LAv-EY-Lx8" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="MyX-0Y-7WM"/>
+                    <constraint firstItem="LAv-EY-Lx8" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="ftT-CC-MID"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <connections>
+                <outlet property="totalAppointmentsLbl" destination="t0h-KB-fsK" id="Tf2-D2-fWj"/>
+            </connections>
+            <point key="canvasLocation" x="131.8840579710145" y="126.5625"/>
+        </tableViewCell>
+    </objects>
+</document>

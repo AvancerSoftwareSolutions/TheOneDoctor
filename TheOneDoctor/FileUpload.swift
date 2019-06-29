@@ -11,7 +11,6 @@ import Foundation
 import Photos
 import Alamofire
 import MobileCoreServices
-import BSImagePicker
 import AVKit
 
 class FileUpload: NSObject {
@@ -20,7 +19,7 @@ class FileUpload: NSObject {
     class func exportOptionMethod(sender:UIBarButtonItem,vc:UIViewController,excelCompletionHandler:@escaping () -> Void,pdfCompletionHandler:@escaping () -> Void)
     {
         let optionsController = UIAlertController(title: "Export as", message: nil, preferredStyle: .actionSheet)
-        optionsController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        optionsController.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: nil))
         
         optionsController.view.tintColor = AppConstants.khudColour
         
@@ -250,13 +249,13 @@ class FileUpload: NSObject {
                 if granted {
                     //NSLog(@"Granted access to %@", AVMediaTypeVideo);
                     FileUpload.openCamera(type: type, imagePicker: imagePicker, vc: vc)
+                    
                 } else {
                     //NSLog(@"Not granted access to %@", AVMediaTypeVideo);
                     FileUpload.camDenied(vc:vc)
                 }
                 return
             })
-            FileUpload.camDenied(vc:vc)
         }
         else if authStatus == .denied
         {
@@ -273,6 +272,7 @@ class FileUpload: NSObject {
     {
         if(UIImagePickerController .isSourceTypeAvailable(UIImagePickerController.SourceType.camera))
         {
+            imagePicker.mediaTypes = [kUTTypeImage as String]
             imagePicker.sourceType = UIImagePickerController.SourceType.camera
             if type == "picture"
             {
@@ -354,6 +354,7 @@ class FileUpload: NSObject {
 //        }, completion: nil)
         
         imagePicker.sourceType = UIImagePickerController.SourceType.photoLibrary
+        imagePicker.mediaTypes = [kUTTypeImage as String]
         if type == "picture"
         {
             imagePicker.mediaTypes = [kUTTypeImage as String]
@@ -363,7 +364,7 @@ class FileUpload: NSObject {
             imagePicker.mediaTypes = [kUTTypeImage as String,kUTTypeMovie as String,kUTTypeVideo as String]
         }
         
-        imagePicker.mediaTypes = UIImagePickerController.availableMediaTypes(for: .photoLibrary)!
+        
         imagePicker.allowsEditing = false
         imagePicker.videoQuality = UIImagePickerController.QualityType.typeHigh
         vc.present(imagePicker, animated: true, completion: nil)

@@ -21,8 +21,11 @@ class QueueViewController: UIViewController {
     //MARK: Variables
     var queueArray:NSMutableArray = []
     var slotsListCell:SlotsCollectionViewCell? = nil
+    var queueCell:QueueCollectionViewCell? = nil
     var queueListData:QueueModel?
     let apiManager = APIManager()
+    var filterType = ""
+    var filterView = UIView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,11 +34,29 @@ class QueueViewController: UIViewController {
         
         let refreshBtn = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(refreshClick))
         
-        self.navigationItem.rightBarButtonItem = refreshBtn
+        filterView = UIView(frame: CGRect(x: 28, y: 0, width: 10, height: 10))
+        filterView.backgroundColor = .red
+        filterView.layer.cornerRadius = 5
+        filterView.layer.masksToBounds = true
+        filterView.isHidden = true
         
-        self.queueCollectionView.register(UINib(nibName: "SlotsCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "slotsListCell")
-        self.loadingQueueDetailsAPI()
+        
+        let svgHoldingView = UIView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
+        GenericMethods.setLeftViewWithSVG(svgView: svgHoldingView, with: "filter", color: UIColor.white)
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(filterBtnClick(sender:)))
+        tapGesture.numberOfTapsRequired = 1
+        svgHoldingView.addGestureRecognizer(tapGesture)
+        svgHoldingView.addSubview(filterView)
+        svgHoldingView.bringSubviewToFront(filterView)
+        filterView.layer.zPosition = .greatestFiniteMagnitude
+        
+        self.navigationItem.rightBarButtonItems = [UIBarButtonItem.init(customView: svgHoldingView),refreshBtn]
 
+        self.loadingQueueDetailsAPI(fromLoad: 0)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(refreshClick), name: Notification.Name(rawValue: "refreshQueue"), object: nil)
+        
+        
         // Do any additional setup after loading the view.
     }
     
@@ -48,9 +69,58 @@ class QueueViewController: UIViewController {
         self.shadowView(view: self.totalPatientView)
         self.shadowView(view:self.pendingPatientView)
     }
+    @objc func filterBtnClick(sender:UITapGestureRecognizer)
+    {
+        let optionsController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+
+        optionsController.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: nil))
+
+        optionsController.view.tintColor = AppConstants.khudColour
+
+        let subView: UIView? = optionsController.view.subviews.first
+        let alertContentView: UIView? = subView?.subviews.first
+        alertContentView?.backgroundColor = UIColor.white
+        alertContentView?.layer.cornerRadius = 5
+        
+        for i in 0..<(self.queueListData?.appointmentData?.filter?.count ?? 0)
+        {
+            optionsController.addAction(UIAlertAction(title: self.queueListData?.appointmentData?.filter?[i], style: .default, handler: { (alertAction) in
+                self.filterView.isHidden = false
+                if i == 0
+                {
+                    self.filterType = ""
+                    self.filterView.isHidden = true
+                }
+                else
+                {
+                   self.filterType = self.queueListData?.appointmentData?.filter?[i] ?? ""
+                }
+                self.loadingQueueDetailsAPI(fromLoad: 1)
+
+            }))
+        }
+       
+        optionsController.addAction(UIAlertAction(title: "Reset", style: .default, handler: { (alertAction) in
+            self.filterType = ""
+            self.filterView.isHidden = true
+            self.loadingQueueDetailsAPI(fromLoad: 1)
+        }))
+
+        //        let senderView = sender
+        optionsController.modalPresentationStyle = .popover
+
+        let popPresenter: UIPopoverPresentationController? = optionsController.popoverPresentationController
+        popPresenter?.sourceView = self.view
+        popPresenter?.sourceRect = self.view.bounds
+        DispatchQueue.main.async(execute: {
+            //    self.hud.hide(animated: true)
+            //[self.tableView reloadData];
+            UIApplication.shared.topMostViewController()?.present(optionsController, animated: true)
+        })
+    }
     @objc func refreshClick()
     {
-        self.loadingQueueDetailsAPI()
+        self.loadingQueueDetailsAPI(fromLoad: 1)
     }
     func shadowView(view:UIView)
     {
@@ -64,10 +134,11 @@ class QueueViewController: UIViewController {
     }
     
     // MARK: - Queue API
-    func loadingQueueDetailsAPI()
+    func loadingQueueDetailsAPI(fromLoad:Int)
     {
         var parameters = Dictionary<String, Any>()
         parameters["doctor_id"] = UserDefaults.standard.value(forKey: "user_id") ?? 0 as Int
+        parameters["Type"] = filterType
         
         GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
         
@@ -88,14 +159,34 @@ class QueueViewController: UIViewController {
                 }
                 else
                 {
+                   if fromLoad == 0
+                   {
                     GenericMethods.showAlertwithPopNavigation(alertMessage: self.queueListData?.status?.message ?? "Unable to fetch data. Please try again after sometime.", vc: self)
+                    
+                    }
+                    else
+                   {
+                    GenericMethods.showAlert(alertMessage: self.queueListData?.status?.message ?? "Unable to fetch data. Please try again after sometime.")
+                    
+                    }
+                    
                     
                 }
                 
                 
             }
             else {
-                GenericMethods.showAlertwithPopNavigation(alertMessage: error?.localizedDescription ?? "Something Went Wrong. Please try again.", vc: self)
+                if fromLoad == 0
+                {
+                    GenericMethods.showAlertwithPopNavigation(alertMessage: error?.localizedDescription ?? "Something Went Wrong. Please try again.", vc: self)
+                    
+                }
+                else
+                {
+                    GenericMethods.showAlert(alertMessage: error?.localizedDescription ?? "Something Went Wrong. Please try again.")
+                    
+                }
+                
                 
                 
                 
@@ -119,40 +210,48 @@ extension QueueViewController:UICollectionViewDelegate,UICollectionViewDataSourc
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        slotsListCell = collectionView.dequeueReusableCell(withReuseIdentifier: "slotsListCell", for: indexPath) as? SlotsCollectionViewCell
+        queueCell = collectionView.dequeueReusableCell(withReuseIdentifier: "queueCell", for: indexPath) as? QueueCollectionViewCell
         
-        slotsListCell?.bgView.layer.cornerRadius = 0.0
-        slotsListCell?.bgView.layer.masksToBounds = true
-        slotsListCell?.slotBtnInstance.isEnabled = true
-        slotsListCell?.bgView.layer.borderColor = UIColor.white.cgColor
-        slotsListCell?.slotBtnInstance.setTitleColor(UIColor.clear, for: .normal)
-        slotsListCell?.slotBtnInstance.setTitle("", for: .normal)
-//        slotsListCell?.slotBtnInstance.setImage(UIImage(named: "green-man.png"), for: .normal)
+        let referral = queueListData?.appointmentData?.queueData?[indexPath.row].referral
+        if referral == 1
+        {
+            queueCell?.userTypeLbl.text = "Referral"
+        }
+        else
+        {
+            queueCell?.userTypeLbl.text = queueListData?.appointmentData?.queueData?[indexPath.row].type
+        }
+        
+        let sex = queueListData?.appointmentData?.queueData?[indexPath.row].sex?.lowercased()
+        print("sex \(sex ?? "empty")")
         
         if queueListData?.appointmentData?.queueData?[indexPath.row].otpStatus ?? 0 == 0
         {
             // Not yet register otp
-            if queueListData?.appointmentData?.queueData?[indexPath.row].sex == "male"
+            if sex == "male"
             {
                 //
-                slotsListCell?.slotBtnInstance.setImage(UIImage(named: "man_NOT.png"), for: .normal)
+                self.queueCell?.queueImgView.image = UIImage(named: "man_NOT.png")
+               
             }
             else
             {
-                slotsListCell?.slotBtnInstance.setImage(UIImage(named: "Wom_NOT.png"), for: .normal)
+                self.queueCell?.queueImgView.image = UIImage(named: "Wom_NOT.png")
+               
             }
         }
         else
         {
             // otp registered
-            if queueListData?.appointmentData?.queueData?[indexPath.row].sex == "male"
+            if sex == "male"
             {
-                //
-                slotsListCell?.slotBtnInstance.setImage(UIImage(named: "man_OTP.png"), for: .normal)
+                self.queueCell?.queueImgView.image = UIImage(named: "man_OTP.png")
+               
             }
             else
             {
-                slotsListCell?.slotBtnInstance.setImage(UIImage(named: "Wom_OTP.png"), for: .normal)
+                self.queueCell?.queueImgView.image = UIImage(named: "Wom_OTP.png")
+               
             }
         }
         
@@ -163,7 +262,7 @@ extension QueueViewController:UICollectionViewDelegate,UICollectionViewDataSourc
         
         
        
-        return slotsListCell!
+        return queueCell!
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         

@@ -31,7 +31,6 @@ class AddScheduleTableViewCell: UITableViewCell {
     let todayDate = Date()
     let dateformatter = DateFormatter()
     let comparisonDateFormatter = DateFormatter()
-    var isCalendarShow:Bool = false
     var delegate:addScheduleTableViewCellDelegate?
     
     var isFilterStr = ""
@@ -77,38 +76,33 @@ class AddScheduleTableViewCell: UITableViewCell {
     
     @IBAction func previousMonthBtnClick(_ sender: Any) {
         calendarView.scrollToSegment(.previous)
-        nextMonthBtnInstance.isHidden = false
-        previousMothBtnInstance.isHidden = true
+        
     }
     @IBAction func nextMonthBtnClick(_ sender: Any) {
         calendarView.scrollToSegment(.next)
-        previousMothBtnInstance.isHidden = false
-        nextMonthBtnInstance.isHidden = true
+        
     }
     func handleSelectedCell(cell:JTAppleCell?,cellState:CellState)
     {
-        guard let validcell = cell as? CalendarDateCollectionViewCell else {
-            return
-        }
         
     }
     func setupViewOfCalendar(from visibleDate:DateSegmentInfo)
     {
-        guard let date = visibleDate.monthDates.first?.date else {
+        guard let firstDate = visibleDate.monthDates.first?.date else {
             return
         }
         comparisonDateFormatter.dateFormat = AppConstants.monthYearFormat
-        dateformatter.dateFormat = AppConstants.dayMonthYearFormat
-        if comparisonDateFormatter.string(from: date) == comparisonDateFormatter.string(from: GenericMethods.currentDateTime())
+        dateformatter.dateFormat = AppConstants.monthYearTextFormat
+        if comparisonDateFormatter.string(from: firstDate) == comparisonDateFormatter.string(from: GenericMethods.currentDateTime())
         {
             currentDateLbl.text = dateformatter.string(from: GenericMethods.currentDateTime())
-//            print("current date time \(GenericMethods.currentDateTime())")
         }
         else
         {
-        currentDateLbl.text = dateformatter.string(from: date)
+        currentDateLbl.text = dateformatter.string(from: firstDate)
         calendarView.reloadData()
         }
+        GenericMethods.monthYearSelectionMethod(date: firstDate, previousBtnInstance: previousMothBtnInstance, nextBtnInstance: nextMonthBtnInstance, lastDate: GenericMethods.dayLimitCalendar(), dateFormat: AppConstants.monthYearFormat)
         
     }
     func searchFromArray(searchKey:String,searchString:String,array:NSMutableArray) -> Array<Any>
@@ -131,7 +125,14 @@ extension AddScheduleTableViewCell:JTAppleCalendarViewDelegate,JTAppleCalendarVi
         if cellState.dateBelongsTo != .thisMonth {
             return false
         }
-        return true
+        else
+        {
+            if GenericMethods.checkDateisBetween(date: date, lastDate: GenericMethods.dayLimitCalendar())
+            {
+                    return true
+            }
+            return false
+        }
     }
     func calendar(_ calendar: JTAppleCalendarView, cellForItemAt date: Date, cellState: CellState, indexPath: IndexPath) -> JTAppleCell {
         
@@ -139,65 +140,85 @@ extension AddScheduleTableViewCell:JTAppleCalendarViewDelegate,JTAppleCalendarVi
         
         cell.dateTextLabel.text = cellState.text
 
-            cell.backgroundColor = UIColor.white
-            cell.dateTextLabel.textColor = UIColor.darkText
+        cell.backgroundColor = UIColor.white
+        cell.dateTextLabel.textColor = UIColor.darkText
+        
             if cellState.dateBelongsTo != .thisMonth {
                 cell.dateTextLabel.textColor = UIColor.lightGray
+                cell.backgroundColor = UIColor.white
                 cell.achievedCountLbl.isHidden = true
             }
             else
             {
-                dateformatter.dateFormat = AppConstants.postDateFormat
-//                print("date is \(dateformatter.string(from: date))")
-                let extractedDate = dateformatter.string(from: date)
-                
-                 let resultArray = self.searchFromArray(searchKey: "date", searchString: extractedDate, array: AppConstants.resultDateArray)
-                 if resultArray.count > 0
-                 {
-                    if  let valueDict1 = (resultArray[0] as? [AnyHashable: Any])
-                   {
+                if GenericMethods.checkDateisBetween(date: date, lastDate: GenericMethods.dayLimitCalendar())
+                {
+                    dateformatter.dateFormat = AppConstants.postDateFormat
                     
-                    cell.achievedCountLbl.isHidden = false
-                    cell.achievedCountLbl.text = "\(valueDict1["achieved"] ?? 0)"
-                    var status = 0
-                    if (AppConstants.schedulefilteredStatus == 0) || (AppConstants.schedulefilteredStatus == 5)
+                    let extractedDate = dateformatter.string(from: date)
+                    
+                    let resultArray = self.searchFromArray(searchKey: "date", searchString: extractedDate, array: AppConstants.resultDateArray)
+                    if resultArray.count > 0
                     {
-                        status = valueDict1["status"]  as? Int ?? 0
+                        if  let valueDict1 = (resultArray[0] as? [AnyHashable: Any])
+                        {
+                            
+                            cell.achievedCountLbl.isHidden = false
+                            cell.achievedCountLbl.text = "\(valueDict1["achieved"] ?? 0)"
+                            var status = 0
+                            
+                            if (AppConstants.schedulefilteredStatus == 0) || (AppConstants.schedulefilteredStatus == 5)
+                            {
+                                status = valueDict1["status"]  as? Int ?? 0
+                                
+                            }
+                            else
+                            {
+                                if valueDict1["status"]  as? Int ?? 0 == AppConstants.schedulefilteredStatus
+                                {
+                                    status = AppConstants.schedulefilteredStatus
+                                }
+                                
+                            }
+                            cell.contentView.layer.borderColor = UIColor.white.cgColor
+                            cell.contentView.layer.borderWidth = 0.2
+                            
+                            switch status
+                            {
+                            case 0:
+                                cell.backgroundColor = UIColor.white
+                            case 1://fully booked
+                                
+                                cell.backgroundColor = UIColor.red.withAlphaComponent(0.7)
+                            case 2://Booking started
+                                cell.backgroundColor = UIColor.yellow.withAlphaComponent(0.7)
+                            case 3: //No Booking
+                                cell.backgroundColor = UIColor(red: 0.0, green: 128.0, blue: 0.0, alpha: 0.7)
+                            case 4://No Slot
+                                cell.backgroundColor = UIColor.orange.withAlphaComponent(0.7)
+                                
+                            case 5://Slots Cancelled
+                                cell.backgroundColor = UIColor.white
+                                cell.contentView.layer.borderColor = UIColor.red.cgColor
+                                cell.contentView.layer.borderWidth = 1.5
+                            default:
+                                cell.backgroundColor = UIColor.white
+                            }
+                            
+                        }
                         
                     }
                     else
                     {
-                        if valueDict1["status"]  as? Int ?? 0 == AppConstants.schedulefilteredStatus
-                        {
-                            status = AppConstants.schedulefilteredStatus
-                        }
-                        
+                        cell.achievedCountLbl.isHidden = true
                     }
-                    
-                    switch status
-                    {
-                    case 0:
-                        cell.backgroundColor = UIColor.white
-                    case 1://fully booked
-                        
-                        cell.backgroundColor = UIColor.red.withAlphaComponent(0.7)
-                    case 2://Booking started
-                        cell.backgroundColor = UIColor.yellow.withAlphaComponent(0.7)
-                    case 3: //No Booking
-                        cell.backgroundColor = UIColor(red: 0.0, green: 128.0, blue: 0.0, alpha: 0.7)
-                    case 4://No Slot
-                        cell.backgroundColor = UIColor.orange.withAlphaComponent(0.7)
-                    default:
-                        break
-                    }
-
-                    }
-                    
                 }
                 else
                 {
+                    cell.dateTextLabel.textColor = UIColor.lightGray
+                    cell.backgroundColor = UIColor.white
                     cell.achievedCountLbl.isHidden = true
                 }
+                
         }
 
         self.handleSelectedCell(cell: cell, cellState: cellState)
@@ -207,17 +228,9 @@ extension AddScheduleTableViewCell:JTAppleCalendarViewDelegate,JTAppleCalendarVi
     
     func configureCalendar(_ calendar: JTAppleCalendarView) -> ConfigurationParameters {
 
-        let endDate = Calendar.current.date(byAdding: .day, value: 28, to: GenericMethods.currentDateTime())
-        
-//        print("current \(GenericMethods.currentDateTime())")
-        let param = ConfigurationParameters(startDate: GenericMethods.currentDateTime(), endDate: endDate!)
-//        let param = ConfigurationParameters(startDate: GenericMethods.currentDateTime(), endDate: endDate, numberOfRows: 6, calendar: Calendar.current, generateInDates: .forFirstMonthOnly, generateOutDates: .off, firstDayOfWeek: .sunday, hasStrictBoundaries: true)
-        
-        
+        let endDate = GenericMethods.dayLimitCalendar()
+        let param = ConfigurationParameters(startDate: GenericMethods.currentDateTime(), endDate: endDate)
         return param
-        
-        
-        
     }
     
     func calendar(_ calendar: JTAppleCalendarView, willDisplay cell: JTAppleCell, forItemAt date: Date, cellState: CellState, indexPath: IndexPath) {
@@ -230,6 +243,8 @@ extension AddScheduleTableViewCell:JTAppleCalendarViewDelegate,JTAppleCalendarVi
             print("userInitial")
             
             print("current selected date \(dateformatter.string(from: date))")
+            
+            
             let selectedDateFormatter = DateFormatter()
             selectedDateFormatter.dateFormat = AppConstants.defaultDateFormat
             selectedDateFormatter.timeZone = TimeZone.current
@@ -241,31 +256,38 @@ extension AddScheduleTableViewCell:JTAppleCalendarViewDelegate,JTAppleCalendarVi
             {
                 return
             }
-            
-            let between = currentDate.isBetween(GenericMethods.currentDateTime(), and: Calendar.current.date(byAdding: .day, value: AppConstants.durationPeriod, to: GenericMethods.currentDateTime())!)
+
+            selectedDateFormatter.dateFormat =
+                AppConstants.postDateFormat
+
+            guard let startDate2 = selectedDateFormatter.date(from: selectedDateFormatter.string(from: GenericMethods.currentDateTime()))
+                else
+            {
+                return
+            }
+            print("startDate2 \(startDate2)")
+            let between = currentDate.isBetween(startDate2, and: GenericMethods.dayLimitCalendar())
             if between
             {
                 self.delegate?.selectedDateMethod(scheduleDate: currentDate)
             }
-            
-
         }
         else if cellState.selectionType == SelectionType.programatic {
             print("programmatic")
-            dateformatter.dateFormat = AppConstants.monthYearFormat
-            dateformatter.locale = Calendar.current.locale
-            dateformatter.timeZone = Calendar.current.timeZone
-            
-            if dateformatter.string(from: date) != dateformatter.string(from: GenericMethods.currentDateTime())
-            {
-                previousMothBtnInstance.isHidden = false
-                nextMonthBtnInstance.isHidden = true
-            }
-            else
-            {
-                nextMonthBtnInstance.isHidden = false
-                previousMothBtnInstance.isHidden = true
-            }
+//            dateformatter.dateFormat = AppConstants.monthYearFormat
+//            dateformatter.locale = Calendar.current.locale
+//            dateformatter.timeZone = Calendar.current.timeZone
+//
+//            if dateformatter.string(from: date) != dateformatter.string(from: GenericMethods.currentDateTime())
+//            {
+//                previousMothBtnInstance.isHidden = false
+//                nextMonthBtnInstance.isHidden = true
+//            }
+//            else
+//            {
+//                nextMonthBtnInstance.isHidden = false
+//                previousMothBtnInstance.isHidden = true
+//            }
         }
         
         

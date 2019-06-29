@@ -347,9 +347,8 @@ class WebAPIHelper: NSObject {
         }
             
     }
-    class func addDoctorPicFileUpload(shownProgress:MBProgressHUD,fileData:[Data],filename:[String],mimeType:[String],methodName:String,vc:UIViewController,success: @escaping (AnyObject?)->Void, Failure: @escaping (NSError) ->Void)
+    class func addDoctorPicFileUpload(shownProgress:MBProgressHUD,parameters:Dictionary<String,Any>,fileData:[Data],filename:[String],mimeType:[String],methodName:String,vc:UIViewController,success: @escaping (AnyObject?)->Void, Failure: @escaping (NSError) ->Void)
     {
-        let apiManager = APIManager()
         if ReachabilityManager.shared.isConnectedToNetwork() == false
             
         {
@@ -358,26 +357,18 @@ class WebAPIHelper: NSObject {
         }
         else
         {
-//            let headers: HTTPHeaders = [
-//                "Accept": "application/json"
-//            ]
-//            UserDefaults.standard.value(forKey: "user_id") ?? 0 as Int
-            let userId = UserDefaults.standard.value(forKey: "user_id") as? Int ?? 0
-            print("userId \(userId)")
-            print("secondUSerid \(UserDefaults.standard.value(forKey: "user_id") as Any)")
-//
-            let body:Parameters = ["doctor_id" : "2"]
+
             
             Alamofire.upload(multipartFormData: { (multipartFormData: MultipartFormData) in
                 for i in 0..<fileData.count
                 {
                     multipartFormData.append(fileData[i], withName: "file[\(i)]", fileName: filename[i], mimeType: mimeType[i])
                 }
-                for (key, value) in body {
+                for (key, value) in parameters {
                     print("value is \(value)")
                     multipartFormData.append("\(value)".data(using: String.Encoding.utf8)!, withName: key)
                 }
-            }, to: "\(apiManager.fileUploadBaseURL)\(methodName)", encodingCompletion: { (encodingResult) in
+            }, to: methodName, encodingCompletion: { (encodingResult) in
                 
                 
                     GenericMethods.hideLoading()
@@ -433,36 +424,50 @@ class WebAPIHelper: NSObject {
                 })
             
             
+        }
+        
+    }
+    class func prescriptionPicFileUpload(shownProgress:MBProgressHUD,parameters:Dictionary<String,Any>,fileData:[Data],filename:[String],mimeType:[String],methodName:String,vc:UIViewController,success: @escaping (AnyObject?)->Void, Failure: @escaping (NSError) ->Void)
+    {
+        if ReachabilityManager.shared.isConnectedToNetwork() == false
+            
+        {
+            GenericMethods.showAlertWithTitle(alertTitle: AppConstants.AppName, alertMessage: "The Internet connection appears to be offline.")
+            
+        }
+        else
+        {
+            //            let headers: HTTPHeaders = [
+            //                "Accept": "application/json"
+            //            ]
+            //            UserDefaults.standard.value(forKey: "user_id") ?? 0 as Int
             
             
-            /*
-            Alamofire.upload(multipartFormData: { multipartFormData in
-             
-             
-             
-             
+            Alamofire.upload(multipartFormData: { (multipartFormData: MultipartFormData) in
                 for i in 0..<fileData.count
                 {
-                  multipartFormData.append(fileData[i], withName: "file[]", fileName: filename[i], mimeType: mimeType[i])
+                    multipartFormData.append(fileData[i], withName: "prescription[\(i)]", fileName: filename[i], mimeType: mimeType[i])
                 }
-                for (key, value) in body {
-                    multipartFormData.append((value as! String).data(using: String.Encoding.utf8)!, withName: key)
+                for (key, value) in parameters {
+                    print("value is \(value)")
+                    multipartFormData.append("\(value)".data(using: String.Encoding.utf8)!, withName: key)
                 }
-             
-                
-//                multipartFormData.append(fileData, withName: "uploadfile", fileName: filename, mimeType: mimeType)
+            }, to: methodName, encodingCompletion: { (encodingResult) in
                 
                 
-            }, to: "\(apiManager.fileUploadBaseURL)\(methodName)", method: .post, headers: nil,
-               encodingCompletion: { encodingResult in
-             
                 GenericMethods.hideLoading()
+                
                 print(encodingResult)
                 switch encodingResult {
                     
                 case .success(let upload, _, _):
                     print(upload.response as Any)
                     print("response Data is \(upload.responseData as Any)")
+                    upload.uploadProgress { progress in
+                        
+                        
+                        shownProgress.progress = Float(progress.fractionCompleted)
+                    }
                     upload.responseJSON { response in
                         
                         //                        print("response is \(response.response as Any)")
@@ -473,6 +478,7 @@ class WebAPIHelper: NSObject {
                             
                         case .success(let json):
                             GenericMethods.hideLoaderMethod(view: vc.view)
+                            
                             let y: AnyObject = (json as AnyObject?)!
                             if let str:Int = y.object(forKey: "error_code") as? Int
                             {
@@ -500,7 +506,7 @@ class WebAPIHelper: NSObject {
                     print("encodingError:\(encodingError)")
                 }
             })
-            */
+            
             
         }
         

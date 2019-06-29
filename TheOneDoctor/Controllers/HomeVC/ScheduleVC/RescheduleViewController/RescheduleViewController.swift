@@ -14,6 +14,8 @@ class RescheduleViewController: UIViewController,sendDateDelegate,refreshLoading
 
     //MARK:- IBOutlets
     
+    @IBOutlet weak var vipBookedSlotsLbl: UILabel!
+    @IBOutlet weak var bookedSlotsLbl: UILabel!
     @IBOutlet weak var availableLbl: UILabel!
     @IBOutlet weak var vipLbl: UILabel!
     @IBOutlet weak var cancelledLbl: UILabel!
@@ -67,6 +69,7 @@ class RescheduleViewController: UIViewController,sendDateDelegate,refreshLoading
     let vipSlotColor:UIColor = AppConstants.vipSlotColor
     let cancelSlotColor:UIColor = .red
     let disableSlotColor:UIColor = .lightGray
+    var fromLoad = false
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -112,17 +115,26 @@ class RescheduleViewController: UIViewController,sendDateDelegate,refreshLoading
         numberToolbar.sizeToFit()
         reasonTextView.inputAccessoryView = numberToolbar
         
-        roundLbl(label: availableLbl,bgColor:normalSlotColor)
-        roundLbl(label: vipLbl,bgColor:vipSlotColor)
+        roundLbl(label: bookedSlotsLbl,bgColor:normalSlotColor)
+        roundLbl(label: vipBookedSlotsLbl,bgColor:vipSlotColor)
+        roundLbl(label: availableLbl,bgColor:UIColor.white)
+        roundLbl(label: vipLbl,bgColor:UIColor.white)
         roundLbl(label: cancelledLbl,bgColor:cancelSlotColor)
         roundLbl(label: completedLbl,bgColor:disableSlotColor)
-        
+        bookedSlotsLbl.backgroundColor = normalSlotColor
+        availableLbl.layer.borderColor = normalSlotColor.cgColor
+        availableLbl.layer.borderWidth = 1.0
+        vipLbl.layer.borderColor = vipSlotColor.cgColor
+        vipLbl.layer.borderWidth = 1.0
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWasShown), name: UIResponder.keyboardDidShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
         
         print("viewdidloaduserSelectedDate \(userSelectedDate)")
         print("day is \(dayFormatter.string(from: userSelectedDate))")
+        
+        fromLoad = true
+        
         loadingRescheduleDetailsAPI(dayStr: dayFormatter.string(from: userSelectedDate), selectedDate: userSelectedDate)
 
         // Do any additional setup after loading the view.
@@ -156,7 +168,7 @@ class RescheduleViewController: UIViewController,sendDateDelegate,refreshLoading
         calendarVC.modalPresentationStyle = .overCurrentContext
         calendarVC.delegate = self
         calendarVC.minimumDate = GenericMethods.currentDateTime()
-        calendarVC.maximumDate = Calendar.current.date(byAdding: .day, value: AppConstants.durationPeriod, to: Date())!
+        calendarVC.maximumDate = GenericMethods.dayLimitCalendar()
         calendarVC.setDate = self.userSelectedDate
         UIApplication.shared.topMostViewController()?.present(calendarVC, animated: true)
         
@@ -203,21 +215,27 @@ class RescheduleViewController: UIViewController,sendDateDelegate,refreshLoading
     {
         self.userSelectedDate = date
         
-        if postDataFormatter.string(from: self.userSelectedDate) == postDataFormatter.string(from: GenericMethods.currentDateTime())
-        {
-            self.previousMonthBtnInst.isHidden = true
-        }
-        else if postDataFormatter.string(from: self.userSelectedDate) == postDataFormatter.string(from: Calendar.current.date(byAdding: .day, value: AppConstants.durationPeriod, to: GenericMethods.currentDateTime())!)
-        {
-            self.nextMonthBtnInst.isHidden = true
-        }
-        else
-        {
-            self.previousMonthBtnInst.isHidden = false
-            self.nextMonthBtnInst.isHidden = false
-        }
+        GenericMethods.dateSelectionMethod(date: date, previousBtnInstance: previousMonthBtnInst, nextBtnInstance: nextMonthBtnInst, lastDate: GenericMethods.dayLimitCalendar(), dateFormat: AppConstants.postDateFormat)
+        
         self.monthDayLbl.text = self.dayMonthFormatter.string(from: self.userSelectedDate)
         self.rescheduleCollectionView.reloadData()
+        
+        
+        
+//        if postDataFormatter.string(from: self.userSelectedDate) == postDataFormatter.string(from: GenericMethods.currentDateTime())
+//        {
+//            self.previousMonthBtnInst.isHidden = true
+//        }
+//        else if postDataFormatter.string(from: self.userSelectedDate) == postDataFormatter.string(from: GenericMethods.dayLimitCalendar())
+//        {
+//            self.nextMonthBtnInst.isHidden = true
+//        }
+//        else
+//        {
+//            self.previousMonthBtnInst.isHidden = false
+//            self.nextMonthBtnInst.isHidden = false
+//        }
+        
     }
     
     func sendDate(selectedDateStr:String,selectedDate:Date)
@@ -246,51 +264,60 @@ class RescheduleViewController: UIViewController,sendDateDelegate,refreshLoading
                 self.reloadAllViews()
                 if self.rescheduleListData?.status?.code == "0" {
                     //MARK: Reschedule List Success Details
+                    self.fromLoad = false
                     self.setCalendarValuesMethod(date: selectedDate)
                     
                     self.unavailableTodayBtnInst.isHidden = false
                     self.editButtonInst.isHidden = false
                     self.slotsLbl.text = "Slots"
-//                    self.rescheduleCollectionView.isUserInteractionEnabled = true
-                    
-                    
-                    
                 }
                 else if self.rescheduleListData?.status?.code == "1" {
                     //user Unavailable
+                    self.fromLoad = false
                     self.setCalendarValuesMethod(date: selectedDate)
                     
                     self.collectionViewHgtConst.constant = 100
                     self.slotsUnavailableLbl.isHidden = false
-//                    self.makeAvailableHgtConst.constant = 40
                     self.makeAvailableHgtConst.constant = 0
                     self.slotsUnavailableHgtConst.constant = 60
                     self.slotsUnavailableLbl.text = "Slots Cancelled"
-//                    GenericMethods.showAlert(alertMessage: self.rescheduleListData?.status?.message ?? "You are unavailable on this day")
                     
                 }
                 else if self.rescheduleListData?.status?.code == "2" {
                     //schedule not available
+                    self.fromLoad = false
                     self.setCalendarValuesMethod(date: selectedDate)
                     self.slotsUnavailableLbl.isHidden = false
                     self.slotsUnavailableHgtConst.constant = 60
                     self.slotsUnavailableLbl.text = "Schedule not available"
-//                    GenericMethods.showAlert(alertMessage: self.rescheduleListData?.status?.message ?? "Schedule not available")
                 }
                     
                 else
                 {
-                    GenericMethods.showAlertwithPopNavigation(alertMessage: self.rescheduleListData?.status?.message ?? "Unable to fetch data. Please try again after sometime.", vc: self)
                     
+                    if self.fromLoad == true
+                    {
+                        GenericMethods.showAlertwithPopNavigation(alertMessage: self.rescheduleListData?.status?.message ?? "Unable to fetch data. Please try again after sometime.", vc: self)
+                    }
+                    else
+                    {
+                        GenericMethods.showAlert(alertMessage: self.rescheduleListData?.status?.message ?? "Unable to fetch data. Please try again after sometime.")
+                    }
                 }
                 
                 
             }
             else {
-                GenericMethods.showAlertwithPopNavigation(alertMessage: error?.localizedDescription ?? "Something Went Wrong. Please try again.", vc: self)
                 
-                
-                
+                if self.fromLoad == true
+                {
+                    GenericMethods.showAlertwithPopNavigation(alertMessage: error?.localizedDescription ?? "Something Went Wrong. Please try again.", vc: self)
+                }
+                else
+                {
+                    GenericMethods.showAlert(alertMessage: error?.localizedDescription ?? "Something Went Wrong. Please try again.")
+                }
+               
             }
         }
     }
@@ -465,22 +492,24 @@ class RescheduleViewController: UIViewController,sendDateDelegate,refreshLoading
         if cancelSlotsArray.contains(time)
         {
            print("contains")
-            slotsCell.slotBtnInstance.backgroundColor = UIColor.white
-            let mySelectedAttributedTitle = NSAttributedString(string: self.rescheduleListData?.rescheduleData?[sender.tag].from ?? "",
-                                                               attributes: [NSAttributedString.Key.foregroundColor : normalSlotColor])
-            slotsCell.slotBtnInstance.setAttributedTitle(mySelectedAttributedTitle, for: .normal)
-            
-            slotsCell.bgView.layer.borderColor = normalSlotColor.cgColor
+//            slotsCell.slotBtnInstance.backgroundColor = UIColor.white
+//            let mySelectedAttributedTitle = NSAttributedString(string: self.rescheduleListData?.rescheduleData?[sender.tag].from ?? "",
+//                                                               attributes: [NSAttributedString.Key.foregroundColor : normalSlotColor])
+//            slotsCell.slotBtnInstance.setAttributedTitle(mySelectedAttributedTitle, for: .normal)
+//
+//            slotsCell.bgView.layer.borderColor = normalSlotColor.cgColor
             self.cancelSlotsArray.remove(self.rescheduleListData?.rescheduleData?[sender.tag].time ?? "")
+            
+            slotsStatus(selectedIndexPath: selectedIndexPath, selectedCell: slotsCell)
             
             return
         }
-        slotsCell.slotBtnInstance.backgroundColor = normalSlotColor
+        slotsCell.slotBtnInstance.backgroundColor = UIColor.black
         let mySelectedAttributedTitle = NSAttributedString(string: self.rescheduleListData?.rescheduleData?[sender.tag].from ?? "",
                                                            attributes: [NSAttributedString.Key.foregroundColor : UIColor.white])
         slotsCell.slotBtnInstance.setAttributedTitle(mySelectedAttributedTitle, for: .normal)
         
-        slotsCell.bgView.layer.borderColor = normalSlotColor.cgColor
+        slotsCell.bgView.layer.borderColor = UIColor.black.cgColor
         self.cancelSlotsArray.add(self.rescheduleListData?.rescheduleData?[sender.tag].time ?? "")
     }
     
@@ -488,6 +517,74 @@ class RescheduleViewController: UIViewController,sendDateDelegate,refreshLoading
     func refreshDelegateMethod(day: String, selectedDate: Date) {
         self.reloadAllViews()
         self.loadingRescheduleDetailsAPI(dayStr: day, selectedDate: self.userSelectedDate)
+    }
+    
+    func slotsStatus(selectedIndexPath:IndexPath,selectedCell:SlotsCollectionViewCell)
+    {
+////        guard let selectedSlotsCell = rescheduleCollectionView.cellForItem(at: selectedIndexPath) as? SlotsCollectionViewCell else{
+////            return
+////        }
+//        guard let selectedSlotsCell = rescheduleCollectionView.dequeueReusableCell(withReuseIdentifier: "slotsListCell", for: selectedIndexPath) as? SlotsCollectionViewCell else{
+//            return
+//        }
+        // status 0 - enable  status 1 - disable  status 2 - appoint fill  status 3 - cancelled slot
+        func changeSlotBtnAppearance(titleColor:UIColor,borderColor:UIColor,bgColor:UIColor,enable:Bool)
+        {
+//            DispatchQueue.main.async {
+//                <#code#>
+//            }
+            
+            selectedCell.slotBtnInstance.backgroundColor = bgColor
+            let mySelectedAttributedTitle = NSAttributedString(string: self.rescheduleListData?.rescheduleData?[selectedIndexPath.row].from ?? "",
+                                                               attributes: [NSAttributedString.Key.foregroundColor : titleColor])
+            selectedCell.slotBtnInstance.setAttributedTitle(mySelectedAttributedTitle, for: .normal)
+            selectedCell.bgView.layer.borderColor = borderColor.cgColor
+            selectedCell.bgView.layer.borderWidth = 1.0
+            
+            
+            selectedCell.slotBtnInstance.isUserInteractionEnabled = enable
+            
+        }
+        
+        let status = self.rescheduleListData?.rescheduleData?[selectedIndexPath.item].status ?? 0
+        let type = self.rescheduleListData?.rescheduleData?[selectedIndexPath.item].type ?? ""
+        
+        
+        switch status
+        {
+        case 0: // Enable
+            if type == "VIP"
+            {
+                changeSlotBtnAppearance(titleColor: vipSlotColor, borderColor: vipSlotColor, bgColor: UIColor.white, enable: true)
+                
+            }
+            else
+            {
+                changeSlotBtnAppearance(titleColor: normalSlotColor, borderColor: normalSlotColor, bgColor: UIColor.white, enable: true)
+            }
+            
+            
+        case 1: // Disable Timeout
+            
+            changeSlotBtnAppearance(titleColor: disableSlotColor, borderColor: disableSlotColor, bgColor: UIColor.white, enable: false)
+            
+        case 2: // Booked slot
+            
+            if type == "VIP"
+            {
+                changeSlotBtnAppearance(titleColor: UIColor.white, borderColor: vipSlotColor, bgColor: vipSlotColor, enable: true)
+            }
+            else
+            {
+                changeSlotBtnAppearance(titleColor: UIColor.white, borderColor:normalSlotColor, bgColor: normalSlotColor, enable: true)
+            }
+        case 3: // Cancelled slot
+            
+            changeSlotBtnAppearance(titleColor: cancelSlotColor, borderColor: cancelSlotColor, bgColor: UIColor.white, enable: false)
+            
+        default:
+            break
+        }
     }
     
     //MARK:- IBActions
@@ -498,7 +595,7 @@ class RescheduleViewController: UIViewController,sendDateDelegate,refreshLoading
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         if self.rescheduleListData?.delayedSlotStatus ?? 0 == 0
         {
-            alert.addAction(UIAlertAction(title: "Reschedule", style: .default, handler: { _ in
+            alert.addAction(UIAlertAction(title: "Reschedule Slots", style: .default, handler: { _ in
                 let changeScheduleVC = self.storyboard?.instantiateViewController(withIdentifier: "changeScheduleVC") as! ChangeScheduleViewController
                 changeScheduleVC.dayStr = self.dayFormatter.string(from: self.userSelectedDate)
                 changeScheduleVC.selectedDate = self.userSelectedDate
@@ -510,7 +607,7 @@ class RescheduleViewController: UIViewController,sendDateDelegate,refreshLoading
                 UIApplication.shared.topMostViewController()?.present(changeScheduleVC, animated: true)
             }))
         }
-        alert.addAction(UIAlertAction(title: "Cancel Schedule", style: .default, handler: { _ in
+        alert.addAction(UIAlertAction(title: "Cancel Slots", style: .default, handler: { _ in
             
             self.cancelSlotsArray = []
             self.cancelView.isHidden = false
@@ -524,7 +621,7 @@ class RescheduleViewController: UIViewController,sendDateDelegate,refreshLoading
             self.unavailableTodayBtnInst.isHidden = true
         }))
         
-        alert.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction.init(title: "Dismiss", style: .destructive, handler: nil))
         
         /*If you want work actionsheet on ipad
          then you have to use popoverPresentationController to present the actionsheet,
@@ -627,67 +724,18 @@ extension RescheduleViewController:UICollectionViewDelegate,UICollectionViewData
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         slotsCell = collectionView.dequeueReusableCell(withReuseIdentifier: "slotsListCell", for: indexPath) as? SlotsCollectionViewCell
         
-        slotsCell?.bgView.layer.cornerRadius = 10.0
-        slotsCell?.bgView.layer.masksToBounds = true
-        slotsCell?.bgView.layer.borderColor = UIColor.white.cgColor
+//        slotsCell?.bgView.layer.cornerRadius = 10.0
+//        slotsCell?.bgView.layer.masksToBounds = true
+//        slotsCell?.bgView.layer.borderColor = UIColor.white.cgColor
+//        slotsCell?.bgView.layer.borderWidth = 1.0
+        
 
         slotsCell?.slotBtnInstance.titleLabel?.adjustsFontSizeToFitWidth = true
         slotsCell?.slotBtnInstance.titleLabel?.font = UIFont.systemFont(ofSize: 10.0, weight: .regular)
         slotsCell?.slotBtnInstance.setTitle(self.rescheduleListData?.rescheduleData?[indexPath.row].from ?? "", for: .normal)
         
-        // status 0 - enable  status 1 - disable  status 2 - appoint fill  status 3 - cancelled slot
-        func changeSlotBtnAppearance(titleColor:UIColor,borderColor:UIColor,bgColor:UIColor,enable:Bool)
-        {
-            
-            slotsCell?.slotBtnInstance.backgroundColor = bgColor
-            let mySelectedAttributedTitle = NSAttributedString(string: self.rescheduleListData?.rescheduleData?[indexPath.row].from ?? "",
-                                                               attributes: [NSAttributedString.Key.foregroundColor : titleColor])
-            slotsCell?.slotBtnInstance.setAttributedTitle(mySelectedAttributedTitle, for: .normal)
-
-            slotsCell?.bgView.layer.borderColor = borderColor.cgColor
-            slotsCell?.slotBtnInstance.isUserInteractionEnabled = enable
-            
-        }
+        slotsStatus(selectedIndexPath: indexPath, selectedCell: slotsCell!)
         
-        let status = self.rescheduleListData?.rescheduleData?[indexPath.item].status ?? 0
-        let type = self.rescheduleListData?.rescheduleData?[indexPath.item].type ?? ""
-       
-        
-        switch status
-        {
-        case 0: // Enable
-            if type == "VIP"
-            {
-                changeSlotBtnAppearance(titleColor: vipSlotColor, borderColor: vipSlotColor, bgColor: UIColor.white, enable: true)
-                
-            }
-            else
-            {
-                changeSlotBtnAppearance(titleColor: normalSlotColor, borderColor: normalSlotColor, bgColor: UIColor.white, enable: true)
-            }
-            
-            
-        case 1: // Disable Timeout
-            
-            changeSlotBtnAppearance(titleColor: disableSlotColor, borderColor: disableSlotColor, bgColor: UIColor.white, enable: false)
-            
-        case 2: // Booked slot
-            
-            if type == "VIP"
-            {
-                changeSlotBtnAppearance(titleColor: UIColor.white, borderColor: vipSlotColor, bgColor: vipSlotColor, enable: true)
-            }
-            else
-            {
-                changeSlotBtnAppearance(titleColor: UIColor.white, borderColor:normalSlotColor, bgColor: normalSlotColor, enable: true)
-            }
-        case 3: // Cancelled slot
-            
-            changeSlotBtnAppearance(titleColor: cancelSlotColor, borderColor: cancelSlotColor, bgColor: UIColor.white, enable: false)
-
-        default:
-            break
-        }
         slotsCell?.slotBtnInstance.tag = indexPath.item
         slotsCell?.slotBtnInstance.addTarget(self, action: #selector(addCancelSlotsBtnClick(sender:)), for: .touchUpInside)
         

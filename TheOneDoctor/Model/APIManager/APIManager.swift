@@ -19,6 +19,7 @@ class APIManager
     //Demo url
     let baseURL = "http://159.89.162.140:3113/api/Doctor/"
     let fileUploadBaseURL = "http://159.89.162.140/Mongo/HMSNew/API/Doctor/"
+    let prescriptionBaseURL = "http://159.89.162.140/Mongo/HMSNew/API/"
     
     let Authorization = "Basic YWRtaW46MTIzNA=="
     
@@ -29,9 +30,10 @@ class APIManager
     let profileSuffix = "Details"
     let updateKeyURLSuffix = ""
     let addSpecialitySuffix = "Speciality"
-    let deletePicSuffix = "fileremove"
+    let deletePicSuffix = "Removefile"
     let updateProfileSuffix = "Update"
     let scheduleSuffix = "DashboardData"
+    let scheduleHistorySuffix = "History"
     let addNormalScheduleSuffix = "Schedule"
     let updateNormalScheduleSuffix = "ScheduleUpdate"
     let appointmentsListSuffix = "Appointment"
@@ -43,6 +45,17 @@ class APIManager
     let rescheduleSuffix = "Reschedule"
     let delayScheduleSuffix = "delayslot"
     let makeAvailableSuffix = "Makeavailable"
+    let advertisementSuffix = "Advertisement"
+    let doctorListSuffix = "ReferDoctorList"
+    let referDoctorSuffix = "ReferInsert"
+    let advertisementCheckSuffix = "AlreadyAdvExists"
+    let referralHistorySuffix = "ReferralHistory"
+    let appointmentHistorySuffix = ""
+    let revenueListSuffix = "Revenue"
+    let addDealsSuffix = "DoctorBestDealsInsert"
+    let dealsHistorySuffix = "DoctorBestDealsList"
+    let advertisementHistorySuffix = "AdvertisementList"
+    let specialityListSuffix = "DoctorSpecialityList"
     
     
     func consolePrintValues(url:String,parameters:Dictionary<String, Any>)
@@ -369,12 +382,12 @@ class APIManager
     
     func deletePicDetailsAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:DeletePicModel?, _ error:Error?)-> Void)
     {
-        let deletePicAPIURL = baseURL + deletePicSuffix
+        let deletePicAPIURL = fileUploadBaseURL + deletePicSuffix
         //        let headers: HTTPHeaders = [ "Authorization": Authorization]
         consolePrintValues(url: deletePicAPIURL, parameters: parameters)
         
         Alamofire.request(deletePicAPIURL, method: .post, parameters: parameters, headers: nil)
-            .validate(contentType: ["application/json"]).responseJSON(completionHandler: { (response) in
+           .responseJSON(completionHandler: { (response) in
                 print(response as Any)
             })
             .responseObject { (response: DataResponse<DeletePicModel>) in
@@ -417,7 +430,7 @@ class APIManager
     }
     func updateProfileDetailsAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:ProfileUpdateModel?, _ error:Error?)-> Void)
     {
-        let updateProfileAPIURL = fileUploadBaseURL + updateProfileSuffix
+        let updateProfileAPIURL = baseURL + updateProfileSuffix
         //        let headers: HTTPHeaders = [ "Authorization": Authorization]
         consolePrintValues(url: updateProfileAPIURL, parameters: parameters)
         
@@ -488,6 +501,55 @@ class APIManager
                             
                             UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
                             self.scheduleDetailsAPI(parameters: parameters, completion: completion)
+                            
+                            
+                        }
+                        else {
+                            print("Failed")
+                            
+                        }
+                    }
+                }
+                else
+                {
+                    switch response.result {
+                        
+                    case .success:
+                        let responseData = response.result.value
+                        completion(true, false, responseData, nil)
+                        
+                    case .failure(let error):
+                        completion(false, true, nil, error)
+                    }
+                }
+                
+        }
+    }
+    
+    func scheduleHistoryAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:ScheduleHistoryModel?, _ error:Error?)-> Void)
+    {
+        let sscheduleHistoryAPIURL = baseURL + scheduleHistorySuffix
+        //        let headers: HTTPHeaders = [ "Authorization": Authorization]
+        consolePrintValues(url: sscheduleHistoryAPIURL, parameters: parameters)
+        
+        Alamofire.request(sscheduleHistoryAPIURL, method: .post, parameters: parameters, headers: nil)
+            .responseJSON(completionHandler: { (response) in
+                print(response as Any)
+            })
+            .responseObject { (response: DataResponse<ScheduleHistoryModel>) in
+                let i =  response.response?.statusCode
+                
+                if i==402{
+                    let apiManager = APIManager()
+                    apiManager.createAPIKey{ (status, showError, response, error) in
+                        var createApiKey: CreateAPIKeyModel?
+                        if status == true {
+                            print("Sucess")
+                            
+                            createApiKey = response
+                            
+                            UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
+                            self.scheduleHistoryAPI(parameters: parameters, completion: completion)
                             
                             
                         }
@@ -1047,5 +1109,582 @@ class APIManager
         }
     }
     
+    func appointmentsDetailsAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:AppointmentsDetailsModel?, _ error:Error?)-> Void)
+    {
+        let appointmentsDetailsAPIURL = baseURL + appointmentsListSuffix
+        //        let headers: HTTPHeaders = [ "Authorization": Authorization]
+        consolePrintValues(url: appointmentsDetailsAPIURL, parameters: parameters)
+        
+        Alamofire.request(appointmentsDetailsAPIURL, method: .post, parameters: parameters, headers: nil)
+            .validate(contentType: ["application/json"])
+            .responseJSON(completionHandler: { (response) in
+                print(response as Any)
+            })
+            .responseObject { (response: DataResponse<AppointmentsDetailsModel>) in
+                let i =  response.response?.statusCode
+                
+                if i==402{
+                    let apiManager = APIManager()
+                    apiManager.createAPIKey{ (status, showError, response, error) in
+                        var createApiKey: CreateAPIKeyModel?
+                        if status == true {
+                            print("Sucess")
+                            
+                            createApiKey = response
+                            
+                            UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
+                            self.appointmentsDetailsAPI(parameters: parameters, completion: completion)
+                            
+                            
+                        }
+                        else {
+                            print("Failed")
+                            
+                        }
+                    }
+                }
+                else
+                {
+                    switch response.result {
+                        
+                    case .success:
+                        let responseData = response.result.value
+                        completion(true, false, responseData, nil)
+                        
+                    case .failure(let error):
+                        completion(false, true, nil, error)
+                    }
+                }
+                
+        }
+    }
+    func appointmentsHistoryAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:AppointmentHistoryModel?, _ error:Error?)-> Void)
+    {
+        let appointmentsDetailsAPIURL = baseURL + appointmentHistorySuffix
+        //        let headers: HTTPHeaders = [ "Authorization": Authorization]
+        consolePrintValues(url: appointmentsDetailsAPIURL, parameters: parameters)
+        
+        Alamofire.request(appointmentsDetailsAPIURL, method: .post, parameters: parameters, headers: nil)
+            .validate(contentType: ["application/json"])
+            .responseJSON(completionHandler: { (response) in
+                print(response as Any)
+            })
+            .responseObject { (response: DataResponse<AppointmentHistoryModel>) in
+                let i =  response.response?.statusCode
+                
+                if i==402{
+                    let apiManager = APIManager()
+                    apiManager.createAPIKey{ (status, showError, response, error) in
+                        var createApiKey: CreateAPIKeyModel?
+                        if status == true {
+                            print("Sucess")
+                            
+                            createApiKey = response
+                            
+                            UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
+                            self.appointmentsHistoryAPI(parameters: parameters, completion: completion)
+                            
+                            
+                        }
+                        else {
+                            print("Failed")
+                            
+                        }
+                    }
+                }
+                else
+                {
+                    switch response.result {
+                        
+                    case .success:
+                        let responseData = response.result.value
+                        completion(true, false, responseData, nil)
+                        
+                    case .failure(let error):
+                        completion(false, true, nil, error)
+                    }
+                }
+                
+        }
+    }
+    func advertisementDetailsAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:AdvertisementModel?, _ error:Error?)-> Void)
+    {
+        let advertisementAPIURL = baseURL + advertisementSuffix
+        //        let headers: HTTPHeaders = [ "Authorization": Authorization]
+        consolePrintValues(url: advertisementAPIURL, parameters: parameters)
+        
+        Alamofire.request(advertisementAPIURL, method: .post, parameters: parameters, headers: nil)
+            .validate(contentType: ["application/json"])
+            .responseJSON(completionHandler: { (response) in
+                print(response as Any)
+            })
+            .responseObject { (response: DataResponse<AdvertisementModel>) in
+                let i =  response.response?.statusCode
+                
+                if i==402{
+                    let apiManager = APIManager()
+                    apiManager.createAPIKey{ (status, showError, response, error) in
+                        var createApiKey: CreateAPIKeyModel?
+                        if status == true {
+                            print("Sucess")
+                            
+                            createApiKey = response
+                            
+                            UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
+                            self.advertisementDetailsAPI(parameters: parameters, completion: completion)
+                            
+                            
+                        }
+                        else {
+                            print("Failed")
+                            
+                        }
+                    }
+                }
+                else
+                {
+                    switch response.result {
+                        
+                    case .success:
+                        let responseData = response.result.value
+                        completion(true, false, responseData, nil)
+                        
+                    case .failure(let error):
+                        completion(false, true, nil, error)
+                    }
+                }
+                
+        }
+    }
+    func doctorListAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:DoctorListModel?, _ error:Error?)-> Void)
+    {
+        let doctorListAPIURL = baseURL + doctorListSuffix
+        //        let headers: HTTPHeaders = [ "Authorization": Authorization]
+        consolePrintValues(url: doctorListAPIURL, parameters: parameters)
+        Alamofire.request(doctorListAPIURL, method: .post, parameters: parameters, headers: nil)
+            .validate(contentType: ["application/json"]).responseJSON(completionHandler: { (response) in
+                print(response as Any)
+            })
+            .responseObject { (response: DataResponse<DoctorListModel>) in
+                let i =  response.response?.statusCode
+                
+                if i==402{
+                    let apiManager = APIManager()
+                    apiManager.createAPIKey{ (status, showError, response, error) in
+                        var createApiKey: CreateAPIKeyModel?
+                        if status == true {
+                            print("Sucess")
+                            
+                            createApiKey = response
+                            
+                            UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
+                            self.doctorListAPI(parameters: parameters, completion: completion)
+                            
+                            
+                        }
+                        else {
+                            print("Failed")
+                            
+                        }
+                    }
+                }
+                else
+                {
+                    switch response.result {
+                        
+                    case .success:
+                        let responseData = response.result.value
+                        completion(true, false, responseData, nil)
+                        
+                    case .failure(let error):
+                        completion(false, true, nil, error)
+                    }
+                }
+                
+        }
+        
+    }
+    func referDoctorAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:SendOTPModel?, _ error:Error?)-> Void)
+    {
+        let referDoctorAPIURL = baseURL + referDoctorSuffix
+        //        let headers: HTTPHeaders = [ "Authorization": Authorization]
+        consolePrintValues(url: referDoctorAPIURL, parameters: parameters)
+        Alamofire.request(referDoctorAPIURL, method: .post, parameters: parameters, headers: nil)
+            .validate(contentType: ["application/json"]).responseJSON(completionHandler: { (response) in
+                print(response as Any)
+            })
+            .responseObject { (response: DataResponse<SendOTPModel>) in
+                let i =  response.response?.statusCode
+                
+                if i==402{
+                    let apiManager = APIManager()
+                    apiManager.createAPIKey{ (status, showError, response, error) in
+                        var createApiKey: CreateAPIKeyModel?
+                        if status == true {
+                            print("Sucess")
+                            
+                            createApiKey = response
+                            
+                            UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
+                            self.referDoctorAPI(parameters: parameters, completion: completion)
+                            
+                            
+                        }
+                        else {
+                            print("Failed")
+                            
+                        }
+                    }
+                }
+                else
+                {
+                    switch response.result {
+                        
+                    case .success:
+                        let responseData = response.result.value
+                        completion(true, false, responseData, nil)
+                        
+                    case .failure(let error):
+                        completion(false, true, nil, error)
+                    }
+                }
+                
+        }
+        
+    }
+    
+    func advertisementCheckAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:AdvertisementCheckModel?, _ error:Error?)-> Void)
+    {
+        let advertisementCheckAPIURL = baseURL + advertisementCheckSuffix
+        //        let headers: HTTPHeaders = [ "Authorization": Authorization]
+        consolePrintValues(url: advertisementCheckAPIURL, parameters: parameters)
+        Alamofire.request(advertisementCheckAPIURL, method: .post, parameters: parameters, headers: nil)
+            .validate(contentType: ["application/json"]).responseJSON(completionHandler: { (response) in
+                print(response as Any)
+            })
+            .responseObject { (response: DataResponse<AdvertisementCheckModel>) in
+                let i =  response.response?.statusCode
+                
+                if i==402{
+                    let apiManager = APIManager()
+                    apiManager.createAPIKey{ (status, showError, response, error) in
+                        var createApiKey: CreateAPIKeyModel?
+                        if status == true {
+                            print("Sucess")
+                            
+                            createApiKey = response
+                            
+                            UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
+                            self.advertisementCheckAPI(parameters: parameters, completion: completion)
+                            
+                            
+                        }
+                        else {
+                            print("Failed")
+                            
+                        }
+                    }
+                }
+                else
+                {
+                    switch response.result {
+                        
+                    case .success:
+                        let responseData = response.result.value
+                        completion(true, false, responseData, nil)
+                        
+                    case .failure(let error):
+                        completion(false, true, nil, error)
+                    }
+                }
+                
+        }
+        
+    }
+    func referralHistoryAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:ReferralHistoryModel?, _ error:Error?)-> Void)
+    {
+        let referralHistoryAPIURL = baseURL + referralHistorySuffix
+        //        let headers: HTTPHeaders = [ "Authorization": Authorization]
+        consolePrintValues(url: referralHistoryAPIURL, parameters: parameters)
+        Alamofire.request(referralHistoryAPIURL, method: .post, parameters: parameters, headers: nil)
+            .validate(contentType: ["application/json"]).responseJSON(completionHandler: { (response) in
+                print(response as Any)
+            })
+            .responseObject { (response: DataResponse<ReferralHistoryModel>) in
+                let i =  response.response?.statusCode
+                
+                if i==402{
+                    let apiManager = APIManager()
+                    apiManager.createAPIKey{ (status, showError, response, error) in
+                        var createApiKey: CreateAPIKeyModel?
+                        if status == true {
+                            print("Sucess")
+                            
+                            createApiKey = response
+                            
+                            UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
+                            self.referralHistoryAPI(parameters: parameters, completion: completion)
+                            
+                            
+                        }
+                        else {
+                            print("Failed")
+                            
+                        }
+                    }
+                }
+                else
+                {
+                    switch response.result {
+                        
+                    case .success:
+                        let responseData = response.result.value
+                        completion(true, false, responseData, nil)
+                        
+                    case .failure(let error):
+                        completion(false, true, nil, error)
+                    }
+                }
+                
+        }
+        
+    }
+    func revenueListAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:RevenueListModel?, _ error:Error?)-> Void)
+    {
+        let referralHistoryAPIURL = baseURL + revenueListSuffix
+        //        let headers: HTTPHeaders = [ "Authorization": Authorization]
+        consolePrintValues(url: referralHistoryAPIURL, parameters: parameters)
+        Alamofire.request(referralHistoryAPIURL, method: .post, parameters: parameters, headers: nil)
+            .validate(contentType: ["application/json"]).responseJSON(completionHandler: { (response) in
+                print(response as Any)
+            })
+            .responseObject { (response: DataResponse<RevenueListModel>) in
+                let i =  response.response?.statusCode
+                
+                if i==402{
+                    let apiManager = APIManager()
+                    apiManager.createAPIKey{ (status, showError, response, error) in
+                        var createApiKey: CreateAPIKeyModel?
+                        if status == true {
+                            print("Sucess")
+                            
+                            createApiKey = response
+                            
+                            UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
+                            self.revenueListAPI(parameters: parameters, completion: completion)
+                            
+                            
+                        }
+                        else {
+                            print("Failed")
+                            
+                        }
+                    }
+                }
+                else
+                {
+                    switch response.result {
+                        
+                    case .success:
+                        let responseData = response.result.value
+                        completion(true, false, responseData, nil)
+                        
+                    case .failure(let error):
+                        completion(false, true, nil, error)
+                    }
+                }
+                
+        }
+        
+    }
+    func specialityListAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:SpecialityModel?, _ error:Error?)-> Void)
+    {
+        let specialityAPIURL = baseURL + specialityListSuffix
+        //        let headers: HTTPHeaders = [ "Authorization": Authorization]
+        consolePrintValues(url: specialityAPIURL, parameters: parameters)
+        Alamofire.request(specialityAPIURL, method: .post, parameters: parameters, headers: nil)
+            .validate(contentType: ["application/json"]).responseJSON(completionHandler: { (response) in
+                print(response as Any)
+            })
+            .responseObject { (response: DataResponse<SpecialityModel>) in
+                let i =  response.response?.statusCode
+                
+                if i==402{
+                    let apiManager = APIManager()
+                    apiManager.createAPIKey{ (status, showError, response, error) in
+                        var createApiKey: CreateAPIKeyModel?
+                        if status == true {
+                            print("Sucess")
+                            
+                            createApiKey = response
+                            
+                            UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
+                            self.specialityListAPI(parameters: parameters, completion: completion)
+                            
+                        }
+                        else {
+                            print("Failed")
+                            
+                        }
+                    }
+                }
+                else
+                {
+                    switch response.result {
+                        
+                    case .success:
+                        let responseData = response.result.value
+                        completion(true, false, responseData, nil)
+                        
+                    case .failure(let error):
+                        completion(false, true, nil, error)
+                    }
+                }
+                
+        }
+        
+    }
+    func addDealsAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:DealsListModel?, _ error:Error?)-> Void)
+    {
+        let referralHistoryAPIURL = baseURL + addDealsSuffix
+        //        let headers: HTTPHeaders = [ "Authorization": Authorization]
+        consolePrintValues(url: referralHistoryAPIURL, parameters: parameters)
+        Alamofire.request(referralHistoryAPIURL, method: .post, parameters: parameters, headers: nil)
+            .validate(contentType: ["application/json"]).responseJSON(completionHandler: { (response) in
+                print(response as Any)
+            })
+            .responseObject { (response: DataResponse<DealsListModel>) in
+                let i =  response.response?.statusCode
+                
+                if i==402{
+                    let apiManager = APIManager()
+                    apiManager.createAPIKey{ (status, showError, response, error) in
+                        var createApiKey: CreateAPIKeyModel?
+                        if status == true {
+                            print("Sucess")
+                            
+                            createApiKey = response
+                            
+                            UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
+                            self.addDealsAPI(parameters: parameters, completion: completion)
+                            
+                            
+                        }
+                        else {
+                            print("Failed")
+                            
+                        }
+                    }
+                }
+                else
+                {
+                    switch response.result {
+                        
+                    case .success:
+                        let responseData = response.result.value
+                        completion(true, false, responseData, nil)
+                        
+                    case .failure(let error):
+                        completion(false, true, nil, error)
+                    }
+                }
+                
+        }
+        
+    }
+    func dealsHistoryAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:DealsHistoryModel?, _ error:Error?)-> Void)
+    {
+        let referralHistoryAPIURL = baseURL + dealsHistorySuffix
+        //        let headers: HTTPHeaders = [ "Authorization": Authorization]
+        consolePrintValues(url: referralHistoryAPIURL, parameters: parameters)
+        Alamofire.request(referralHistoryAPIURL, method: .post, parameters: parameters, headers: nil)
+            .validate(contentType: ["application/json"]).responseJSON(completionHandler: { (response) in
+                print(response as Any)
+            })
+            .responseObject { (response: DataResponse<DealsHistoryModel>) in
+                let i =  response.response?.statusCode
+                
+                if i==402{
+                    let apiManager = APIManager()
+                    apiManager.createAPIKey{ (status, showError, response, error) in
+                        var createApiKey: CreateAPIKeyModel?
+                        if status == true {
+                            print("Sucess")
+                            
+                            createApiKey = response
+                            
+                            UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
+                            self.dealsHistoryAPI(parameters: parameters, completion: completion)
+                            
+                            
+                        }
+                        else {
+                            print("Failed")
+                            
+                        }
+                    }
+                }
+                else
+                {
+                    switch response.result {
+                        
+                    case .success:
+                        let responseData = response.result.value
+                        completion(true, false, responseData, nil)
+                        
+                    case .failure(let error):
+                        completion(false, true, nil, error)
+                    }
+                }
+                
+        }
+        
+    }
+    func advertisementHistoryAPI(parameters:Dictionary<String, Any>,completion: @escaping( _ status:Bool, _ showError:Bool, _ response:AdvertisementHistoryModel?, _ error:Error?)-> Void)
+    {
+        let referralHistoryAPIURL = baseURL + advertisementHistorySuffix
+        //        let headers: HTTPHeaders = [ "Authorization": Authorization]
+        consolePrintValues(url: referralHistoryAPIURL, parameters: parameters)
+        Alamofire.request(referralHistoryAPIURL, method: .post, parameters: parameters, headers: nil)
+            .validate(contentType: ["application/json"]).responseJSON(completionHandler: { (response) in
+                print(response as Any)
+            })
+            .responseObject { (response: DataResponse<AdvertisementHistoryModel>) in
+                let i =  response.response?.statusCode
+                
+                if i==402{
+                    let apiManager = APIManager()
+                    apiManager.createAPIKey{ (status, showError, response, error) in
+                        var createApiKey: CreateAPIKeyModel?
+                        if status == true {
+                            print("Sucess")
+                            
+                            createApiKey = response
+                            
+                            UserDefaults.standard.set(createApiKey?.key, forKey: "sessionApiKey")
+                            self.advertisementHistoryAPI(parameters: parameters, completion: completion)
+                          
+                        }
+                        else {
+                            print("Failed")
+                            
+                        }
+                    }
+                }
+                else
+                {
+                    switch response.result {
+                        
+                    case .success:
+                        let responseData = response.result.value
+                        completion(true, false, responseData, nil)
+                        
+                    case .failure(let error):
+                        completion(false, true, nil, error)
+                    }
+                }
+                
+        }
+        
+    }
 }
-

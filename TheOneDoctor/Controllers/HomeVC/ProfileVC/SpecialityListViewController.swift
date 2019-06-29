@@ -19,7 +19,6 @@ class SpecialityListViewController: UIViewController {
     @IBOutlet weak var closeBtnInst: UIButton!
     @IBOutlet weak var specialityLbl: UILabel!
     
-    @IBOutlet weak var popUpHgtConst: NSLayoutConstraint!
     @IBOutlet weak var doneBtnInst: UIButton!
     //MARK:- Variables
     var specialityCell:SpecialityTableViewCell? = nil
@@ -48,7 +47,6 @@ class SpecialityListViewController: UIViewController {
             specialityLbl.text = "Select SubSpeciality"
         }
         
-//        popUpHgtConst.constant = self.view.bounds.height - 100
 
         // Do any additional setup after loading the view.
     }

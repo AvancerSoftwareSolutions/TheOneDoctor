@@ -13,6 +13,28 @@ import Alamofire
 import Photos
 import SwiftSVG
 import SDWebImage
+extension UIPanGestureRecognizer {
+    
+    func isLeft(theViewYouArePassing: UIView) -> Bool {
+        let detectionLimit: CGFloat = 50
+        let velocityView : CGPoint = velocity(in: theViewYouArePassing)
+        if velocityView.x > detectionLimit {
+            print("Gesture went right")
+            return true
+        } else if velocityView.x < -detectionLimit {
+            print("Gesture went left")
+            return false
+        }
+        return true
+    }
+}
+extension UIImageView {
+    func setImageColor(color: UIColor) {
+        let templateImage = self.image?.withRenderingMode(.alwaysTemplate)
+        self.image = templateImage
+        self.tintColor = color
+    }
+}
 extension Date {
     var localizedDescription: String {
         return description(with: .current)
@@ -140,6 +162,37 @@ class GenericMethods: NSObject {
     static var bgView : UIView = UIView()
     static var loaderView : UIView = UIView()
     static var activityIndicator = UIActivityIndicatorView()
+    
+    
+    class func ResizeImage(image: UIImage, targetSize: CGSize) -> UIImage {
+        let size = image.size
+        
+        let widthRatio  = targetSize.width  / image.size.width
+        let heightRatio = targetSize.height / image.size.height
+        
+        // Figure out what our orientation is, and use that to form the rectangle
+        var newSize: CGSize
+        if(widthRatio > heightRatio) {
+            
+            newSize = CGSize(width: size.width * heightRatio, height: size.height * heightRatio)
+        } else {
+            newSize = CGSize(width: size.width * widthRatio, height: size.height * widthRatio)
+        }
+        
+        // This is the rect that we've calculated out and this is what is actually used below
+        
+        let rect = CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height)
+        
+        // Actually do the resizing to the rect using the ImageContext stuff
+        UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
+        image.draw(in: rect)
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()!
+        
+        UIGraphicsEndImageContext()
+        
+        return newImage
+    }
+    
     //    static var isLoading : Bool = false
     class func isStringEmpty(_ str: String?) -> Bool {
         if str == nil || ((str?.isEmpty)!) || (str?.count ?? 0) == 0 || (str?.trimmingCharacters(in: CharacterSet.whitespaces).count == 0) {
@@ -392,7 +445,7 @@ class GenericMethods: NSObject {
             }
         }
     }
-    class func setProfileImage(imageView: UIImageView,borderColor:UIColor)
+    class func setProfileImage(imageView: UIImageView,borderColor:UIColor,imageString:String)
     {
         imageView.layer.cornerRadius = imageView.frame.size.height / 2
         imageView.layer.borderWidth = 0.2
@@ -402,17 +455,12 @@ class GenericMethods: NSObject {
         imageView.layer.borderColor = borderColor.cgColor
         imageView.contentMode = .scaleToFill
         imageView.image = nil
-        let gender = UserDefaults.standard.value(forKey: "gender") as? String ?? ""
-        var placeHolderImg = UIImage(named: "Menprofile.png")
-        if gender == "Male"
-        {
-            placeHolderImg = UIImage(named: "Menprofile.png")
-        }
-        else
-        {
-            placeHolderImg = UIImage(named: "Womenprofile.png")
-        }
-        imageView.sd_setImage(with: URL(string: "\((UserDefaults.standard.value(forKey: "user_image")) ?? "")"), placeholderImage: placeHolderImg,options: SDWebImageOptions(rawValue: 0), completed: { (image, error, cacheType, imageURL) in
+        let placeHolderImg = UIImage(named: "EmptyProfile.png")
+        
+        imageView.sd_setShowActivityIndicatorView(true)
+        imageView.sd_setIndicatorStyle(.gray)
+        
+        imageView.sd_setImage(with: URL(string: imageString), placeholderImage: placeHolderImg,options: SDWebImageOptions(rawValue: 0), completed: { (image, error, cacheType, imageURL) in
             
             if error == nil
             {
@@ -484,7 +532,30 @@ class GenericMethods: NSObject {
         return datestr
         
     }
-    
+    class func currentCalender()-> Calendar
+    {
+        var currentcalendar = Calendar.current
+        currentcalendar.timeZone = TimeZone.current
+        currentcalendar.locale = Locale.current
+        
+        return currentcalendar
+    }
+    class func dayLimitCalendar() -> Date
+    {
+
+        var components = DateComponents()
+        components.day = AppConstants.durationPeriod
+        let date = Calendar.current.date(byAdding: components, to:Calendar.current.startOfDay(for: Date()))!
+        return date
+    }
+    class func advtDayLimitCalendar() -> Date
+    {
+        
+        var components = DateComponents()
+        components.day = AppConstants.advtDurationPeriod
+        let date = Calendar.current.date(byAdding: components, to:Calendar.current.startOfDay(for: Date()))!
+        return date
+    }
     class func currentDateTime() -> Date
     {
         let date = NSDate()
@@ -492,22 +563,19 @@ class GenericMethods: NSObject {
         dateFormatter.dateFormat = AppConstants.defaultDateFormat
         dateFormatter.timeZone = TimeZone.current
         let datestr = dateFormatter.string(from: date as Date)
-//        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-        print("currentdatestr \(datestr)")
-        //        print("dateDate\(dateFormatter.date(from: datestr)!)")
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
         guard let currentDate = dateFormatter.date(from: datestr)
             else
         {
             return Date()
         }
-        print("currentDate \(currentDate)")
         return currentDate
     }
-    class func convertStringToDate(dateString:String)-> Date
+    class func convertStringToDate(dateString:String,dateformat:String)-> Date
     {
         print("dateString \(dateString)")
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat =  AppConstants.defaultDateFormat
+        dateFormatter.dateFormat =  dateformat
         //        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
         dateFormatter.locale = Locale.current
         
@@ -631,6 +699,10 @@ class GenericMethods: NSObject {
             dateFormatter.dateFormat = AppConstants.timeMinFormat
             let min = dateFormatter.string(from: date)
             return Int(min)!
+        case "sec":
+            dateFormatter.dateFormat = AppConstants.timeSecFormat
+            let sec = dateFormatter.string(from: date)
+            return Int(sec)!
         default:
             return 0
         }
@@ -703,6 +775,125 @@ class GenericMethods: NSObject {
         appDelegate?.window?.rootViewController = loginVC
         appDelegate?.window?.makeKeyAndVisible()
     }
+    //MARK:- Calendar Methods
+    class func checkDateisBetween(date:Date,lastDate:Date)-> Bool
+    {
+        let selectedDateFormatter = DateFormatter()
+        selectedDateFormatter.dateFormat = AppConstants.defaultDateFormat
+        selectedDateFormatter.timeZone = TimeZone.current
+        let datestr = selectedDateFormatter.string(from: date)
+        selectedDateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        
+        guard let currentDate = selectedDateFormatter.date(from: datestr)
+            else
+        {
+            return false
+        }
+        
+        selectedDateFormatter.dateFormat =
+            AppConstants.postDateFormat
+        
+        guard let startDate2 = selectedDateFormatter.date(from: selectedDateFormatter.string(from: GenericMethods.currentDateTime()))
+            else
+        {
+            return false
+        }
+        //        print("startDate2 \(startDate2)")
+        let between = currentDate.isBetween(startDate2, and: lastDate)
+        if between
+        {
+            //TODO: selectind slots
+            //            print("between")
+            return true
+            
+        }
+        else
+        {
+            return false
+        }
+    }
+    
+    
+    class func monthYearSelectionMethod(date:Date,previousBtnInstance:UIButton,nextBtnInstance:UIButton,lastDate:Date,dateFormat:String)
+    { 
+        let dayFormatter = DateFormatter()
+        dayFormatter.dateFormat = dateFormat
+        dayFormatter.timeZone = TimeZone.current
+        dayFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        guard let firstDate = dayFormatter.date(from: dayFormatter.string(from: GenericMethods.currentDateTime()))
+            else
+        {
+            return
+        }
+        guard let lastDate = dayFormatter.date(from: dayFormatter.string(from: lastDate))
+            else
+        {
+            return
+        }
+        
+        guard let currentDate = dayFormatter.date(from: dayFormatter.string(from: Calendar.current.date(byAdding: .day, value: 1, to: date)!))
+            else
+        {
+            return
+        }
+        
+        if firstDate == currentDate
+        {
+            print("this month")
+            nextBtnInstance.isHidden = false
+            previousBtnInstance.isHidden = true
+        }
+        else if lastDate == currentDate
+        {
+            nextBtnInstance.isHidden = true
+            previousBtnInstance.isHidden = false
+        }
+        else
+        {
+            nextBtnInstance.isHidden = false
+            previousBtnInstance.isHidden = false
+        }
+    }
+    class func dateSelectionMethod(date:Date,previousBtnInstance:UIButton,nextBtnInstance:UIButton,lastDate:Date,dateFormat:String)
+    {
+        let dayFormatter = DateFormatter()
+        dayFormatter.dateFormat = dateFormat
+        dayFormatter.timeZone = TimeZone.current
+        dayFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        guard let firstDate = dayFormatter.date(from: dayFormatter.string(from: GenericMethods.currentDateTime()))
+            else
+        {
+            return
+        }
+        guard let lastDate = dayFormatter.date(from: dayFormatter.string(from: lastDate))
+            else
+        {
+            return
+        }
+        
+        guard let currentDate = dayFormatter.date(from: dayFormatter.string(from: date))
+            else
+        {
+            return
+        }
+        
+        if firstDate == currentDate
+        {
+            print("this month")
+            nextBtnInstance.isHidden = false
+            previousBtnInstance.isHidden = true
+        }
+        else if lastDate == currentDate
+        {
+            nextBtnInstance.isHidden = true
+            previousBtnInstance.isHidden = false
+        }
+        else
+        {
+            nextBtnInstance.isHidden = false
+            previousBtnInstance.isHidden = false
+        }
+    }
     
     //MARK:- Getting thumbnail from Video
     class func createThumbnailOfVideoFromRemoteUrl(url: String,imgView:UIImageView,playImgView:UIImageView) {
@@ -736,6 +927,8 @@ class GenericMethods: NSObject {
                 playImgView.isHidden = true
                 imgView.contentMode = .scaleAspectFit
                 imgView.image = nil
+                imgView.sd_setShowActivityIndicatorView(true)
+                imgView.sd_setIndicatorStyle(.gray)
                 imgView.sd_setImage(with: URL(string: url), placeholderImage: AppConstants.docImgListplaceHolderImg,options: SDWebImageOptions(rawValue: 0), completed: { (image, error, cacheType, imageURL) in
                     
                     if error == nil
@@ -743,7 +936,8 @@ class GenericMethods: NSObject {
                         imgView.image = image
                         
                     }
-                    else{
+                    else
+                    {
                         print("error is \(error?.localizedDescription as Any)")
                         imgView.contentMode = .center
                         imgView.image = AppConstants.errorLoadingImg

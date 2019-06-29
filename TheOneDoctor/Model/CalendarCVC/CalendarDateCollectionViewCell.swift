@@ -18,6 +18,10 @@ class CalendarDateCollectionViewCell: JTAppleCell {
         super.awakeFromNib()
         self.layer.cornerRadius = 5.0
         self.layer.masksToBounds = true
+        self.contentView.layer.cornerRadius = 5.0
+        self.contentView.layer.masksToBounds = true
+        self.contentView.layer.borderColor = UIColor.white.cgColor
+        self.contentView.layer.borderWidth = 0.3
         // Initialization code
     }
 

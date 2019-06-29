@@ -17,9 +17,7 @@ class DeletePicturesCollectionViewCell: UICollectionViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         playImg.isHidden = true
-        playImg.image = playImg.image?.withRenderingMode(.alwaysTemplate)
-        playImg.tintColor = UIColor.white
-
+        playImg.setImageColor(color: UIColor.white)
         
         // Initialization code
     }

@@ -18,11 +18,13 @@ class AppointmentsTableViewCell: UITableViewCell {
     @IBOutlet weak var dayMonthLbl: UILabel!
     @IBOutlet weak var userTypeWdtConst: NSLayoutConstraint!
     @IBOutlet weak var bgView: UIView!
+    @IBOutlet weak var statusLabel: UILabel!
     
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
         semiRound(label: self.userTypeLbl)
+        self.selectionStyle = .none
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

@@ -20,6 +20,11 @@ class AppointmentsDataModel:Mappable
     var fromTime:String?
     var status:Int?
     var appointmentId:String?
+    var picture:String?
+    var imageArray:Array<String>?
+    var id:Int?
+    var referredDoctorName:String?
+    var referral:Int?
     
     required init?(map: Map) {
         
@@ -34,6 +39,11 @@ class AppointmentsDataModel:Mappable
         fromTime <- map["From"]
         status <- map["status"]
         appointmentId <- map["appointment_id"]
+        id <- map["id"]
+        picture <- map["profile"]
+        imageArray <- map["prescription"]
+        referredDoctorName <- map["referby"]
+        referral <- map["Referral"]
     }
     
     init() {

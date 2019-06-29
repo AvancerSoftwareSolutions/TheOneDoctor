@@ -18,8 +18,8 @@ class DoctorPicturesCollectionViewCell: UICollectionViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         playImgView.isHidden = true
-        playImgView.image = playImgView.image?.withRenderingMode(.alwaysTemplate)
-        playImgView.tintColor = UIColor.white
+        playImgView.setImageColor(color: UIColor.white)
+        
         
         // Initialization code
     }
