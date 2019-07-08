@@ -140,7 +140,7 @@ class RevenuesViewController: UIViewController {
         calendarComp.hour = 0
         calendarComp.minute = 0
         calendarComp.second = 0
-        let userSelectedDate = Calendar.current.date(from: calendarComp)!
+        let userSelectedDate = GenericMethods.currentCalender().date(from: calendarComp)!
         return userSelectedDate
     }
     func dateSelectionMethod(previousBtnInstance:UIButton,nextBtnInstance:UIButton,firstdate:Date,lastDate:Date,dateFormat:String,currentDate:Date)
@@ -155,7 +155,7 @@ class RevenuesViewController: UIViewController {
         {
             return
         }
-        guard let lastDate = dayFormatter.date(from: dayFormatter.string(from: currentDate))
+        guard let lastDate = dayFormatter.date(from: dayFormatter.string(from: lastDate))
             else
         {
             return
@@ -215,10 +215,17 @@ class RevenuesViewController: UIViewController {
                     
                     let selectDate =  self.getDateFrom(day: 1, month: self.selectedMonth, year: Int(self.selectedYear)!)
                     let firstDate =  self.getDateFrom(day: 1, month: 1, year: Int(self.yearArray[0])!)
-                    let lastDate =  self.getDateFrom(day: 1, month: 12, year: Int(self.yearArray.last!)!)
+                    let lastDate =  GenericMethods.currentDateTime()
                     self.dateSelectionMethod(previousBtnInstance: self.previousBtnInstance, nextBtnInstance: self.nextBtnInstance, firstdate: firstDate, lastDate: lastDate, dateFormat: AppConstants.monthYearFormat, currentDate: selectDate)
+                    if self.redeemBtnInstance.isHidden == true
+                    {
+                        self.priceLbl.text = "\(self.revenueDetailsData?.totalValue ?? 0) KWD"
+                    }
+                    else
+                    {
+                        self.priceLbl.text = "\(self.revenueDetailsData?.totalValue ?? 0) points"
+                    }
                     
-                    self.priceLbl.text = "\(self.revenueDetailsData?.totalValue ?? 0)"
                     print("name \(self.revenueDetailsData?.referralData?[0].name ?? "")")
                     self.barChartUpdate()
                     

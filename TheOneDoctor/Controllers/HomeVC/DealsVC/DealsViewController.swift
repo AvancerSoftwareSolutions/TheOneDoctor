@@ -269,7 +269,31 @@ extension DealsViewController:UITextViewDelegate
 {
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        return textView.text.count + (text.count - range.length) <= 250
+        if range.length == 1
+        {
+            return true
+        }
+        let notAllowedCharacters = "<>";
+        let set = NSCharacterSet(charactersIn: notAllowedCharacters);
+        let inverted = set.inverted;
+        let filtered = text.components(separatedBy: inverted).joined(separator: "")
+        if filtered == text
+        {
+            return false
+        }
+        else
+        {
+            let textCount = textView.text.count + (text.count - range.length)
+            if textCount <= 250
+            {
+                return true
+            }
+            
+            return false
+        }
+        
+        
+        
     }
     func textViewDidBeginEditing(_ textView: UITextView) {
         let scrollPoint : CGPoint = CGPoint(x:0 , y: detailsTextView.frame.origin.y)

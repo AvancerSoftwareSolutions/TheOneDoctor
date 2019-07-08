@@ -347,6 +347,15 @@ extension AppointmentsViewController:UITableViewDelegate,UITableViewDataSource
             }
         }
         
+        if  !GenericMethods.isStringEmpty(appointmentsListData?.appointmentsData?[indexPath.row].referredDoctorName ?? "")
+        {
+            appointmentsCell?.referraldoctorName.text = "Referred by: Dr. \(appointmentsListData?.appointmentsData?[indexPath.row].referredDoctorName ?? "")"
+        }
+        else
+        {
+            appointmentsCell?.referraldoctorName.text = ""
+        }
+        
         
         let status = appointmentsListData?.appointmentsData?[indexPath.row].status ?? 0
         
@@ -394,6 +403,10 @@ extension AppointmentsViewController:UITableViewDelegate,UITableViewDataSource
         return appointmentsCell!
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if  !GenericMethods.isStringEmpty(appointmentsListData?.appointmentsData?[indexPath.row].referredDoctorName ?? "")
+        {
+            return 190
+        }
         return 155
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

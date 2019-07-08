@@ -96,7 +96,7 @@ class ChangeScheduleViewController: UIViewController {
     
     @IBAction func delayedSlotsBtnClick(_ sender: Any) {
         let optionsController = UIAlertController(title: "Select No. of slots", message: nil, preferredStyle: .actionSheet)
-        optionsController.addAction(UIAlertAction(title: "Dismiss", style: .destructive, handler: nil))
+        
         
         optionsController.view.tintColor = AppConstants.khudColour
         
@@ -116,7 +116,7 @@ class ChangeScheduleViewController: UIViewController {
             })
             optionsController.addAction(action)
         }
-        
+        optionsController.addAction(UIAlertAction(title: "Dismiss", style: .destructive, handler: nil))
         optionsController.modalPresentationStyle = .popover
         
         let popPresenter: UIPopoverPresentationController? = optionsController.popoverPresentationController
@@ -203,7 +203,31 @@ extension ChangeScheduleViewController:UITextViewDelegate
 {
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        return textView.text.count + (text.count - range.length) <= 250
+        if range.length == 1
+        {
+            return true
+        }
+        let notAllowedCharacters = "<>";
+        let set = NSCharacterSet(charactersIn: notAllowedCharacters);
+        let inverted = set.inverted;
+        let filtered = text.components(separatedBy: inverted).joined(separator: "")
+        if filtered == text
+        {
+            return false
+        }
+        else
+        {
+            let textCount = textView.text.count + (text.count - range.length)
+            if textCount <= 250
+            {
+                return true
+            }
+            
+            return false
+        }
+        
+        
+        
     }
     func textViewDidBeginEditing(_ textView: UITextView) {
         let scrollPoint : CGPoint = CGPoint(x:0 , y: reasonTextView.frame.origin.y)

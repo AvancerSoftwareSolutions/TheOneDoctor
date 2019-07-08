@@ -31,6 +31,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         print("first date \(GenericMethods.dayLimitCalendar())")
+        let kuwaitDate = DateFormatter()
+        kuwaitDate.dateFormat = AppConstants.defaultDateFormat
+        kuwaitDate.timeZone = TimeZone(identifier: "Asia/Kuwait")
+        print("Kuwait time \(kuwaitDate.string(from: Date()))")
         
          guard let statusBarView = UIApplication.shared.value(forKeyPath: "statusBarWindow.statusBar") as? UIView else {
          return false

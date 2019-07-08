@@ -112,6 +112,8 @@
 		1F55DB8B229832EE00B92E6B /* AppointmentsDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F55DB8A229832EE00B92E6B /* AppointmentsDataModel.swift */; };
 		1F55DB8D2298331200B92E6B /* AppointmentsFilterModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F55DB8C2298331200B92E6B /* AppointmentsFilterModel.swift */; };
 		1FA27EA622829AB600759E6A /* emptyProfile.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FA27EA522829AB500759E6A /* emptyProfile.png */; };
+		1FA602CE22CC6AED00F5EDD3 /* EditMobileNumberViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FA602CD22CC6AED00F5EDD3 /* EditMobileNumberViewController.swift */; };
+		1FA602D022CC9C7F00F5EDD3 /* EditBiographyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FA602CF22CC9C7F00F5EDD3 /* EditBiographyViewController.swift */; };
 		1FAAABB822AE7CE8004E2A52 /* MediaCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FAAABB722AE7CE8004E2A52 /* MediaCollectionViewController.swift */; };
 		1FAAABBA22AE9F29004E2A52 /* ButtonTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FAAABB922AE9F29004E2A52 /* ButtonTitleView.swift */; };
 		1FB0F0BA22A7F4A3005D5504 /* man_OTP.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FB0F0B922A7F4A2005D5504 /* man_OTP.png */; };
@@ -123,6 +125,7 @@
 		1FB8F3A722818AF0006AF087 /* ProfileDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB8F3A622818AF0006AF087 /* ProfileDataModel.swift */; };
 		1FB8F3A92281B283006AF087 /* DashboardCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB8F3A82281B283006AF087 /* DashboardCollectionViewCell.swift */; };
 		1FB970CF22C77978005D3DDE /* profileEdit.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FB970CE22C77977005D3DDE /* profileEdit.png */; };
+		1FB970D122C77CEA005D3DDE /* splash.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FB970D022C77CEA005D3DDE /* splash.png */; };
 		1FBE36B12293BC5F002E32BA /* DeletePicturesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FBE36B02293BC5F002E32BA /* DeletePicturesViewController.swift */; };
 		1FBE36B32293BCCF002E32BA /* DeletePicturesCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FBE36B22293BCCF002E32BA /* DeletePicturesCollectionViewCell.swift */; };
 		1FBE36B52293D651002E32BA /* closeBtn.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FBE36B42293D651002E32BA /* closeBtn.png */; };
@@ -301,6 +304,8 @@
 		1F55DB8A229832EE00B92E6B /* AppointmentsDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentsDataModel.swift; sourceTree = "<group>"; };
 		1F55DB8C2298331200B92E6B /* AppointmentsFilterModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentsFilterModel.swift; sourceTree = "<group>"; };
 		1FA27EA522829AB500759E6A /* emptyProfile.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = emptyProfile.png; sourceTree = "<group>"; };
+		1FA602CD22CC6AED00F5EDD3 /* EditMobileNumberViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditMobileNumberViewController.swift; sourceTree = "<group>"; };
+		1FA602CF22CC9C7F00F5EDD3 /* EditBiographyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditBiographyViewController.swift; sourceTree = "<group>"; };
 		1FAAABB722AE7CE8004E2A52 /* MediaCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaCollectionViewController.swift; sourceTree = "<group>"; };
 		1FAAABB922AE9F29004E2A52 /* ButtonTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonTitleView.swift; sourceTree = "<group>"; };
 		1FB0F0B922A7F4A2005D5504 /* man_OTP.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = man_OTP.png; sourceTree = "<group>"; };
@@ -312,6 +317,7 @@
 		1FB8F3A622818AF0006AF087 /* ProfileDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileDataModel.swift; sourceTree = "<group>"; };
 		1FB8F3A82281B283006AF087 /* DashboardCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardCollectionViewCell.swift; sourceTree = "<group>"; };
 		1FB970CE22C77977005D3DDE /* profileEdit.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = profileEdit.png; sourceTree = "<group>"; };
+		1FB970D022C77CEA005D3DDE /* splash.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = splash.png; sourceTree = "<group>"; };
 		1FBE36B02293BC5F002E32BA /* DeletePicturesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeletePicturesViewController.swift; sourceTree = "<group>"; };
 		1FBE36B22293BCCF002E32BA /* DeletePicturesCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeletePicturesCollectionViewCell.swift; sourceTree = "<group>"; };
 		1FBE36B42293D651002E32BA /* closeBtn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = closeBtn.png; sourceTree = "<group>"; };
@@ -634,6 +640,8 @@
 				1F0D8786228E7C9C0011050E /* OpenFileViewController.swift */,
 				1F4C669D228438C300453B2E /* SpecialityListViewController.swift */,
 				1F0C2980228AD07C00C575DB /* SpecialityTableViewCell.swift */,
+				1FA602CD22CC6AED00F5EDD3 /* EditMobileNumberViewController.swift */,
+				1FA602CF22CC9C7F00F5EDD3 /* EditBiographyViewController.swift */,
 			);
 			path = ProfileVC;
 			sourceTree = "<group>";
@@ -708,6 +716,7 @@
 				1F1BFD81228C438E0005D927 /* ProfileBGImg.png */,
 				1FC3419D2296DFFD00634EAD /* reload.png */,
 				1FF8E54E2282AAF40060D7FC /* Menprofile.png */,
+				1FB970D022C77CEA005D3DDE /* splash.png */,
 				1FF8E54F2282AAF40060D7FC /* Womenprofile.png */,
 				1F12427A2280399100B13213 /* homeBg01.png */,
 				1FF8E5542282D2060060D7FC /* addImg.png */,
@@ -1294,6 +1303,7 @@
 				1FF8E54B2282A58C0060D7FC /* Upload.png in Resources */,
 				1FBE36C82294374B002E32BA /* AddScheduleTableViewCell.xib in Resources */,
 				1F209A052280675900C48120 /* GoogleService-Info.plist in Resources */,
+				1FB970D122C77CEA005D3DDE /* splash.png in Resources */,
 				1FE013DA229A681700CA4EFC /* SlotsTableViewCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1388,6 +1398,7 @@
 				1FE013DC229A717E00CA4EFC /* ScheduleDateModel.swift in Sources */,
 				1F124283228055F000B13213 /* APIManager.swift in Sources */,
 				1F04E41822C335C10058576B /* RevenueListModel.swift in Sources */,
+				1FA602D022CC9C7F00F5EDD3 /* EditBiographyViewController.swift in Sources */,
 				1F55DB8D2298331200B92E6B /* AppointmentsFilterModel.swift in Sources */,
 				1F0EF2F722B9EE73006B0236 /* ScheduleHistoryModel.swift in Sources */,
 				1F351D63229FA7FA00681691 /* DashboardDataModel.swift in Sources */,
@@ -1439,6 +1450,7 @@
 				1F1D807922C5F66C002DE82F /* DealsHistoryTableViewCell.swift in Sources */,
 				1FCEE5FD22C0A7BD00EF51AD /* RevenuesViewController.swift in Sources */,
 				1F04E41B22C336270058576B /* AppointmentHistoryModel.swift in Sources */,
+				1FA602CE22CC6AED00F5EDD3 /* EditMobileNumberViewController.swift in Sources */,
 				1F12425C228015E100B13213 /* DashboardViewController.swift in Sources */,
 				1FE013CA2299131A00CA4EFC /* SectionHeaderCollectionReusableView.swift in Sources */,
 				1F0EF31222BA6A9B006B0236 /* AdvertisementPriceModel.swift in Sources */,

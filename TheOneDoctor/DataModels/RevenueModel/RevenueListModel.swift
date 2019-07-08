@@ -14,7 +14,7 @@ class RevenueListModel:Mappable
     
     var status:StatusDataModel?
     var referralData:Array<RevenueListDataModel>?
-    var totalValue:Int?
+    var totalValue:Double?
     
     required init?(map: Map) {
         
@@ -36,7 +36,7 @@ class RevenueListDataModel:Mappable
 {
     
     var name:String?
-    var value:Int?
+    var value:Double?
     
     
     required init?(map: Map) {

@@ -350,7 +350,7 @@ class RescheduleViewController: UIViewController,sendDateDelegate,refreshLoading
         parameters["type"] = type
         parameters["cancelslot"] = sendArr()
         parameters["reason"] = reasonTextView.text!
-//        print("parm \(parameters)")
+        print("parm \(parameters)")
         
         GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
 
@@ -589,7 +589,7 @@ class RescheduleViewController: UIViewController,sendDateDelegate,refreshLoading
     
     //MARK:- IBActions
     @IBAction func editBtnClick(_ sender: Any) {
-        rescheduleCollectionView.isUserInteractionEnabled = true
+        
         makeAvailableBtnInst.isHidden = true
         
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -619,6 +619,7 @@ class RescheduleViewController: UIViewController,sendDateDelegate,refreshLoading
             self.reasonLbl.text = "Reason for Cancel"
             self.reasonTextView.text = ""
             self.unavailableTodayBtnInst.isHidden = true
+            self.rescheduleCollectionView.isUserInteractionEnabled = true
         }))
         
         alert.addAction(UIAlertAction.init(title: "Dismiss", style: .destructive, handler: nil))
@@ -754,7 +755,31 @@ extension RescheduleViewController:UITextViewDelegate
 {
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        return textView.text.count + (text.count - range.length) <= 250
+        if range.length == 1
+        {
+            return true
+        }
+        let notAllowedCharacters = "<>";
+        let set = NSCharacterSet(charactersIn: notAllowedCharacters);
+        let inverted = set.inverted;
+        let filtered = text.components(separatedBy: inverted).joined(separator: "")
+        if filtered == text
+        {
+            return false
+        }
+        else
+        {
+            let textCount = textView.text.count + (text.count - range.length)
+            if textCount <= 250
+            {
+                return true
+            }
+            
+            return false
+        }
+        
+        
+        
     }
     func textViewDidBeginEditing(_ textView: UITextView) {
         print("textViewDidBeginEditing")

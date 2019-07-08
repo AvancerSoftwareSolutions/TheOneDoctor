@@ -13,16 +13,21 @@ import AlamofireObjectMapper
 class APIManager
 {
     //MARK:- Base Url & Suffixes
-    // live URL
-//    let baseURL = "http://159.89.162.140:3112/api/Doctor/"
-//    let fileUploadBaseURL = "http://159.89.162.140/HMSNew/API/Doctor/"
-    //Demo url
-    let baseURL = "http://159.89.162.140:3113/api/Doctor/"
-    let fileUploadBaseURL = "http://159.89.162.140/Mongo/HMSNew/API/Doctor/"
-    let prescriptionBaseURL = "http://159.89.162.140/Mongo/HMSNew/API/"
+    
+    
+    //MARK:- live URL
+    let baseURL = "http://159.89.162.140:3112/api/Doctor/"
+    let fileUploadBaseURL = "http://159.89.162.140/HMSNew/API/Doctor/"
+    let prescriptionBaseURL = "http://159.89.162.140/HMSNew/API/"
+    
+    //MARK:- Demo url
+//    let baseURL = "http://159.89.162.140:3113/api/Doctor/"
+//    let fileUploadBaseURL = "http://159.89.162.140/Mongo/HMSNew/API/Doctor/"
+//    let prescriptionBaseURL = "http://159.89.162.140/Mongo/HMSNew/API/"
+//
+    
     
     let Authorization = "Basic YWRtaW46MTIzNA=="
-    
     let createApiKeyURLSuffix = ""
     let sendOTPSuffix = "SendOTP"
     let loginSuffix = "Login"

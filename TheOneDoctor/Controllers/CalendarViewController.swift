@@ -11,7 +11,8 @@ protocol sendDateDelegate {
     func sendDate(selectedDateStr:String,selectedDate:Date)
 }
 
-class CalendarViewController: UIViewController {
+class CalendarViewController: UIViewController
+{
 
     @IBOutlet weak var titleLbl: UILabel!
     @IBOutlet weak var popupView: UIView!

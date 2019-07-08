@@ -536,6 +536,7 @@ class GenericMethods: NSObject {
     {
         var currentcalendar = Calendar.current
         currentcalendar.timeZone = TimeZone.current
+        currentcalendar.timeZone = TimeZone(secondsFromGMT: 0)!
         currentcalendar.locale = Locale.current
         
         return currentcalendar
@@ -836,7 +837,7 @@ class GenericMethods: NSObject {
         {
             return
         }
-        
+        print("firstDate \(firstDate) currentDate \(currentDate) lastDate \(lastDate)")
         if firstDate == currentDate
         {
             print("this month")

@@ -609,41 +609,36 @@ class AdvertisementViewController: UIViewController {
                         switch response.result {
                             
                         case .success(let json):
+                            
+                            print("json \(json)")
                             GenericMethods.hideLoaderMethod(view: self.view)
                             
-                            let y: AnyObject = (json as AnyObject?)!
-                            if let str:Int = y.object(forKey: "error_code") as? Int
+                            
+                            let responseObject: AnyObject = (json as AnyObject?)!
+                            guard let status = responseObject.object(forKey: "status") else
                             {
-                                print(str)
                                 GenericMethods.showAlert(alertMessage: "Something Went Wrong! Please try again")
+                                return
+                            }
+                            if (status as AnyObject).object(forKey: "code") as? String == "0"
+                            {
+                                
+                                GenericMethods.hideLoaderMethod(view: self.view)
+                                
+                                GenericMethods.showAlert(alertMessage: (status as AnyObject).object(forKey: "message") as? String ?? "Success")
+                                
+                                self.loadingAdvertisementDetailsAPI(loadFrom: 1)
+
+                                
                             }
                             else
                             {
                                 
-                                //                                    success(json as AnyObject?)
-                                
-                                print("response \(response as Any)")
                                 GenericMethods.hideLoaderMethod(view: self.view)
-                                
-                                let responseObject: AnyObject = (json as AnyObject?)!
-                                guard let status = responseObject.object(forKey: "status") else
-                                {
-                                    GenericMethods.showAlert(alertMessage: "Something Went Wrong! Please try again")
-                                    return
-                                }
-                                if (status as AnyObject).object(forKey: "code") as? String == "0"
-                                {
-                                    
-                                    GenericMethods.showAlert(alertMessage: (status as AnyObject).object(forKey: "message") as? String ?? "Success")
-                                    
-                                    self.loadingAdvertisementDetailsAPI(loadFrom: 1)
-
-                                }
-                                else
-                                {
-                                    GenericMethods.showAlert(alertMessage:(status as AnyObject).object(forKey: "message") as? String ?? "Something Went Wrong! Please try again")
-                                }
+                                GenericMethods.showAlert(alertMessage: "Something Went Wrong! Please try again")
                             }
+                            
+                        
                         case .failure(let error):
                             GenericMethods.hideLoaderMethod(view: self.view)
                             
@@ -953,6 +948,7 @@ extension AdvertisementViewController:UICollectionViewDelegate,UICollectionViewD
                 self.adPriceId = self.advertisementListData?.adPrice?[indexPath.row].priceId ?? 0
                 self.noOfDays = self.advertisementListData?.adPrice?[indexPath.row].noOfDays ?? 0
                 print("adPrice \(adPrice) adPriceTypeId \(adPriceTypeId) adPriceId \(adPriceId) noOfDays \(noOfDays)")
+                self.selectedDateArray = []
                 checkAvailabilityMethod()
                 //TODO: put function if 1 day
                 

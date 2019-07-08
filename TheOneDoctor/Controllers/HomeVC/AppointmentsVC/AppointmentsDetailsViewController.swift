@@ -281,6 +281,7 @@ class AppointmentsDetailsViewController: UIViewController,sendMediaAssetsDelegat
             }
             if (status as AnyObject).object(forKey: "code") as? String == "0"
             {
+               
                 GenericMethods.showAlertwithPopNavigation(alertMessage: (status as AnyObject).object(forKey: "message") as? String ?? "Uploaded sucessfully", vc: self)
 
             }

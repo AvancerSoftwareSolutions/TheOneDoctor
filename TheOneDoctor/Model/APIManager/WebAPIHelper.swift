@@ -371,7 +371,7 @@ class WebAPIHelper: NSObject {
             }, to: methodName, encodingCompletion: { (encodingResult) in
                 
                 
-                    GenericMethods.hideLoading()
+                    
                 
                     print(encodingResult)
                     switch encodingResult {

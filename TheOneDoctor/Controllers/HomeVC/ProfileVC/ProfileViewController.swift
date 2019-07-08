@@ -15,7 +15,11 @@ import MobileCoreServices
 import SDWebImage
 import Alamofire
 
-class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UIImagePickerControllerDelegate, UINavigationControllerDelegate,UIDocumentInteractionControllerDelegate,sendSpecialityListValuesDelegate,sendDeletePicDelegate,sendMediaAssetsDelegate {
+class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UIImagePickerControllerDelegate, UINavigationControllerDelegate,UIDocumentInteractionControllerDelegate,sendSpecialityListValuesDelegate,sendDeletePicDelegate,sendMediaAssetsDelegate,sendEditMobileNumberDelegate,sendBioDelegate {
+    
+    
+    
+    
     
     
     
@@ -32,9 +36,9 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
     @IBOutlet weak var profilePicBtnInstance: UIButton!
     @IBOutlet weak var addSpecBtnInst: UIButton!
     @IBOutlet weak var addSubSpecBtnInst: UIButton!
-    @IBOutlet weak var mobileIconView: UIView!
+    @IBOutlet weak var emailTF: ACFloatingTextfield!
     
-    @IBOutlet weak var emailTF: UITextField!
+
     @IBOutlet weak var mobileTF: UITextField!
     @IBOutlet weak var experienceTF: UITextField!
     
@@ -81,6 +85,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
     
     var otp = ""
     var isPictureUpload:Bool = false
+    var loadPicture = true
     
     
     var mobileNumber = ""
@@ -91,6 +96,9 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
     var picture = ""
     var additionalpicture = [""]
     var additionalvideo = [""]
+    
+    var textView = UITextView()
+    var loadingFetchNotification = MBProgressHUD()
     
     /*
     parameters["mobile"] = mobileTF.text
@@ -110,20 +118,20 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
         otpHgtConst.constant = 0
         otpTopConst.constant = 0
         
-        let label = UILabel(frame: CGRect(x: 0, y: 0, width: 70, height: 30))
-        label.text = "Update"
-        label.font = UIFont.systemFont(ofSize: 13.0)
-        label.textAlignment = .center
-        label.textColor = .white
-        label.backgroundColor = .black
-        label.layer.cornerRadius = 10.0
-        label.layer.masksToBounds = true
-        label.isUserInteractionEnabled = true
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileUpdateMethod))
-        tapGesture.numberOfTapsRequired = 1
-        label.addGestureRecognizer(tapGesture)
-        
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(customView: label)
+//        let label = UILabel(frame: CGRect(x: 0, y: 0, width: 70, height: 30))
+//        label.text = "Update"
+//        label.font = UIFont.systemFont(ofSize: 13.0)
+//        label.textAlignment = .center
+//        label.textColor = .white
+//        label.backgroundColor = .black
+//        label.layer.cornerRadius = 10.0
+//        label.layer.masksToBounds = true
+//        label.isUserInteractionEnabled = true
+//        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileUpdateMethod))
+//        tapGesture.numberOfTapsRequired = 1
+//        label.addGestureRecognizer(tapGesture)
+//
+//        self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(customView: label)
         
         
         userNameLbl.adjustsFontSizeToFitWidth = true
@@ -133,7 +141,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
         doctorPicturesCollectionView.register(UINib(nibName: "DoctorPicturesCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "docPicturesCell")
         
         GenericMethods.setProfileImage(imageView: profileImgView,borderColor:UIColor.white, imageString: UserDefaults.standard.value(forKey: "user_image") as? String ?? "")
-        GenericMethods.setLeftViewWithSVG(svgView: mobileIconView, with: "phone", color: AppConstants.appGreenColor)
+        
         
         roundButton(button: profilePicBtnInstance)
         profilePicBtnInstance.imageView?.contentMode = .center
@@ -156,17 +164,21 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
         mobileTF.inputAccessoryView = mobileNumberToolbar
         otpTF.inputAccessoryView = numberToolbar
         biographyTextView.inputAccessoryView = numberToolbar
-
+        textView.inputAccessoryView = numberToolbar
+        textView.delegate = self
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWasShown), name: UIResponder.keyboardDidShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-
         
         
         // Do any additional setup after loading the view.
     }
     override func viewWillAppear(_ animated: Bool)
     {
-        loadingProfileDetailsAPI()
+        if loadPicture == true
+        {
+            loadingProfileDetailsAPI()
+        }
+        
     }
     func roundButton(button:UIButton)
     {
@@ -178,7 +190,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
     @objc func doneWithNumberPad()
     {
         let _ = biographyTextView.resignFirstResponder()
-        
+        let _ = textView.resignFirstResponder()
         let _ = otpTF.resignFirstResponder()
     }
     @objc func doneWithMobile()
@@ -226,6 +238,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
         specialityCollectionView.reloadData()
         subSpecialityCollectionView.reloadData()
         print("specialityArray \(specialityArray) subSpecialityArray \(subSpecialityArray)")
+        profileUpdateMethod(mobile: "", email: "", biography: "", speciality: specialityArray, subspeciality: subSpecialityArray)
     }
     @objc func subSpecialityDeleteMethod(button:UIButton)
     {
@@ -240,7 +253,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
         var parameters = Dictionary<String, Any>()
         parameters["user_id"] = UserDefaults.standard.value(forKey: "user_id") ?? 0 as Int
         
-        GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
+        GenericMethods.showLoaderMethod(shownView: self.view, message: "Fetching Details")
         
         apiManager.profileDetailsAPI(parameters: parameters) { (status, showError, response, error) in
             
@@ -249,12 +262,14 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
             if status == true {
                 self.profileData = response
                 if self.profileData?.status?.code == "0" {
+                    self.specialityArray = []
+                    self.subSpecialityArray = []
+                    self.loadPicture = false
                     //MARK: Profile Success Details
                     self.mobileNumber = self.profileData?.profileData?.mobile ?? ""
                     self.email = self.profileData?.profileData?.email ?? ""
                     self.short_biography = self.profileData?.profileData?.short_biography ?? ""
                     self.picture = self.profileData?.profileData?.picture ?? ""
-                    
                     
                     self.biographyTextView.text = self.profileData?.profileData?.short_biography ?? ""
                     self.mobileTF.text = self.profileData?.profileData?.mobile
@@ -447,6 +462,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
         }
 //        self.reloadHeaderView()
         print("specialityArray \(specialityArray) subSpecialityArray \(subSpecialityArray)")
+        profileUpdateMethod(mobile: "", email: "", biography: "", speciality: specialityArray, subspeciality: subSpecialityArray)
         
     }
     func removeDictFromArray(searchKey:String,searchString:String,array:NSMutableArray)
@@ -894,12 +910,164 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
 
         }
     }
+    @IBAction func emailEditBtnClick(_ sender: Any) {
+        let alertController = UIAlertController(title: "Edit Email Id", message: "", preferredStyle: .alert)
+        alertController.addTextField { (textField : UITextField!) -> Void in
+            textField.text = self.profileData?.profileData?.email
+            textField.keyboardType = .emailAddress
+            
+        }
+        let saveAction = UIAlertAction(title: "Submit", style: .default, handler: { alert -> Void in
+            let firstTextField = alertController.textFields![0] as UITextField
+            print(firstTextField.text as Any)
+            if GenericMethods.isStringEmpty(firstTextField.text)
+            {
+                GenericMethods.showAlert(alertMessage: "Please enter mail id")
+            }
+            else if !GenericMethods.validate(YourEMailAddress: firstTextField.text!)
+            {
+                GenericMethods.showAlertMethod(alertMessage: "Enter valid EmailId")
+            }
+            else
+            {
+                var param = Dictionary<String, Any>()
+                param["user_id"] = UserDefaults.standard.value(forKey: "user_id") as? Int ?? 0
+                param["email"] = firstTextField.text
+                self.updateAPICallMethod(parameters: param)
+            }
+            
+        })
+        let cancelAction = UIAlertAction(title: "Cancel", style: .destructive, handler: {
+            (action : UIAlertAction!) -> Void in
+            
+        })
+        alertController.addAction(saveAction)
+        alertController.addAction(cancelAction)
+        
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
+    @IBAction func mobileEditBtnClick(_ sender: Any) {
+        let editMobileVC = self.storyboard?.instantiateViewController(withIdentifier: "editMobileVC") as! EditMobileNumberViewController
+        
+        editMobileVC.mobileNumber = self.profileData?.profileData?.mobile ?? ""
+        editMobileVC.delegate = self
+        self.navigationController?.pushViewController(editMobileVC, animated: true)
+    }
+    @IBAction func biographyEditBtnClick(_ sender: Any) {
+        // editBioVC
+        let editBioVC = self.storyboard?.instantiateViewController(withIdentifier: "editBioVC") as! EditBiographyViewController
+        
+        editBioVC.biography = self.profileData?.profileData?.short_biography ?? ""
+        editBioVC.delegate = self
+        
+        self.navigationController?.definesPresentationContext = true
+        editBioVC.modalTransitionStyle = .crossDissolve
+        editBioVC.modalPresentationStyle = .overCurrentContext
+         UIApplication.shared.topMostViewController()?.present(editBioVC, animated: true)
+        
+        
+//        let alert = UIAlertController(title: "Enter your biography", message: "Max. 250 characters", preferredStyle: .alert)
+//
+//        let customView = UIView()
+//        alert.view.addSubview(customView)
+//        customView.translatesAutoresizingMaskIntoConstraints = false
+//        customView.topAnchor.constraint(equalTo: alert.view.topAnchor, constant: 45).isActive = true
+//        customView.rightAnchor.constraint(equalTo: alert.view.rightAnchor, constant: -10).isActive = true
+//        customView.leftAnchor.constraint(equalTo: alert.view.leftAnchor, constant: 10).isActive = true
+//        customView.heightAnchor.constraint(equalToConstant: 150).isActive = true
+//        alert.view.translatesAutoresizingMaskIntoConstraints = false
+//        alert.view.heightAnchor.constraint(equalToConstant: 250).isActive = true
+//
+////        customView.backgroundColor = .green
+//
+//        customView.addSubview(textView)
+//        textView.translatesAutoresizingMaskIntoConstraints = false
+//        textView.topAnchor.constraint(equalTo: alert.view.topAnchor, constant: 45).isActive = true
+//        textView.rightAnchor.constraint(equalTo: alert.view.rightAnchor, constant: -10).isActive = true
+//        textView.leftAnchor.constraint(equalTo: alert.view.leftAnchor, constant: 10).isActive = true
+//        textView.heightAnchor.constraint(equalToConstant: 150).isActive = true
+//        GenericMethods.roundedCornerTextView(textView: textView)
+//        textView.text = self.profileData?.profileData?.short_biography
+////        alert.view.autoresizesSubviews = true
+//
+//
+//
+////        textView.textContainerInset = UIEdgeInsets.init(top: 8, left: 5, bottom: 8, right: 5)
+//
+////        textView.translatesAutoresizingMaskIntoConstraints = false
+////
+////
+////        let leadConstraint = NSLayoutConstraint(item: alert.view as Any, attribute: .leading, relatedBy: .equal, toItem: textView, attribute: .leading, multiplier: 1.0, constant: -8.0)
+////        let trailConstraint = NSLayoutConstraint(item: alert.view as Any, attribute: .trailing, relatedBy: .equal, toItem: textView, attribute: .trailing, multiplier: 1.0, constant: 8.0)
+////
+////        let topConstraint = NSLayoutConstraint(item: alert.view as Any, attribute: .top, relatedBy: .equal, toItem: textView, attribute: .top, multiplier: 1.0, constant: -64.0)
+////        let bottomConstraint = NSLayoutConstraint(item: alert.view as Any, attribute: .bottom, relatedBy: .equal, toItem: textView, attribute: .bottom, multiplier: 1.0, constant: 64.0)
+////        alert.view.addSubview(textView)
+////        NSLayoutConstraint.activate([leadConstraint, trailConstraint, topConstraint, bottomConstraint])
+//        alert.addAction(UIAlertAction(title: "Submit", style: .default, handler: { action in
+//            print("\(String(describing: self.textView.text))")
+//
+//            if GenericMethods.isStringEmpty(self.textView.text)
+//            {
+//                GenericMethods.showAlert(alertMessage: "Please enter biography")
+//            }
+//            else
+//            {
+//                var param = Dictionary<String, Any>()
+//                param["user_id"] = UserDefaults.standard.value(forKey: "user_id") as? Int ?? 0
+//                param["short_biography"] = self.textView.text
+//                self.updateAPICallMethod(parameters: param)
+//            }
+//
+//        }))
+//        alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: nil))
+//
+////        alert.view.addObserver(self, forKeyPath: "bounds", options: NSKeyValueObservingOptions.new, context: nil)
+////
+////        NotificationCenter.default.addObserver(forName: UITextView.textDidChangeNotification, object: textView, queue: OperationQueue.main) { (notification) in
+////
+////        }
+////        textView.backgroundColor = UIColor.green
+////        alert.view.addSubview(self.textView)
+//        self.present(alert, animated: true, completion: nil)
+        
+    }
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?)
+    {
+        if keyPath == "bounds"{
+            
+            if let rect = change?[.newKey] as? NSValue
+            {
+                if let newrect = rect.cgRectValue as CGRect?
+                {
+                    let margin:CGFloat = 8.0
+
+                    textView.frame = CGRect(x: newrect.origin.x + margin, y: newrect.origin.y + margin, width: newrect.width - 2*margin, height: newrect.height  / 2)
+                    textView.bounds = CGRect(x: newrect.origin.x + margin, y: newrect.origin.y + margin, width: newrect.width  - 2*margin, height: newrect.height  / 2)
+                }
+                
+            }
+            
+//            if let rect = ((change?[NSKeyValueChangeKey.newKey]) as AnyObject).CGRectValue(){
+//                let margin:CGFloat = 8.0
+//                textView.frame = CGRectMake(rect.origin.x + margin, rect.origin.y + margin, CGRectGetWidth(rect) - 2*margin, CGRectGetHeight(rect) / 2)
+//                textView.bounds = CGRectMake(rect.origin.x + margin, rect.origin.y + margin, CGRectGetWidth(rect) - 2*margin, CGRectGetHeight(rect) / 2)
+//            }
+        }
+    }
+    
     
     //MARK:- Delegate Method
-    func sendDeletePicValues(picArray: NSMutableArray,uploadArray:NSMutableArray) {
-        self.doctorMediaArray = NSMutableArray(array: picArray)
-        self.uploadingMediaArray = NSMutableArray(array: uploadArray)
-        self.doctorPicturesCollectionView.reloadData()
+    
+    func sendBioDelegateMethod(text: String) {
+        var param = Dictionary<String, Any>()
+        param["user_id"] = UserDefaults.standard.value(forKey: "user_id") as? Int ?? 0
+        param["short_biography"] = text
+        self.updateAPICallMethod(parameters: param)
+    }
+    func sendDeletePicValues() {
+        
     }
     func sendMediaAssests(assets:[PHAsset])
     {
@@ -911,47 +1079,72 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
         print("selectedAssets \(self.selectedAssets)")
         self.gettingValuesFromPHAsset(assetsArr: self.selectedAssets)
     }
+    func sendEditMobileMethod(mobileNo: String) {
+        var param = Dictionary<String, Any>()
+        param["user_id"] = UserDefaults.standard.value(forKey: "user_id") as? Int ?? 0
+        param["mobile"] = mobileNo
+        self.updateAPICallMethod(parameters: param)
+    }
     func gettingValuesFromPHAsset(assetsArr:[PHAsset])
     {
+        
         fileDataArr = []
         fileNameArr = []
         mimeTypeArr = []
-        UIApplication.shared.beginIgnoringInteractionEvents()
-        let loadingProfileNotification = MBProgressHUD.showAdded(to: self.view, animated: true)
-        loadingProfileNotification.mode = MBProgressHUDMode.determinate
-        loadingProfileNotification.label.text = "Fetching"
-        for i in 0..<assetsArr.count {
-            print("assets index \(assetsArr[i])")
-            FileUpload.getURL(of: assetsArr[i]) { (url) in
-                print("mediaURL \(String(describing: url))")
+        var valuecount = 0
+//        UIApplication.shared.beginIgnoringInteractionEvents()
+        loadingFetchNotification = MBProgressHUD.showAdded(to: self.view, animated: true)
+        loadingFetchNotification.mode = MBProgressHUDMode.determinate
+        loadingFetchNotification.label.text = "Fetching"
+        print("fileDataArr load \(self.fileDataArr.count)")
+        
+        func sendAssetDataToServer(mediaURL:URL)
+        {
+            do
+            {
+                let mediaData = try Data.init(contentsOf: mediaURL)
+                self.fileDataArr.append(mediaData)
+                print("fileDataArr inside \(self.fileDataArr)")
+                self.fileNameArr.append(mediaURL.lastPathComponent)
+                self.mimeTypeArr.append(FileUpload.mimeTypeForPath(path: mediaURL.path))
                 
-                func sendAssetDataToServer(mediaURL:URL)
+                print("fileDataArr.count \(self.fileDataArr.count) ASSets count \(assetsArr.count)")
+                
+                if self.fileDataArr.count == (assetsArr.count)
                 {
-                    do
-                    {
-                        let mediaData = try Data.init(contentsOf: mediaURL)
-                        self.fileDataArr.append(mediaData)
-                        self.fileNameArr.append(mediaURL.lastPathComponent)
-                        self.mimeTypeArr.append(FileUpload.mimeTypeForPath(path: mediaURL.path))
-                        if self.fileDataArr.count == (assetsArr.count)
+                    valuecount += 1
+                    DispatchQueue.main.async {
+                        print("addDocto 1")
+                        if valuecount == 1
                         {
-                            GenericMethods.hideLoaderMethod(view: self.view)
-                            DispatchQueue.main.async {
-                                self.addDocFilesUpload()
-                            }
-                            
+                           self.addDocFilesUpload()
+                            return
                         }
-                        else
-                        {
-                            GenericMethods.hideLoaderMethod(view: self.view)
-                        }
-                    }
-                    catch
-                    {
-                        GenericMethods.hideLoaderMethod(view: self.view)
-                        print("Cannot convert photo data")
                     }
                 }
+                else
+                {
+                    print("addDocto failed")
+                    //                            loadingFetchNotification.hide(animated: true)
+                    //                            UIApplication.shared.endIgnoringInteractionEvents()
+                }
+            }
+            catch
+            {
+                //                        loadingFetchNotification.hide(animated: true)
+                //                        UIApplication.shared.endIgnoringInteractionEvents()
+                print("Cannot convert photo data")
+            }
+        }
+        
+        for i in 0..<assetsArr.count {
+            print("assets index \(assetsArr[i])")
+            
+            FileUpload.getURL(of: assetsArr[i]) { (url) in
+                print("mediaURL \(String(describing: url))")
+            
+                print("fileDataArrfirst.count \(self.fileDataArr.count)")
+                
                 guard let mediaURL = url else
                 {
                     let options = PHImageRequestOptions()
@@ -969,7 +1162,8 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                             (image, info) in
                             guard let getImage = image,let dictInfo = info else
                             {
-                                GenericMethods.hideLoaderMethod(view: self.view)
+//                                loadingFetchNotification.hide(animated: true)
+//                                UIApplication.shared.endIgnoringInteractionEvents()
                                 GenericMethods.showAlert(alertMessage: "Something went wrong. Try again.")
                                 return
                             }
@@ -986,7 +1180,8 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                                             try fileManager.createDirectory(atPath: filePath.path, withIntermediateDirectories: true, attributes: nil)
                                         } catch {
                                             NSLog("Couldn't create document directory")
-                                            GenericMethods.hideLoaderMethod(view: self.view)
+//                                            loadingFetchNotification.hide(animated: true)
+//                                            UIApplication.shared.endIgnoringInteractionEvents()
                                         }
                                     }
                                     else
@@ -1000,7 +1195,8 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                                     guard let imgData = getImage.pngData()
                                         else
                                     {
-                                        GenericMethods.hideLoaderMethod(view: self.view)
+//                                        loadingFetchNotification.hide(animated: true)
+//                                        UIApplication.shared.endIgnoringInteractionEvents()
                                         GenericMethods.showAlert(alertMessage: "Error in retrieving image. Please try again")
                                         
                                         return
@@ -1018,7 +1214,8 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                                     catch {
                                         print("failed to write data")
                                         
-                                        GenericMethods.hideLoaderMethod(view: self.view)
+//                                        loadingFetchNotification.hide(animated: true)
+//                                        UIApplication.shared.endIgnoringInteractionEvents()
                                         GenericMethods.showAlert(alertMessage: "Error in retrieving image. Please try again")
                                     }
                                 }
@@ -1027,15 +1224,16 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                             
                             sendAssetDataToServer(mediaURL: imgUrl)
                             
-                            
                         })
                     }
                     return
                 }
-                sendAssetDataToServer(mediaURL: mediaURL)
-                
+                    sendAssetDataToServer(mediaURL: mediaURL)
             }
         }
+//        loadingFetchNotification.hide(animated: true)
+//        UIApplication.shared.endIgnoringInteractionEvents()
+        
     }
     //TODO: File upload
     
@@ -1043,7 +1241,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
     {
         //MARK:- Profile picture upload
 
-        UIApplication.shared.beginIgnoringInteractionEvents()
+//        UIApplication.shared.beginIgnoringInteractionEvents()
         let loadingProfileNotification = MBProgressHUD.showAdded(to: self.view, animated: true)
         loadingProfileNotification.mode = MBProgressHUDMode.annularDeterminate
         loadingProfileNotification.label.text = "Uploading"
@@ -1084,7 +1282,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
         
 //        GenericMethods.showLoaderMethod(shownView: self.view, message: "Uploading")
         
-        UIApplication.shared.beginIgnoringInteractionEvents()
+//        UIApplication.shared.beginIgnoringInteractionEvents()
         let loadingNotification = MBProgressHUD.showAdded(to: self.view, animated: true)
         loadingNotification.mode = MBProgressHUDMode.annularDeterminate
         loadingNotification.label.text = "Uploading"
@@ -1137,6 +1335,7 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                     case .success(let json):
                         print("json \(json)")
                         GenericMethods.hideLoaderMethod(view: self.view)
+                        self.loadingFetchNotification.hide(animated: true)
                         
                             
                             let responseObject: AnyObject = (json as AnyObject?)!
@@ -1148,17 +1347,22 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                             if (status as AnyObject).object(forKey: "code") as? String == "0"
                             {
                                 
+                                GenericMethods.hideLoaderMethod(view: self.view)
+                                
                                 GenericMethods.showAlertMethod(alertMessage: (status as AnyObject).object(forKey: "message") as? String ?? "Uploaded sucessfully")
                                  self.loadingProfileDetailsAPI()
                             }
                             else
                             {
+                                
+                                GenericMethods.hideLoaderMethod(view: self.view)
                                 GenericMethods.showAlert(alertMessage: "Something Went Wrong! Please try again")
                             }
                         
                         
                     case .failure(let error):
                         GenericMethods.hideLoaderMethod(view: self.view)
+                        self.loadingFetchNotification.hide(animated: true)
                         
                         print("failure error is \(error)")
                         
@@ -1167,36 +1371,13 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
                 }
             case .failure(let encodingError):
                 GenericMethods.hideLoaderMethod(view: self.view)
+                self.loadingFetchNotification.hide(animated: true)
                 print("encodingError:\(encodingError)")
             }
         })
         
         
-//        WebAPIHelper.addDoctorPicFileUpload(shownProgress:loadingNotification, parameters: body,fileData: fileDataArr, filename: fileNameArr, mimeType: mimeTypeArr, methodName: "\(apiManager.fileUploadBaseURL)multipleupload", vc: self, success: { (response) in
-//            print("response \(response as Any)")
-//            GenericMethods.hideLoaderMethod(view: self.view)
-//
-//            let responseObject: AnyObject = (response as AnyObject?)!
-//            guard let status = responseObject.object(forKey: "status") else
-//            {
-//                GenericMethods.showAlert(alertMessage: "Something Went Wrong! Please try again")
-//                return
-//            }
-//            if (status as AnyObject).object(forKey: "code") as? String == "0"
-//            {
-//
-//                GenericMethods.showAlert(alertMessage: (status as AnyObject).object(forKey: "message") as? String ?? "Uploaded sucessfully")
-//            }
-//            else
-//            {
-//                GenericMethods.showAlert(alertMessage: "Something Went Wrong! Please try again")
-//            }
-//
-//
-//
-//        }, Failure: { (error) in
-//            print(error.localizedDescription)
-//        })
+
     }
     func otpSuccessMethod()
     {
@@ -1250,34 +1431,32 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
             }
         }
     }
-    @objc func profileUpdateMethod()
+    @objc func profileUpdateMethod(mobile:String,email:String,biography:String,speciality:NSMutableArray,subspeciality:NSMutableArray)
     {
-        self.view.endEditing(true)
-        if GenericMethods.isStringEmpty(emailTF.text)
+        var param = Dictionary<String, Any>()
+        param["user_id"] = UserDefaults.standard.value(forKey: "user_id") as? Int ?? 0
+
+        if !GenericMethods.isStringEmpty(mobile)
         {
-            GenericMethods.showAlert(alertMessage: "Please enter mail id")
+            
+            if GenericMethods.isStringEmpty(mobileTF.text)
+            {
+                GenericMethods.showAlert(alertMessage: "Please enter mobile number")
+            }
+            else
+            {
+                param["mobile"] = mobileTF.text
+                updateAPICallMethod(parameters: param)
+            }
         }
-        else if GenericMethods.isStringEmpty(mobileTF.text)
+        
+        else if !GenericMethods.isStringEmpty(biography)
         {
-            GenericMethods.showAlert(alertMessage: "Please enter mail id")
-        }
-        else if !GenericMethods.validate(YourEMailAddress: emailTF.text!)
-        {
-            GenericMethods.showAlertMethod(alertMessage: "Enter valid EmailId")
-        }
-        else if mobileTF.text!.count < 8
-        {
-            GenericMethods.showAlertMethod(alertMessage: "Invalid mobile number")
-        }
-        else if otpHgtConst.constant == 45 && otpTF.text!.count == 4 && self.otp != self.randomNumber
-        {
-            GenericMethods.showAlertMethod(alertMessage: "Invalid OTP")
+            
         }
         else
         {
-            var imgArr = Array<String>()
-            var videoArr = Array<String>()
-            print("update success")
+            
             let specArr:NSMutableArray = NSMutableArray(array: getIdMethod(listArray: specialityArray, type: 0) as [String])
             let specArrString = specArr.componentsJoined(by: ",")
             print("specArrString\(specArrString)")
@@ -1286,66 +1465,57 @@ class ProfileViewController: UIViewController,AVPlayerViewControllerDelegate,UII
             let subspecArrString = subspecArr.componentsJoined(by: ",")
             print("subspecArrString\(subspecArrString)")
             
-            
-            
-            for i in 0..<uploadingMediaArray.count
-            {
-                let str = FileUpload.checkImgOrVideofromURL(filePath: uploadingMediaArray[i] as! String)
-                if str == "image"
-                {
-                    imgArr.append(uploadingMediaArray[i] as? String ?? "")
-                }
-                else if str == "video"
-                {
-                    videoArr.append(uploadingMediaArray[i] as? String ?? "")
-                }
-            }
-            
-            print("imgarr \(imgArr) \n videoArr \(videoArr)")
-
-            var parameters = Dictionary<String, Any>()
-            parameters["user_id"] = UserDefaults.standard.value(forKey: "user_id") as? Int ?? 0
-            parameters["mobile"] = mobileTF.text
-            parameters["email"] = emailTF.text
-            parameters["short_biography"] = biographyTextView.text
-//            parameters["picture"] = self.picture
-//
-//            parameters["additionalpicture"] = imgArr
-//            parameters["additionalvideo"] = videoArr
-            parameters["speciality"] = specArrString
-            parameters["subspeciality"] = subspecArrString
-            
-            
-            GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
-            
-            apiManager.updateProfileDetailsAPI(parameters: parameters) { (status, showError, response, error) in
-                
-                GenericMethods.hideLoaderMethod(view: self.view)
-                
-                if status == true {
-                    self.profileUpdateData = response
-                    print(self.profileUpdateData?.status?.code ?? "empty")
-                    if self.profileUpdateData?.status?.code == "0" {
-                        //MARK: Update Success Details
-                        
-                        GenericMethods.showAlertwithPopNavigation(alertMessage: self.profileUpdateData?.status?.message ?? "", vc: self)
-                        
-                    }
-                    else
-                    {
-                        GenericMethods.showAlert(alertMessage: self.profileUpdateData?.status?.message ?? "Unable to fetch data. Please try again after sometime.")
-                    }
-                    
-                }
-                else {
-                    GenericMethods.showAlert(alertMessage:error?.localizedDescription ?? "")
-                    
-                }
-            }
-            
+            param["speciality"] = specArrString
+            param["subspeciality"] = subspecArrString
+            updateAPICallMethod(parameters: param)
         }
+    }
+    func updateAPICallMethod(parameters:Dictionary<String, Any>)
+    {
+        self.view.endEditing(true)
+        GenericMethods.showLoaderMethod(shownView: self.view, message: "Loading")
         
-        
+        apiManager.updateProfileDetailsAPI(parameters: parameters) { (status, showError, response, error) in
+            
+            GenericMethods.hideLoaderMethod(view: self.view)
+            
+            if status == true {
+                self.profileUpdateData = response
+                print(self.profileUpdateData?.status?.code ?? "empty")
+                if self.profileUpdateData?.status?.code == "0" {
+                    //MARK: Update Success Details
+                    
+                    
+                    
+                    let alert = UIAlertController(title: nil, message: self.profileUpdateData?.status?.message ?? "Success", preferredStyle: .alert)
+                    GenericMethods.hideLoading()
+                    let win = UIWindow(frame: UIScreen.main.bounds)
+                    let vc = UIViewController()
+                    vc.view.backgroundColor = .clear
+                    win.rootViewController = vc
+                    win.windowLevel = UIWindow.Level.alert + 1
+                    win.makeKeyAndVisible()
+                    vc.present(alert, animated: true, completion: nil)
+                    
+                    let duration: Int = 1 // duration in seconds
+                    
+                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Double(duration) * Double(NSEC_PER_SEC)) / Double(NSEC_PER_SEC), execute: {
+                        alert.dismiss(animated: true)
+                        self.loadingProfileDetailsAPI()
+                    })
+                    
+                }
+                else
+                {
+                    GenericMethods.showAlert(alertMessage: self.profileUpdateData?.status?.message ?? "Unable to fetch data. Please try again after sometime.")
+                }
+                
+            }
+            else {
+                GenericMethods.showAlert(alertMessage:error?.localizedDescription ?? "")
+                
+            }
+        }
         
     }
     /*
@@ -1569,10 +1739,36 @@ extension ProfileViewController:UITextFieldDelegate
 extension ProfileViewController:UITextViewDelegate
 {
    
-    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        return textView.text.count + (text.count - range.length) <= 250
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool
+    {
+        if range.length == 1
+        {
+            return true
+        }
+        let notAllowedCharacters = "<>";
+        let set = NSCharacterSet(charactersIn: notAllowedCharacters);
+        let inverted = set.inverted;
+        let filtered = text.components(separatedBy: inverted).joined(separator: "")
+        if filtered == text
+        {
+            return false
+        }
+        else
+        {
+            let textCount = textView.text.count + (text.count - range.length)
+            if textCount <= 250
+            {
+                return true
+            }
+            
+            return false
+        }
+        
+        
+        
     }
     func textViewDidBeginEditing(_ textView: UITextView) {
+        
         let scrollPoint : CGPoint = CGPoint(x:0 , y: biographyTextView.frame.origin.y)
         self.scrollViewInstance.setContentOffset(scrollPoint, animated: true)
     }

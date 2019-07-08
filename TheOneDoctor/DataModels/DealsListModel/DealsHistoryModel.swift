@@ -22,7 +22,7 @@ class DealsHistoryModel:Mappable
     
     func mapping(map: Map) {
         status <- map["status"]
-        dealsListData <- map["bestdeals"]
+        dealsListData <- map["bestdealslist"]
         
     }
     
@@ -52,7 +52,6 @@ class DealsHistoryDataModel:Mappable
         amount <- map["amount"]
         percentage <- map["percentage"]
         currencyCode <- map["currencyCode"]
-        
     }
     
     init() {

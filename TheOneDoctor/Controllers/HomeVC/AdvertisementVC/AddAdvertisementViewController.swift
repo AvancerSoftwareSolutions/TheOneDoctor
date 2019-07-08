@@ -313,6 +313,21 @@ class AddAdvertisementViewController: UIViewController,UIImagePickerControllerDe
         
         self.present(alert, animated: true, completion: nil)
     }
+    func removeStringFromStr(str:String) ->String
+    {
+        var resstr = str.replacingOccurrences(of: "removeString", with: "", options: NSString.CompareOptions.literal, range: nil)
+        print("resstr\(resstr)")
+//        let str = resstr.replacingOccurrences(of: "\\s+", with: "", options: .regularExpression, range: nil)
+//        print("str\(str)")
+        
+        if let dotRange = str.range(of: ".") {
+            resstr.removeSubrange(dotRange.lowerBound..<str.endIndex)
+        }
+        print("resstr after \(resstr)")
+        
+        //        let str = resstr.replacingOccurrences(of: " ", with: "", options: NSString.CompareOptions.literal, range: nil)
+        return resstr
+    }
     func updateProfPicUpload(fileData:Data,filename:String,mimeType:String,keyname:String)
     {
         //MARK:- Profile picture upload
@@ -322,20 +337,25 @@ class AddAdvertisementViewController: UIViewController,UIImagePickerControllerDe
         self.mimeTypeStr = mimeType
         
         //        print("uploadFile \(self.uploadfileData) \n filename \(self.fileNameStr) mimeTypeStr \(self.mimeTypeStr)")
+        
         self.imgContainerViewHgtConst.constant = 150
         self.advertisementImageView.image = UIImage(data: self.uploadfileData)
         
+        let removedUrl = removeStringFromStr(str: fileNameStr)
+        print("remove url \(removedUrl)")
         
         guard let imageWidth = Double(imgWidth),let imageHeight = Double(imgHeight) else
         {
             self.uploadfileData = Data()
             self.mimeTypeStr = ""
+            self.fileNameStr = ""
             return
         }
         guard let fileImg = UIImage(data: fileData) else
         {
             self.uploadfileData = Data()
             self.mimeTypeStr = ""
+            self.fileNameStr = ""
             return
         }
         print("fileImg \(fileImg.size.width),\(fileImg.size.height)")
@@ -343,12 +363,25 @@ class AddAdvertisementViewController: UIViewController,UIImagePickerControllerDe
         
         guard let pngData = img.pngData() else
         {
-            self.uploadfileData = Data()
-            self.mimeTypeStr = ""
+            
+            print("png failed")
+            guard let jpgData = img.jpegData(compressionQuality: 0)
+                else {
+                self.uploadfileData = Data()
+                self.mimeTypeStr = ""
+                self.fileNameStr = ""
+                return
+            }
+            self.uploadfileData = jpgData
+            self.fileNameStr = "\(removedUrl).jpeg"
+            self.mimeTypeStr = ".jpeg"
+            
             return
         }
         self.uploadfileData = pngData
+        self.fileNameStr = "\(removedUrl).png"
         self.mimeTypeStr = ".png"
+        print("self.mimeTypeStr is \(self.mimeTypeStr), uploadfileData\(self.uploadfileData)")
         print("resultant image is \(img.size.width),\(img.size.height)")
         
         
@@ -356,7 +389,11 @@ class AddAdvertisementViewController: UIViewController,UIImagePickerControllerDe
     
     @IBAction func submitBtnClick(_ sender: Any)
     {
-
+        
+        print("fileNameStr \(fileNameStr)")
+        print("mimeTypeStr \(mimeTypeStr)")
+        print("uploadfileData \(uploadfileData)")
+        
         if GenericMethods.isStringEmpty(fileNameStr)
         {
             GenericMethods.showAlert(alertMessage: "Please upload image")
@@ -442,42 +479,36 @@ class AddAdvertisementViewController: UIViewController,UIImagePickerControllerDe
                                 //                        print(response.request as Any)
                                 //                        print(response.result)
                                 
+                                
+                                
+                                
                                 switch response.result {
                                     
                                 case .success(let json):
+                                    
+                                    print("json \(json)")
                                     GenericMethods.hideLoaderMethod(view: self.view)
                                     
-                                    let y: AnyObject = (json as AnyObject?)!
-                                    if let str:Int = y.object(forKey: "error_code") as? Int
+                                    
+                                    let responseObject: AnyObject = (json as AnyObject?)!
+                                    guard let status = responseObject.object(forKey: "status") else
                                     {
-                                        print(str)
                                         GenericMethods.showAlert(alertMessage: "Something Went Wrong! Please try again")
+                                        return
+                                    }
+                                    if (status as AnyObject).object(forKey: "code") as? String == "0"
+                                    {
+                                        
+                                        GenericMethods.hideLoaderMethod(view: self.view)
+                                        
+                                        GenericMethods.showAlertwithPopNavigation(alertMessage: (status as AnyObject).object(forKey: "message") as? String ?? "Success", vc: self)
+                                        
                                     }
                                     else
                                     {
-                                        //                                    success(json as AnyObject?)
-                                        print("response \(response as Any)")
-                                        GenericMethods.hideLoaderMethod(view: self.view)
                                         
-                                        let responseObject: AnyObject = (json as AnyObject?)!
-                                        guard let status = responseObject.object(forKey: "status") else
-                                        {
-                                            GenericMethods.showAlert(alertMessage: "Something Went Wrong! Please try again")
-                                            return
-                                        }
-                                        if (status as AnyObject).object(forKey: "code") as? String == "0"
-                                        {
-                                            
-                                            
-                                            GenericMethods.showAlertwithPopNavigation(alertMessage: (status as AnyObject).object(forKey: "message") as? String ?? "Success", vc: self)
-                                            
-                                            
-                                            
-                                        }
-                                        else
-                                        {
-                                            GenericMethods.showAlert(alertMessage: "Something Went Wrong! Please try again")
-                                        }
+                                        GenericMethods.hideLoaderMethod(view: self.view)
+                                        GenericMethods.showAlert(alertMessage: "Something Went Wrong! Please try again")
                                     }
                                     
                                     
@@ -487,6 +518,12 @@ class AddAdvertisementViewController: UIViewController,UIImagePickerControllerDe
                                     print("failure error is \(error)")
                                     
                                     GenericMethods.showAlertWithTitle(alertTitle: AppConstants.AppName, alertMessage: "\(error.localizedDescription)")
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
                                 }
                             }
                         case .failure(let encodingError):
@@ -594,7 +631,31 @@ extension AddAdvertisementViewController:UITextViewDelegate
 {
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        return textView.text.count + (text.count - range.length) <= 250
+        if range.length == 1
+        {
+            return true
+        }
+        let notAllowedCharacters = "<>";
+        let set = NSCharacterSet(charactersIn: notAllowedCharacters);
+        let inverted = set.inverted;
+        let filtered = text.components(separatedBy: inverted).joined(separator: "")
+        if filtered == text
+        {
+            return false
+        }
+        else
+        {
+            let textCount = textView.text.count + (text.count - range.length)
+            if textCount <= 250
+            {
+                return true
+            }
+            
+            return false
+        }
+        
+        
+        
     }
     func textViewDidBeginEditing(_ textView: UITextView) {
         let scrollPoint : CGPoint = CGPoint(x:0 , y: advtTextView.frame.origin.y)

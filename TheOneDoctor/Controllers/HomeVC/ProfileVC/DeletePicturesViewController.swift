@@ -11,7 +11,7 @@ import AVKit
 import AVFoundation
 
 protocol sendDeletePicDelegate {
-    func sendDeletePicValues(picArray:NSMutableArray,uploadArray:NSMutableArray)
+    func sendDeletePicValues()
 }
 
 class DeletePicturesViewController: UIViewController {
@@ -31,14 +31,16 @@ class DeletePicturesViewController: UIViewController {
         
         
         self.title = "Additional Pictures"
-        let closeBtn = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(closeBtnMethod))
+        let closeBtn = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(closeBtnMethod))
         self.navigationItem.rightBarButtonItem = closeBtn
 
         // Do any additional setup after loading the view.
     }
     @objc func closeBtnMethod()
     {
-        self.dismiss(animated: true, completion: nil)
+        self.dismiss(animated: true) {
+            self.delegate?.sendDeletePicValues()
+        }
     }
     
     @objc func deleteImg(btn:UIButton)

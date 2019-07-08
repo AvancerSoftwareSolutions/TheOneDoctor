@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AVKit
 
 class PreviewMediaViewController: UIViewController {
     
@@ -121,20 +122,37 @@ extension PreviewMediaViewController:UICollectionViewDelegate,UICollectionViewDa
                 
                 self.mediaListCollectionView.scrollToItem(at: indexToScrollTo, at: .right, animated: false)
                 
-//                if let mediaListCell = self.mediaListCollectionView.cellForItem(at: indexToScrollTo) as? DoctorPicturesCollectionViewCell
-//                {
-//                    mediaListCell.DocPicImgView.layer.borderWidth = 2.0
-//                    mediaListCell.DocPicImgView.layer.borderColor = UIColor.white.cgColor
-//                    mediaListCell.DocPicImgView.layer.masksToBounds = true
-//                    mediaListCell.DocPicImgView.layer.cornerRadius = 5.0
-//                }
-                
-                
-                
             default:
                 break
             }
         
+        
+    }
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let media = FileUpload.checkImgOrVideofromURL(filePath: self.mediaArray[indexPath.item] as? String ?? "")
+        print("media \(media)")
+        if media == AppConstants.imageFileName
+        {
+//            let openFileVC = self.storyboard!.instantiateViewController(withIdentifier: "openFileVC") as? OpenFileViewController
+//            openFileVC?.titleStr = ""
+//            openFileVC?.openURLStr = "\(self.mediaArray[indexPath.item] as? String ?? "")"
+//
+//            self.present(openFileVC!, animated: <#T##Bool#>, completion: <#T##(() -> Void)?##(() -> Void)?##() -> Void#>)
+//            self.navigationController?.pushViewController(openFileVC!, animated: true)
+        }
+        else if media == AppConstants.videoFileName
+        {
+            DispatchQueue.main.async {
+                guard let mediaUrl = URL(string: self.mediaArray[indexPath.item] as? String ?? "") else {return}
+                
+                let player = AVPlayer(url: mediaUrl)
+                let playerViewController = AVPlayerViewController()
+                playerViewController.player = player
+                self.present(playerViewController, animated: true) {
+                    playerViewController.player!.play()
+                }
+            }
+        }
         
     }
     

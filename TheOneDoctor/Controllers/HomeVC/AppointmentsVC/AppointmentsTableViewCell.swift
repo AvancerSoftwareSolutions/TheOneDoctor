@@ -19,6 +19,7 @@ class AppointmentsTableViewCell: UITableViewCell {
     @IBOutlet weak var userTypeWdtConst: NSLayoutConstraint!
     @IBOutlet weak var bgView: UIView!
     @IBOutlet weak var statusLabel: UILabel!
+    @IBOutlet weak var referraldoctorName: UILabel!
     
     override func awakeFromNib() {
         super.awakeFromNib()

@@ -131,6 +131,15 @@ extension AdvertisementHistoryViewController:UITableViewDelegate,UITableViewData
         {
             advtHistCell?.priceLbl.text = ""
         }
+        let typeId = self.advertisementHistoryData?.advtHistoryData?[indexPath.row].adTypeID ?? 0
+        if typeId == 3
+        {
+            advtHistCell?.viewAdsLbl.isHidden = true
+        }
+        else
+        {
+            advtHistCell?.viewAdsLbl.isHidden = false
+        }
         advtHistCell?.viewAdsLbl.tag = indexPath.row
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(viewAdsClick(sender:)))
         advtHistCell?.viewAdsLbl.addGestureRecognizer(tapGesture)

@@ -55,7 +55,7 @@ class ScheduleViewController: UIViewController,addScheduleTableViewCellDelegate 
         bookingYetStartLbl.layer.borderWidth = 0.2
 
         addBtn = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addScheduleBtnClick))
-        editBtn = UIBarButtonItem(image: UIImage(named: "edit.png"), style: .plain, target: self, action: #selector(editScheduleBtnClick))
+        editBtn = UIBarButtonItem(image: UIImage(named: "profileEdit.png"), style: .plain, target: self, action: #selector(editScheduleBtnClick))
         
         filterView = UIView(frame: CGRect(x: 28, y: 0, width: 10, height: 10))
         filterView.backgroundColor = .red
@@ -165,7 +165,7 @@ class ScheduleViewController: UIViewController,addScheduleTableViewCellDelegate 
         }))
         
         
-        alert.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction.init(title: "Dismiss", style: .destructive, handler: nil))
         
         /*If you want work actionsheet on ipad
          then you have to use popoverPresentationController to present the actionsheet,
